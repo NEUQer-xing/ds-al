@@ -1,6 +1,5 @@
 <style>
 .layout{
-    border: 1px solid #d7dde4;
     background: #f5f7f9;
     position: relative;
     border-radius: 4px;
@@ -11,9 +10,16 @@
     margin: 0 auto;
     margin-right: 20px;
 }
+.layout-logo{
+    width: 110px;
+    height: 55px;
+    float: left;
+    position: relative;
+}
 #title {
-    font-size: 40px;
+    font-size: 35px;
     font-weight: bold;
+    float: right;
     color: #76b8fa;
   }
 </style>
@@ -21,11 +27,32 @@
     <div class="layout">
         <Layout>
             <Header>
-                <Menu mode="horizontal" theme="dark" active-name="1">
-                    <div>
-                        <p id="title">
-                            <router-link to="/">DS&AL</router-link>
-                        </p>
+                <Menu mode="horizontal" theme="dark">
+                    <div class="layout-logo">
+                        <a href="/welcome.html">
+                            <img src="./assets/img/D&A.png" style="width: 110px; height: 55px;"/>
+                        </a>
+                    </div>
+                    <div style="float: right;">
+                        <MenuItem>
+                            <Button type="primary">
+                                <a href="/welcome.html">
+                                    <span style="font-size: 16px; font-weight: bold; color: #ffff;">登录</span>
+                                </a>
+                            </Button>
+                            &nbsp;&nbsp;
+                            <Button type="info">
+                                <a href="/welcome.html">
+                                    <span style="font-size: 16px; font-weight: bold; color: #ffff;">注册</span>
+                                </a>
+                            </Button>
+                        </MenuItem>
+                    </div>
+                    <div id="title">
+                        <span style="font-size: 30px; font-weight: bold; color: #f75200;">数据结构</span>
+                        <span style="font-size: 30px; font-weight: bold; color: #76b8fa;">与</span>
+                        <span style="font-size: 30px; font-weight: bold; color: #45a0fc ;">算法</span>
+                        <span style="font-size: 30px; font-weight: bold; color: #76b8fa;">可视化平台</span>
                     </div>
                 </Menu>
             </Header>

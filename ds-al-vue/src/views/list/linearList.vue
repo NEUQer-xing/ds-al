@@ -1,11 +1,20 @@
 <template>
-  这是线性表
+    <Row>
+        <Col span="17">
+          col-20
+        </Col>
+        <Col span="7">
+          <listmenu></listmenu>
+          <note></note>
+          <chatgpt></chatgpt>
+        </Col>
+    </Row>
 </template>
 
-<script>
-export default {
-
-}
+<script setup>
+  import listmenu from '@/components/listmenu.vue';
+  import note from '@/components/note.vue';
+  import chatgpt from '@/components/chatgpt.vue';
 </script>
 
 <style>
