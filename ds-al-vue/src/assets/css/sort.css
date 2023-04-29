@@ -1,0 +1,108 @@
+@charset "utf-8";
+/* CSS Document */
+.sortStartHide{
+	width:             42px;
+	height:            70px;
+	background:        rgb(89, 229, 89);
+	position:          fixed;
+	left:              0px;
+	top:               530px;
+	cursor:            pointer;
+}
+.sortStartHide img{
+	position:          relative;
+	top:               27px;
+}
+.compareSortStarts,.radixSortStarts,.heapSortStarts{
+	position:          fixed;
+	top:               530px;
+	left:              46px;
+	width:             0px;
+	height:            70px;
+	background:        rgb(89, 229, 89);
+	cursor:            pointer; 
+	display:           none;
+}
+.compareSortStarts p,.radixSortStarts p,.heapSortStarts p{
+	text-align:        left;
+    color:             white;
+    font-size:         1em;
+    width:             100%;
+    padding-top:       8px;
+    padding-bottom:    6px;
+    margin:            0px;
+    text-indent:       1.5em;
+}
+.arrayLength{
+	position:          fixed;
+	left:              190px;
+	top:               530px;
+	width:             200px;
+	height:            35px;
+	background:        rgb(89,229,89);
+	display:           none;
+	cursor:            pointer;         
+}
+.arrayLength span{
+	font-size:         1em;
+	color:             white;
+	display:           inline-block;
+	margin-top:        5px;
+	margin-left:       -8px;
+}
+.arrayLength input{
+	width:             72%;
+	margin-left:       6px;
+}
+.createArray,.createRadixArray,.createHeapArray{
+	position:          fixed;
+	left:              394px;
+	top:               530px;
+	width:             80px;
+	height:            35px;
+	background:        rgb(89,229,89);
+	display:           none;
+	cursor:            pointer; 
+}
+.createArray p,.createRadixArray p,.createHeapArray p{
+	width:             100%;
+	margin-top:        8px;
+	color:             white;
+	font-size:         1em;
+	text-align:        center;
+}
+.subC2,.subV2,.subHS2{
+	position:          fixed;
+	top:               565px;
+	width:             80px;
+	height:            35px;
+	background:        rgb(89,229,89);
+	display:           none;
+	cursor:            pointer;
+	left:              190px; 
+}
+.subC2 p,.subV2 p,.subHS2 p{
+	width:             100%;
+	margin-top:        8px;
+	color:             white;
+	font-size:         1em;
+	text-align:        center;
+}
+.insertSort,.radixSort{
+	left:              190px; 
+}
+.selectSort{
+	left:              274px;
+}
+.bubbleSort{
+	left:              359px;
+}
+.shellSort{
+	left:              443px;
+}
+.quickSort{
+	left:              527px;
+}
+.mergeSort{
+	left:              611px;
+}

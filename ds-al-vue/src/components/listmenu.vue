@@ -8,7 +8,7 @@
 <template>
     <Card style="width: 100%;">
         <template #title>
-            <strong><Icon type="ios-construct" />操作面板</strong>
+            <strong><Icon type="md-cube" />操作面板</strong>
         </template>
         <Collapse>
             <Panel name="1">
