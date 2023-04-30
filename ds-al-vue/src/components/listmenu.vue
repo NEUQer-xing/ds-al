@@ -15,10 +15,9 @@
                 初始化
                 <template #content>
                     <space direction="vertical">
-                        <Input v-model="value" placeholder="设置初始数据"/>
+                        <Input v-model="init_value" placeholder="设置初始列表大小"/>
                         <space>
-                            <Button type="primary" @click="init">随机数据</Button> 
-                            <Button type="primary" @click="init">创建</Button> 
+                            <Button type="primary" @click="listInit">创建</Button> 
                         </space> 
                     </space>
                 </template>
@@ -27,9 +26,14 @@
                 插入
                 <template #content>
                     <space direction="vertical">
-                        <Input v-model="value" placeholder="输入插入的位置"/>
                         <space>
-                            <Button type="primary" @click="init">插入</Button> 
+                            <Input v-model="insert_index" placeholder="插入的位置"/>
+                        </space>
+                        <space>
+                            <Input v-model="insert_value" placeholder="插入的值"/>
+                        </space>
+                        <space>
+                            <Button type="primary" @click="listInsert">插入</Button> 
                         </space> 
                     </space>
                 </template>
@@ -38,9 +42,9 @@
                 删除
                 <template #content>
                     <space direction="vertical">
-                        <Input v-model="value" placeholder="输入删除数据所在位置"/>
+                        <Input v-model="delete_index" placeholder="删除数据所在位置"/>
                         <space>
-                            <Button type="primary" @click="init">删除</Button> 
+                            <Button type="primary" @click="listDelete">删除</Button> 
                         </space> 
                     </space>
                 </template>
@@ -48,6 +52,21 @@
         </Collapse>
     </Card>
 </template>
-<script>
-    
+<script setup>
+    import { ref } from 'vue';
+    const init_value = ref();
+    const insert_index = ref();
+    const insert_value = ref();
+    const delete_index = ref();
+    const emit = defineEmits(['list_init','list_insert','list_delete']);
+    function listInit(){
+        emit('list_init',init_value);
+    }
+    function listInsert(){
+        emit('list_insert',insert_index,insert_value);
+    }
+    function listDelete(){
+        emit('list_delete',delete_index);
+    }
+
 </script>
