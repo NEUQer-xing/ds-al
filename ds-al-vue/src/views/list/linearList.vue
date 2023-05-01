@@ -1,8 +1,9 @@
 <template>
+
     <Row>
         <Col span="17">
           <div class="showBox" style="overflow: scroll;">
-		        <canvas id="drawing" width="500" height="500">Canvas</canvas>
+		        <canvas id="drawing" width="2000" height="1000">Canvas</canvas>
 		      </div>
         </Col>
         <Col span="7">
@@ -12,6 +13,7 @@
           <chatgpt></chatgpt>
         </Col>
     </Row>
+    
 </template>
 
 <script setup>
@@ -19,7 +21,7 @@
   import listmenu from '@/components/listmenu.vue';
   import note from '@/components/note.vue';
   import chatgpt from '@/components/chatgpt.vue';
-  import { ref } from 'vue';
+  import { ref, watch, watchEffect } from 'vue';
 
   // start 播放控制
   const speed = ref(50); // 播放速度
@@ -31,8 +33,32 @@
   function play_func(play_or_hold){
     play.value = play_or_hold.value;
     console.log(play.value);
+    if(play.value){
+      clear_canvas();
+      test_canvas();
+    }
   }
   // end 播放控制
+
+  // start canvas
+  function test_canvas(){
+    var canvas = document.getElementById("drawing");
+    if (canvas.getContext){
+      var ctx = canvas.getContext("2d");
+      ctx.fillStyle = "rgb(200,0,0)";
+      ctx.fillRect (10, 10, 55, 50);
+      ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
+      ctx.fillRect (30, 30, 55, 50);
+    }
+  }
+  function clear_canvas(){
+    var canvas = document.getElementById("drawing");
+    if (canvas.getContext){
+      var ctx = canvas.getContext("2d");
+      ctx.clearRect(0,0,500,500);
+    }
+  }
+  // end canvas
 
   // 具体操作
   const list_size = ref(); // 列表大小
@@ -51,6 +77,7 @@
     list_delete_value.value = delet
     e_value.value;
   }
+
 </script>
 
 <style>
