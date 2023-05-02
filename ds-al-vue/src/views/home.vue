@@ -64,7 +64,7 @@
                     </p>
                     <!-- Buttons -->
                     <div class="text-center text-md-left mt-5">
-                        <a href="/"
+                        <a href="/linearList"
                             class="btn btn-primary btn-icon" target="_blank">
                             <span class="btn-inner--text">立即体验</span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle">

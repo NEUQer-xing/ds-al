@@ -25,7 +25,7 @@
     </Card>
 </template>
 
-<script lang="ts" setup>
+<script  setup>
     import { ref } from 'vue';
     const play_speed = ref(50);
     const play_or_hold = ref(true);

@@ -1,27 +1,53 @@
 <style>
-.layout{
-    background: #f5f7f9;
-    position: relative;
-    border-radius: 4px;
-    overflow: hidden;
-}
-.layout-nav{
-    width: 420px;
-    margin: 0 auto;
-    margin-right: 20px;
-}
-.layout-logo{
-    width: 110px;
-    height: 55px;
-    float: left;
-    position: relative;
-}
-#title {
-    font-size: 35px;
-    font-weight: bold;
-    float: right;
-    color: #76b8fa;
-  }
+ .layout{
+        border: 1px solid #d7dde4;
+        background: #f5f7f9;
+        position: relative;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .layout-header-bar{
+        background: #fff;
+        box-shadow: 0 1px 1px rgba(0,0,0,.1);
+    }
+    .menu-item span{
+        display: inline-block;
+        overflow: hidden;
+        width: 69px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: bottom;
+        transition: width .2s ease .2s;
+    }
+    .menu-item i{
+        transform: translateX(0px);
+        transition: font-size .2s ease, transform .2s ease;
+        vertical-align: middle;
+        font-size: 16px;
+    }
+    .collapsed-menu span{
+        width: 0px;
+        transition: width .2s ease;
+    }
+    .collapsed-menu i{
+        transform: translateX(5px);
+        transition: font-size .2s ease .2s, transform .2s ease .2s;
+        vertical-align: middle;
+        font-size: 22px;
+    }
+    .dev-run-preview .dev-run-preview-edit{ display: none }
+    .layout-logo{
+        width: 110px;
+        height: 55px;
+        float: left;
+        position: relative;
+    }
+    #title {
+        font-size: 35px;
+        font-weight: bold;
+        float: right;
+        color: #76b8fa;
+      }
 </style>
 <template>
     <div class="layout">
@@ -57,12 +83,12 @@
                 </Menu>
             </Header>
             <Layout>
-                <Sider hide-trigger :style="{background: '#fff'}">
-                    <Menu theme="light" width="auto">
+                <Sider breakpoint="md" collapsible :collapsed-width="110" v-model="isCollapsed" :style="{background: '#fff'}">
+                    <Menu theme="light" width="auto" :class="menuitemClasses">
                         <Submenu name="1" >
                             <template #title>
                                 <Icon type="md-code" />
-                                线性表
+                                <span>线性表</span>
                             </template>
                             <MenuItem name="1-1" to="linearList">顺序表</MenuItem>
                             <MenuItem name="1-2" to="singleList">单链表</MenuItem>
@@ -74,7 +100,7 @@
                         <Submenu name="2">
                             <template #title>
                                 <Icon type="ios-git-merge" />
-                                树
+                                <span>树</span>
                             </template>
                             <MenuItem name="2-1" to="BST">线索二叉树</MenuItem>
                             <MenuItem name="2-2" to="heap_tree">堆</MenuItem>
@@ -86,7 +112,7 @@
                         <Submenu name="3">
                             <template #title>
                                 <Icon type="ios-keypad" />
-                                图
+                                <span>图</span>
                             </template>
                             <MenuItem name="3-1" to="DFS_traverse">DFS遍历</MenuItem>
                             <MenuItem name="3-2" to="BFS_traverse">BFS遍历</MenuItem>
@@ -98,7 +124,7 @@
                         <Submenu name="4">
                             <template #title>
                                 <Icon type="md-stats" />
-                                排序
+                                <span>排序</span>
                             </template>
                             <Submenu name="4-1">
                                 <template #title>
@@ -117,16 +143,15 @@
                         <Submenu name="5">
                             <template #title>
                                 <Icon type="md-search" />
-                                字符串
+                                <span>字符串</span>
                             </template>
                             <MenuItem name="5-1" to="search">查找算法</MenuItem>
                             <MenuItem name="5-2" to="string_match">字符串匹配</MenuItem>
                         </Submenu>
-
                     </Menu>
                 </Sider>
-                <Layout :style="{padding: '0 10px 0px'}">
-                    <Content :style="{padding: '24px', minHeight: '600px', background: '#fff'}">
+                <Layout :style="{padding: '0px 5px 0px'}">
+                    <Content :style="{padding: '10px 10px 0px', minHeight: '600px', background: '#fff'}">
                         <router-view> </router-view>
                     </Content>
                 </Layout>
@@ -134,6 +159,22 @@
         </Layout>
     </div>
 </template>
-<script>
 
+<script>
+    export default {
+        data () {
+            return {
+                isCollapsed: false
+            };
+        },
+        computed: {
+            menuitemClasses: function () {
+                return [
+                    'menu-item',
+                    this.isCollapsed ? 'collapsed-menu' : ''
+                ]
+            }
+        }
+    }
 </script>
+    

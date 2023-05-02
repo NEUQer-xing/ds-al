@@ -29,6 +29,7 @@ function AnimationManager(objectManager) {
 		while(this.currentAnimation < this.animationSteps.length && !foundBreak) {
 			var nextCommand = this.animationSteps[this.currentAnimation].split("<cry>");
 			//alert(nextCommand) ;
+			console.log('下一个步骤为:'+nextCommand) ;
 			// 画圆形
 			if(nextCommand[0].toUpperCase() == "CREATECIRCLE") {
 				this.objectManager.addCircleObject(parseInt(nextCommand[1]), 
@@ -99,9 +100,7 @@ function AnimationManager(objectManager) {
 			}
 			// 设置状态框
 			else if(nextCommand[0].toUpperCase() == "SETSTATE") {
-				//this.objectManager.setState(parseInt(nextCommand[1]),
-				//									  nextCommand[2]) ;
-				$('.state p')[0].innerHTML=nextCommand[1] ;
+				alert(nextCommand[1]);
 			}
 			// 设置标签
 			else if(nextCommand[0].toUpperCase() == "SETLABEL") {
@@ -265,3 +264,4 @@ setAnimationSpeed = function(value){
 		// alert(timespan);
 	}
 }
+

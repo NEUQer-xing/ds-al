@@ -1,17 +1,32 @@
-// JavaScript Document
+import {Message,Notice} from 'view-ui-plus';
+function show_notice(notices, type) {
+	var type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	}
+	Notice[type]({
+		title: type_zh, // 标题
+		desc: notices,  // 内容
+		duration: 6  	// 持续时间
+	});
+}
 
 var currentOrderList;
 // 初始化函数
-function init() {
+export function init(drawing) {
 	objectManager = new ObjectManager() ;
 	animationManager = new AnimationManager(objectManager) ;
+	console.log('成功init:'+drawing.width + " " + drawing.height);
 	currentOrderList = new OrderList(animationManager, drawing.width, drawing.height) ;
 }
 
 // 顺序表
 var OrderList = function(animManager, width, height) {
 	this.init(animManager, width, height) ;
-	// this.initControls() ; // 初始化控件
 	this.initAttributes() ; // 初始化属性
 }
 // 继承与构造
@@ -20,22 +35,10 @@ OrderList.prototype.constructor = OrderList;
 
 // 初始化控件
 OrderList.prototype.initControls = function() {
-	addLabelToAlgorithmBar("数组大小");
-	this.insertField_maxSize = addInputToAlgorithmBar("text", "");
-	this.initButton = addInputToAlgorithmBar("button", "初始化数组");
 	this.initButton.onclick = this.initCallBack.bind(this) ;
-	addLabelToAlgorithmBar("序号");
-	this.insertField_seq = addInputToAlgorithmBar("text", "");
-	addLabelToAlgorithmBar("数值");
-	this.insertField_value = addInputToAlgorithmBar("text", "");
-	this.insertButton =	addInputToAlgorithmBar("button", "插入节点");
 	this.insertButton.onclick = this.insertCallBack.bind(this) ;
-	addLabelToAlgorithmBar("序号");
-	this.insertField_del = addInputToAlgorithmBar("text", "");
-	this.deleteButton = addInputToAlgorithmBar("button", "删除节点");
 	this.deleteButton.onclick = this.deleteCallBack.bind(this) ;
 }
-
 // 初始化
 OrderList.prototype.initAttributes = function() {
 	// 逻辑部分ID
@@ -53,44 +56,18 @@ OrderList.prototype.initAttributes = function() {
 	this.startArrayY = 250 ; // 开始的数组的y坐标
 	this.startArrowY = 300 ; // 开始的箭头的y坐标
 	this.length = 30 ; // 箭头的长度
-	// this.implementAction(this.initStateBox.bind(this), "start") ;
 }
-
-// 初始化状态框
-OrderList.prototype.initStateBox = function(state) {
-	return this.commands ;
-}
-
 // 初始化回调函数
 OrderList.prototype.initCallBack = function(length) {
-	if (parseInt(length) > 0 && parseInt(length) <= 18) {
-		this.implementAction(this.initArray.bind(this), length);
-		this.cmd("Step");
-		this.cmd("SetState", "从 0 开始插入元素");
-	}
-	else {
-		alert('输入的数组长度应在0~18之间');
-	}
+	this.implementAction(this.initArray.bind(this), length);
 }
-
 // 插入回调函数
 OrderList.prototype.insertCallBack = function(seq, value) {
-	if (this.maxSize == null) {
-		alert("请先初始化数组");
-		return;
-	}
-	if (seq != "" && value != "")
-	{
-		this.implementAction(this.insertNode.bind(this), [seq, value]);
-	}
+	this.implementAction(this.insertNode.bind(this), [seq, value]);
 }
-
 // 删除回调函数
 OrderList.prototype.deleteCallBack = function(seq) {
-	if (seq != "")
-	{
-		this.implementAction(this.deleteNode.bind(this), seq);
-	}
+	this.implementAction(this.deleteNode.bind(this), seq);
 }
 
 OrderList.prototype.clearCanvas = function() {
@@ -123,7 +100,6 @@ OrderList.prototype.clearCanvas = function() {
 		this.arrow = null ;
 	}
 }
-
 // 初始化数组
 OrderList.prototype.initArray = function(maxSize) {
 	// 删除所有数组
@@ -133,10 +109,8 @@ OrderList.prototype.initArray = function(maxSize) {
 	this.arrayList = new Array(this.maxSize) ; // 数组框
 	this.arrayListLabel = new Array(this.maxSize); // pos label
 	this.orderList = new Array(this.maxSize) ; // 顺序表数组
-	// 设置状态栏
-	{
-		this.cmd("SetState", "创建大小为 "+maxSize+" 的数组") ;
-	}
+	// 显示状态
+	show_notice("创建大小为 "+maxSize+" 的数组", 'success');
 	// 创建数组
 	for(var i=0 ; i<this.maxSize ; i++) {
 		this.arrayList[i] = new OrderListNode(this.objectID, "", parseInt(this.startX+i*(this.width-1)), this.startArrayY) ;
@@ -166,13 +140,13 @@ OrderList.prototype.insertNode = function(valueArr) {
 	var value = valueArr[1] ;
 	var newNode;
 	if(this.head >= this.maxSize-1) {
-		// alert('Already full!') ;
-		this.cmd("SetState", "顺序表已满，无法插入！");
+		//alert("顺序表已满，无法插入！");
+		show_notice("顺序表已满，无法插入！", 'error');
 	}
 	else {
 		if(pos > this.head+1 || pos < 0) {
-			this.cmd("SetState", "位置错误！");
-			// alert('Position error!') ;
+			//alert("位置错误！");
+			show_notice("位置错误！", 'error');
 		}
 		else {
 			this.head ++ ;
@@ -180,7 +154,8 @@ OrderList.prototype.insertNode = function(valueArr) {
 			this.objectID ++ ;
 			// 创建矩形
 			{
-				this.cmd("SetState", "创建值为"+value+"的数组元素") ;
+				//this.cmd("SetState", "创建值为"+value+"的数组元素") ;
+				show_notice("创建值为"+value+"的数组元素", 'info');
 				this.cmd("Step") ;
 				this.cmd("CreateRectangle", newNode.objectID, newNode.value, this.width, this.height, 
 					'center', 'center', newNode.x, newNode.y) ;
@@ -192,7 +167,8 @@ OrderList.prototype.insertNode = function(valueArr) {
 			if(this.head == pos) {
 				// 方框高亮
 				{
-					this.cmd("SetState", "数组"+pos+"位置无元素, 可插入新元素") ;
+					//this.cmd("SetState", "数组"+pos+"位置无元素, 可插入新元素") ;
+					show_notice("数组"+pos+"位置无元素, 可插入新元素", 'info');
 					this.cmd("Step") ;
 					this.cmd("SetHighlight", this.arrayList[pos].objectID, true) ;
 					this.cmd("Step") ;
@@ -203,7 +179,8 @@ OrderList.prototype.insertNode = function(valueArr) {
 			else {
 				// 数组元素高亮
 				{
-					this.cmd("SetState", "数组"+pos+"位置有元素, 之后的所有元素后移一位") ;
+					//this.cmd("SetState", "数组"+pos+"位置有元素, 之后的所有元素后移一位") ;
+					show_notice("数组"+pos+"位置有元素, 之后的所有元素后移一位", 'info');
 					this.cmd("Step") ;
 					this.cmd("SetHighlight", this.orderList[pos].objectID, true) ;
 					this.cmd("Step") ;
@@ -226,7 +203,8 @@ OrderList.prototype.insertNode = function(valueArr) {
 			this.orderList[pos].x = parseInt(this.startX+pos*(this.width-1)) ;
 			this.orderList[pos].y = this.startArrayY ;
 			{
-				this.cmd("SetState", "在数组"+pos+"位置插入新元素"+value) ;
+				//this.cmd("SetState", "在数组"+pos+"位置插入新元素"+value) ;
+				show_notice("在数组"+pos+"位置插入新元素"+value, 'success');
 				this.cmd("Step") ;
 				this.cmd("Move", this.orderList[pos].objectID, this.orderList[pos].x ,this.orderList[pos].y) ;
 				this.cmd("Step") ;
@@ -247,7 +225,8 @@ OrderList.prototype.insertNode = function(valueArr) {
 			}
 			// 判断是否满
 			if(this.head == this.maxSize-1) {
-				this.cmd("SetState", "数组满,已经无法插入") ;
+				//this.cmd("SetState", "数组满,已经无法插入") ;
+				show_notice("数组满,已经无法插入", 'error');
 				this.cmd("Step") ;
 			}
 			this.objectID ++ ;
@@ -259,18 +238,17 @@ OrderList.prototype.insertNode = function(valueArr) {
 // 删除
 OrderList.prototype.deleteNode = function(pos) {
 	if(this.head <= -1) {
-		// alert('Already empty!') ;
-		this.cmd("SetState", "顺序表已空，无法删除！");
+		show_notice("顺序表已空，无法删除！", 'error');
 	}
 	else {
 		if(pos > this.head || pos < 0) {
-			this.cmd("SetState", "位置错误！");
-			// alert('Position error!') ;
+			show_notice("位置错误！", 'error');
 		}
 		else {
 			// 查找对应位置
 			{
-				this.cmd("SetState", "在数组"+pos+"位置删除新元素"+this.orderList[pos].value) ;
+				//this.cmd("SetState", "在数组"+pos+"位置删除新元素"+this.orderList[pos].value) ;
+				show_notice("在数组"+pos+"位置删除新元素"+this.orderList[pos].value, 'info');
 				this.cmd("Step") ;
 				this.cmd("SetHighlight", this.orderList[pos].objectID, true) ;
 				this.cmd("Step") ;
@@ -287,7 +265,8 @@ OrderList.prototype.deleteNode = function(pos) {
 			if(pos != this.head) {
 				// 元素向后移动
 				{
-					this.cmd("SetState", "数组位置"+pos+"之后的元素向前移动") ;
+					//this.cmd("SetState", "数组位置"+pos+"之后的元素向前移动") ;
+					show_notice("数组位置"+pos+"之后的元素向前移动", 'info');
 					this.cmd("Step") ;
 				}
 				// 之后的节点向前移动一位
@@ -302,14 +281,16 @@ OrderList.prototype.deleteNode = function(pos) {
 				this.cmd("Step") ;
 				// 删除成功
 				{
-					this.cmd("SetState", "删除成功") ;
+					//this.cmd("SetState", "删除成功") ;
+					show_notice("删除成功", 'success');
 					this.cmd("Step") ;
 				}
 			}
 			else {
 				// 元素向后移动
 				{
-					this.cmd("SetState", "删除成功") ;
+					//this.cmd("SetState", "删除成功") ;
+					show_notice("删除成功", 'success');
 					this.cmd("Step") ;
 				}
 			}
@@ -325,7 +306,8 @@ OrderList.prototype.deleteNode = function(pos) {
 			}
 			// 判断数组是否空
 			if(this.head == -1) {
-				this.cmd("SetState", "数组空,已经无法删除") ;
+				//this.cmd("SetState", "数组空,已经无法删除") ;
+				show_notice("数组空,已经无法删除", 'error');
 				this.cmd("Step") ;
 			}
 		}
@@ -339,4 +321,38 @@ var OrderListNode = function(objectID, value, x, y) {
 	this.value = value ; // 值
 	this.x = x ; // x坐标
 	this.y = y ; // y坐标
+}
+
+
+
+
+
+
+
+// 连接组件
+export function list_init_index(dataLength){
+    if (dataLength != '') {
+        if(dataLength>=18){
+            alert('数组长度过大,请输入小于18的数值');
+        }else if(dataLength<=0){
+            Message.error({
+				background: true,
+				content: '数组长度过小,请输入大于0的数值'
+			});
+        }else{
+            currentOrderList.initCallBack(dataLength);
+        }
+    }
+}
+
+export function list_insert_index(serialNumber,arrayData){
+	if (serialNumber != '' && arrayData != '') {
+		currentOrderList.insertCallBack(serialNumber, arrayData);
+	}
+}
+
+export function list_delete_index(serialNumber){
+	if (serialNumber != '') {
+		currentOrderList.deleteCallBack(serialNumber);
+	}
 }

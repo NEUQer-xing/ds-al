@@ -3,12 +3,12 @@
     <Row>
         <Col span="17">
           <div class="showBox" style="overflow: scroll;">
-		        <canvas id="drawing" width="2000" height="1000">Canvas</canvas>
+		        <canvas ref="canvasRef" width="2000" height="1000" id="drawing">Canvas</canvas>
 		      </div>
         </Col>
         <Col span="7">
           <control @control_speed="speed_func" @control_play="play_func"></control>
-          <listmenu @list_init="init" @list_insert="insert" @list_delete="Delete"></listmenu>
+          <listmenu @list_init="init_list" @list_insert="insert" @list_delete="Delete"></listmenu>
           <note></note>
           <chatgpt></chatgpt>
         </Col>
@@ -21,63 +21,48 @@
   import listmenu from '@/components/listmenu.vue';
   import note from '@/components/note.vue';
   import chatgpt from '@/components/chatgpt.vue';
-  import { ref, watch, watchEffect } from 'vue';
+  import {ref,onMounted} from 'vue';
 
-  // start 播放控制
-  const speed = ref(50); // 播放速度
-  const play = ref(false); // 播放状态
+  import {speed_func_control,play_func_control} from '@/assets/js/test/play_control.js';
+  import {init,list_init_index,list_insert_index} from '@/assets/js/list/OrderList.js';
+import { list_delete_index } from '../../assets/js/List/OrderList';
+  const canvasRef = ref(null);
+  var drawing_size = {
+    width:0,
+    height:0
+  };
+  onMounted(() => {
+    // canvasRef只是个引用,需要通过.value来获取值,才可以当作html中的canvas来进行使用
+    // 获取画布的大小
+    drawing_size.width = canvasRef.value.width; 
+    drawing_size.height = canvasRef.value.height;
+    console.log(`成功渲染出组件!`)
+    console.log(drawing_size)
+    init(drawing_size);
+  })
+  // // start 播放控制
+  // 播放速度
   function speed_func(play_speed){
-    speed.value = play_speed.value;
-    console.log(speed.value);
+    const speed = speed_func_control(play_speed);
+    console.log(drawing) 
+    alert(drawing)
+    //alert('哈哈哈哈哈当前播放的速度为:'+speed.value)
   }
   function play_func(play_or_hold){
-    play.value = play_or_hold.value;
-    console.log(play.value);
-    if(play.value){
-      clear_canvas();
-      test_canvas();
-    }
+    const play = play_func_control(play_or_hold);
   }
-  // end 播放控制
-
-  // start canvas
-  function test_canvas(){
-    var canvas = document.getElementById("drawing");
-    if (canvas.getContext){
-      var ctx = canvas.getContext("2d");
-      ctx.fillStyle = "rgb(200,0,0)";
-      ctx.fillRect (10, 10, 55, 50);
-      ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
-      ctx.fillRect (30, 30, 55, 50);
-    }
-  }
-  function clear_canvas(){
-    var canvas = document.getElementById("drawing");
-    if (canvas.getContext){
-      var ctx = canvas.getContext("2d");
-      ctx.clearRect(0,0,500,500);
-    }
-  }
-  // end canvas
 
   // 具体操作
-  const list_size = ref(); // 列表大小
-  const list_insert_index = ref(); // 插入的位置
-  const list_insert_value = ref(); // 插入的值
-  const list_delete_value = ref(); // 删除数据所在位置
-  function init(init_value){
-    list_size.value = init_value.value; // 因为是const引用,所以只能通过相互赋值进行传递参数
-    console.log(list_size);
+  function init_list(init_value){
+    // 因为是const引用,所以只能通过相互赋值进行传递参数
+    list_init_index(init_value.value);
   }
   function insert(insert_index,insert_value){
-    list_insert_index.value = insert_index.value;
-    list_insert_value.value = insert_value.value;
+    list_insert_index(insert_index.value,insert_value.value);
   }
   function Delete(delete_value){
-    list_delete_value.value = delet
-    e_value.value;
+    list_delete_index(delete_value.value);
   }
-
 </script>
 
 <style>
