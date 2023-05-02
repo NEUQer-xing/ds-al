@@ -1,8 +1,24 @@
 ﻿// JavaScript Document
+import {Message,Notice} from 'view-ui-plus';
+function show_notice(notices, type) {
+	var type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	}
+	Notice[type]({
+		title: type_zh, // 标题
+		desc: notices,  // 内容
+		duration: 6  	// 持续时间
+	});
+}
 
 var currentStack;
 // 初始化函数
-function init() {
+export function init() {
 	objectManager = new ObjectManager() ;
 	animationManager = new AnimationManager(objectManager) ;
 	currentStack = new Stack(animationManager, drawing.width, drawing.height) ;
@@ -17,21 +33,11 @@ var Stack = function(animManager, width, height) {
 // 继承与构造
 Stack.prototype = new Algorithm();
 Stack.prototype.constructor = Stack;
-
 // 初始化控件
 Stack.prototype.initControls = function() {
-	addLabelToAlgorithmBar("数组大小");
-	this.insertField_maxSize = addInputToAlgorithmBar("text", "");
-	this.initButton = addInputToAlgorithmBar("button", "初始化数组");
 	this.initButton.onclick = this.initCallBack.bind(this) ;
-	addLabelToAlgorithmBar("数值");
-	this.insertField_value = addInputToAlgorithmBar("text", "");
-	this.pushButton =addInputToAlgorithmBar("button", "入栈");
-	this.pushButton.onclick = this.pushCallBack.bind(this) ;
-	this.popButton = addInputToAlgorithmBar("button", "出栈");
 	this.popButton.onclick = this.popCallBack.bind(this) ;
 }
-
 // 初始化
 Stack.prototype.initAttributes = function() {
 	// 逻辑部分ID
@@ -48,19 +54,13 @@ Stack.prototype.initAttributes = function() {
 	this.startArrayX = 400 ; // 开始的数组的x坐标
 	// this.initStateBox("栈大小的初始化范围 1-8");
 }
-
-// 初始化状态框
-Stack.prototype.initStateBox = function(state) {
-	this.cmd("SetState", state);
-}
-
 // 初始化回调函数
 Stack.prototype.initCallBack = function(length) {
-	if (parseInt(length) > 0 && parseInt(length) <= 8) {
+	if (parseInt(length) > 0 && parseInt(length) <= 10) {
 		this.implementAction(this.initArray.bind(this), length);
 	}
 	else {
-		alert("栈的大小应在1~8之间") ;
+		show_notice("栈的大小应在1~10之间", 'error') ;
 	}
 }
 
@@ -94,7 +94,7 @@ Stack.prototype.initArray = function(maxSize) {
         
 	// 设置状态栏
 	{
-		this.cmd("SetState", "创建大小为"+maxSize+"的数组") ;
+		show_notice("创建大小为"+maxSize+"的数组", 'success') ;
 	} 
        
 	for(var i=0 ; i<this.maxSize ; i++) {
@@ -113,20 +113,18 @@ Stack.prototype.initArray = function(maxSize) {
 // 入栈
 Stack.prototype.pushNode = function(value) {
 	if (this.stack == null) {
-		this.cmd("SetState", '请先创建栈');
+		show_notice("请先创建栈", 'error') ;
 		return this.commands;
 	}
 	if(this.head >= this.maxSize-1) {
-		this.cmd("SetState", '栈已满，不能继续入栈');
-		// alert('Already full!') ;
+		show_notice("栈已满，不能继续入栈", 'error') ;
 	}
 	else {
 		this.head ++ ;
 		// 出现矩形
 		{
-			this.cmd("SetState", "创建值为"+value+"的数组元素") ;
+			show_notice("创建值为"+value+"的数组元素", 'info');
 			this.cmd("Step") ;
-
 			this.cmd("CreateRectangle", this.objectID, value, this.width, this.height, 
 				'center', 'center', this.startX, this.startY) ;
 			this.cmd("SetForegroundColor", this.objectID, this.foregroundColor) ;
@@ -135,7 +133,7 @@ Stack.prototype.pushNode = function(value) {
 		}
 		// 查找对应位置
 		{
-			this.cmd("SetState", "数组"+this.head+"位置无元素, 可插入新元素") ;
+			show_notice("数组"+this.head+"位置无元素, 可插入新元素", 'info') ;
 			this.cmd("Step") ;
 			this.cmd("SetHighlight",this.maxSize-this.head, true) ;
 			this.cmd("Step") ;
@@ -146,7 +144,7 @@ Stack.prototype.pushNode = function(value) {
 		this.stack[this.head] = value ;
 		// 新生成的节点插入
 		{
-			this.cmd("SetState", "在数组"+this.head+"位置插入新元素"+value) ;
+			show_notice("在数组"+this.head+"位置插入新元素"+value, 'success') ;
 			this.cmd("Step") ;
 			this.cmd("Move", this.orderObjectID[this.maxSize-this.head], this.startArrayX,this.startY+(this.maxSize-this.head-1)*(this.width-1)) ;
 			this.cmd("Step") ;
@@ -159,17 +157,16 @@ Stack.prototype.pushNode = function(value) {
 // 弹栈
 Stack.prototype.popNode = function() {
 	if (this.stack == null) {
-		this.cmd("SetState", '请先创建栈');
+		show_notice("请先创建栈", 'error') ;
 		return this.commands;
 	}
 	if(this.head <= -1) {
-		this.cmd("SetState", '栈已空，不能继续出栈');
-		// alert('Already empty!') ;
+		show_notice("栈已空，不能继续出栈", 'error') ;
 	}
 	else {
 			// 查找对应位置
 			{
-                this.cmd("SetState", "在数组"+this.head+"位置删除新元素"+this.stack[this.head]) ;
+				show_notice("在数组"+this.head+"位置删除新元素"+this.stack[this.head], 'info') ;
 				this.cmd("Step") ;
 				this.cmd("SetHighlight", this.orderObjectID[this.maxSize-this.head], true) ;
 				this.cmd("Step") ;
@@ -184,13 +181,9 @@ Stack.prototype.popNode = function() {
 				this.cmd("Step") ;
 				this.cmd("Delete", deleteObjectID) ;
 				this.cmd("Step") ;
-				this.cmd("SetState", "删除成功") ;
+				show_notice("删除成功", 'success') ;
 				this.cmd("Step") ;
 			}
-			//Stack.pop(this.head);
-			//this.stack[this.head] = [] ;
-			//this.head -- ;
-			//this.stack[this.head] = 0;
 		}
 	return this.commands ;
 }
@@ -201,4 +194,24 @@ var StackNode = function(objectID, value, x, y) {
 	this.value = value ; // 值
 	this.x = x ; // x坐标
 	this.y = y ; // y坐标
+}
+
+
+// 连接组件
+export function list_init_index(dataLength){
+    if (dataLength != '') {
+		currentStack.initCallBack(dataLength);
+    }
+}
+
+export function list_insert_index(serialNumber,arrayData){
+	if (serialNumber != '' && arrayData != '') {
+		currentStack.pushCallBack(serialNumber, arrayData);
+	}
+}
+
+export function list_delete_index(serialNumber){
+	if (serialNumber != '') {
+		currentStack.popCallBack(serialNumber);
+	}
 }

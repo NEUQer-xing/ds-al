@@ -74,67 +74,6 @@ $(function () {
         currentStack.popCallBack();
     });
 
-    //单链表代码
-    var singleStartFlag = 0;
-    $('.singleStartHide').click(function () {
-        if (singleStartFlag == 0) {
-            $(this).children().css('transform', 'rotate(180deg)');
-            setTimeout('$(".singleStarts").show()', 100);
-            $('.singleStarts').animate({
-                'width': '140px',
-            }, 200);
-            singleStartFlag = 1;
-        } else {
-            $(this).children().css('transform', 'rotate(360deg)');
-            setTimeout('$(".singleStarts").hide()', 100);
-            $('.subT1').hide();
-            $('.subT2').hide();
-            $('.singleStarts').animate({
-                'width': '0px',
-            }, 200);
-            singleStartFlag = 0;
-        }
-
-    });
-
-    $('.singleStarts p').click(function () {
-        var str = $(this).attr('class');
-        var s = str[str.length - 1];
-        for (var i = 1; i < 4; i++) {
-            if (i != s) {
-                $('.subT' + i).hide();
-            }
-            else {
-                $('.subT' + s).show();
-                $('.singleLength span,input').show()
-                $('.singleInit p').show();
-                $('.singleInit').animate({
-                    'width': '80px'
-                }, 10);
-
-                $('.singleLength').animate({
-                    'width': '200px'
-                }, 10);
-            }
-        };
-
-    });
-    //单链表插入数据
-    $('.singleInsert').click(function () {
-        var serial = $('.singleSerial').val();
-        var number = $('.singleInputNumber').val();
-        if (serial != '' && number != '') {
-            currentLinkList.insertCallBack(serial, number);
-        } else { }
-    });
-    //单链表删除数据
-    $('.singleDelete').click(function () {
-        var serial = $('.singleDelNumber').val();
-        if (serial != '') {
-            currentLinkList.deleteCallBack(serial);
-        } else { }
-    });
-
 
     //队列代码
     var queueStartFlag = 0;
