@@ -2,44 +2,6 @@ var type = 0;
 var index = 0;
 var s_succ = '成功了';
 $(function () {
-    //线性表
-    //顺序表创建数组
-    $('.init p').click(function () {
-        stateFlag = 0; 
-
-        // ! 按钮相应的事件
-        var dataLength = $('.inputLength').val();
-        if (dataLength != '') {
-            currentOrderList.initCallBack(dataLength);
-        }
-        $('.inputLength').attr('value', '');
-        // ! 按钮相应的事件
-
-        $(this).hide();
-        $('.init').animate({
-            'width': '0'
-        }, 10);
-        $('.length span,input').hide();
-        $('.length').animate({
-            'width': '0'
-        }, 10);
-    });
-    //顺序表插入数据
-    $('.insertGo p').click(function () {
-        var serialNumber = $('.inputNumber').val();
-        var arrayData = $('.inputInsertNumber').val();
-        if (serialNumber != '' && arrayData != '') {
-            currentOrderList.insertCallBack(serialNumber, arrayData);
-        }
-    });
-    //顺序表删除数据
-    $('.deleteGo p').click(function () {
-        var deleteNumber = $('.inputDeleteNumber').val();
-        if (deleteNumber != '') {
-            currentOrderList.deleteCallBack(deleteNumber);
-        }
-    });
-
     //栈代码
     var stackStartFlag = 0;
     $('.startHide').click(function () {

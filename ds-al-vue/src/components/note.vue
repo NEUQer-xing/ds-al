@@ -3,19 +3,15 @@
         <template #title>
             <strong><Icon type="md-bookmarks" />笔记</strong>
         </template>
-        <Collapse>
-            <Panel name="1">
-                展开记录笔记
-                <template #content>
-                    <v-md-editor v-model="text" height="400px" left-toolbar="undo"></v-md-editor> 
-                    <!-- left-toolbar="undo" 控制markdown上方工具栏的数量 -->
-                </template>
-            </Panel>
-        </Collapse>
+        <Button type="success" @click="call_note" icon="ios-book-outline" long ghost>
+            <strong>记录笔记</strong>
+        </Button>
     </Card>
 </template>
-<script lang="ts" setup>
+<script setup>
     import { ref } from 'vue';
-    import { Panel } from 'view-ui-plus';
-    var text=ref("this is my note!");
+    const emit = defineEmits(['call_note_emit']);
+    function call_note(){
+        emit('call_note_emit');
+    }
 </script>

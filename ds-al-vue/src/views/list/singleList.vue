@@ -9,30 +9,36 @@
     </Col>
     <Col span="7">
       <control @control_speed="speed_func"></control>
-      <listmenu
-        @list_init="init_list"
+      <singlelist_menu
         @list_insert="insert"
         @list_delete="Delete"
-      ></listmenu>
-      <note></note>
-      <chatgpt></chatgpt>
+      ></singlelist_menu>
+      <note @call_note_emit="show_note"></note>
+      <chatgpt @call_gpt_emit="show_gpt"></chatgpt>
     </Col>
   </Row>
+  <Drawer title="AI助理" placement="left" :closable="false" v-model="gpt" width="30">
+            <chatgpt_main></chatgpt_main>
+  </Drawer>
+  <Drawer title="学习笔记" placement="bottom" :closable="false" v-model="notes" height="70">
+            <note_main></note_main>
+  </Drawer>
 </template>
 
 <script setup>
 import control from "@/components/control.vue";
-import listmenu from "@/components/listmenu.vue";
+import singlelist_menu from "@/components/list/singlelist_menu.vue";
 import note from "@/components/note.vue";
 import chatgpt from "@/components/chatgpt.vue";
+import chatgpt_main from "@/components/chatgpt/chatgpt_main.vue";
+import note_main from "@/components/markdown_note/note_main.vue";
 import { ref, onMounted } from "vue";
 import { speed_func_control } from "@/assets/js/play_control.js";
 import {
   init,
-  list_init_index,
   list_insert_index,
   list_delete_index,
-} from "@/assets/js/list/OrderList.js";
+} from "@/assets/js/list/LinkedList.js";
 
 const canvasRef = ref(null);
 var drawing_size = {
@@ -57,18 +63,26 @@ function speed_func(play_speed) {
 }
 
 // 具体操作
-function init_list(init_value) {
-  // 因为是const引用,所以只能通过相互赋值进行传递参数
-  list_init_index(init_value.value);
-}
 function insert(insert_index, insert_value) {
   list_insert_index(insert_index.value, insert_value.value);
 }
 function Delete(delete_value) {
   list_delete_index(delete_value.value);
 }
+
+// 显示gpt
+const gpt = ref(false);
+function show_gpt() {
+  gpt.value = true;
+}
+
+// 显示notes
+const notes = ref(false);
+function show_note() {
+  notes.value = true;
+}
 </script>
 
 <style>
-@import url("@/assets/css/index.css");
+  @import url("@/assets/css/index.css");
 </style>
