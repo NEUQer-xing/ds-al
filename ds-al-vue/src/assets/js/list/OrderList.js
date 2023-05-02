@@ -14,13 +14,11 @@ function show_notice(notices, type) {
 		duration: 6  	// 持续时间
 	});
 }
-
 var currentOrderList;
 // 初始化函数
 export function init(drawing) {
 	objectManager = new ObjectManager() ;
 	animationManager = new AnimationManager(objectManager) ;
-	console.log('成功init:'+drawing.width + " " + drawing.height);
 	currentOrderList = new OrderList(animationManager, drawing.width, drawing.height) ;
 }
 
