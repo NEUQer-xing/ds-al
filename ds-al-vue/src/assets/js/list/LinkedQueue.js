@@ -1,8 +1,25 @@
+import {Message,Notice} from 'view-ui-plus';
+function show_notice(notices, type) {
+	var type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	}
+	Notice[type]({
+		title: type_zh, // 标题
+		desc: notices,  // 内容
+		duration: 6  	// 持续时间
+	});
+}
+
 // JavaScript Document
 
 var currentLinkedQueue;
 // 初始化函数
-function init() {
+export function init() {
 	objectManager = new ObjectManager() ;
 	animationManager = new AnimationManager(objectManager) ;
 	currentLinkedQueue = new LinkedQueue(animationManager, drawing.width, drawing.height) ;
@@ -11,7 +28,6 @@ function init() {
 // 单链表
 var LinkedQueue = function(animManager, width, height) {
 	this.init(animManager, width, height) ;
-	//this.initControls() ; // 初始化控件
 	this.initAttributes() ; // 初始化属性
 }
 // 继承与构造
@@ -20,24 +36,16 @@ LinkedQueue.prototype.constructor = LinkedQueue;
 
 // 初始化控件
 LinkedQueue.prototype.initControls = function() {
-	addLabelToAlgorithmBar("序号");
-	this.insertField_seq = addInputToAlgorithmBar("text", "");
-	addLabelToAlgorithmBar("数值");
-	this.insertField_value = addInputToAlgorithmBar("text", "");
-	this.insertButton =	addInputToAlgorithmBar("button", "插入节点");
 	this.insertButton.onclick = this.insertCallBack.bind(this) ;
-	addLabelToAlgorithmBar("序号");
-	this.insertField_del = addInputToAlgorithmBar("text", "");
-	this.deleteButton = addInputToAlgorithmBar("button", "删除节点");
 	this.deleteButton.onclick = this.deleteCallBack.bind(this) ;
 }
 
 // 初始化
 LinkedQueue.prototype.initAttributes = function() {
 	// 逻辑部分
-	this.head = null ;
-	this.tail = null ;
-	// this.length = 0 ;
+	this.head = -1 ;
+	this.tail = -1;
+	 this.length = 0 ;
 	// 图形部分
 	this.objectID = 1 ; // 图形的序号
 	this.width = 50 ; // 矩形的宽度
@@ -57,28 +65,25 @@ LinkedQueue.prototype.initAttributes = function() {
 }
 
 LinkedQueue.prototype.pushCallBack = function(value) {
-	this.insertCallBack(this.head.value+1, value);
-	console.log('push at:'+ this.head.value +' val:'+value);
+	this.insertCallBack(this.head.value+1,value);
 }
 
 LinkedQueue.prototype.popCallBack = function(value) {
 	this.deleteCallBack(1);
-	console.log('pop at:'+this.head.value);
 }
 
 // 插入回调函数
 LinkedQueue.prototype.insertCallBack = function(seq, value) {
-	seq = parseInt(seq);
-	value = value.trim();
-	if (value != '') {
+	if (value != "")
+	{
+		seq = parseInt(seq);
+		value = parseInt(value);
 		if(this.head.value <= 5) {
 			this.implementAction(this.insertNode.bind(this), [seq, value]);
 		}
 		else {
-			alert("链表的长度应6以下");
+			show_notice("链表的长度应6以下", 'error');
 		}
-	} else {
-		alert('入队元素不能为空');
 	}
 }
 
@@ -98,7 +103,6 @@ LinkedQueue.prototype.initHeadNode = function() {
 	this.length ++ ;
 	// 绘制头结点
 	{
-		this.cmd("SetState", "创建链表的头指针，该链表是带表头的单链表，可以从 1 开始插入元素") ;
 		this.cmd("CreateRectangle", this.head.objectID, this.head.value, this.width, this.height, 
 				 'center', 'center', this.head.x, this.head.y) ;
 		this.cmd("SetForegroundColor", this.head.objectID, this.foregroundColor) ;
@@ -124,8 +128,7 @@ LinkedQueue.prototype.insertNode = function(valueArr) {
 	var value = valueArr[1] ;
 	var point = this.head ;
 	if(pos > this.length || pos <= 0) {
-		alert("位置错误！位置超出范围。\n当前范围 1-"+this.head.value);
-		// alert('Position error! The position is out of range.\nCurrent range ' + 1 +' to '+this.head.value) ;
+		show_notice("位置错误！位置超出范围。\n当前范围 1-"+this.head.value, 'error');
 	}
 	else {
 		var newNode = new ListNode(this.objectID, value, this.startX, this.startY, null) ;
@@ -133,7 +136,7 @@ LinkedQueue.prototype.insertNode = function(valueArr) {
 		this.length ++ ;
 		// 绘制新结点
 		{
-			this.cmd("SetState", "创建新节点"+value) ;
+			show_notice("创建新节点"+value, 'info');
 			this.cmd("Step") ;
 			this.cmd("CreateRectangle", newNode.objectID, newNode.value, this.width, this.height, 
 					 'center', 'center', newNode.x, newNode.y) ;
@@ -142,20 +145,11 @@ LinkedQueue.prototype.insertNode = function(valueArr) {
 			this.cmd("Step") ;
 		}
 		for(var i=0 ; i<pos-1 ; i++) {
-			// 高亮
-			/*{
-				this.cmd("SetState", "搜索到位置"+i) ;
-				this.cmd("Step") ;
-				this.cmd("SetHighlight", point.objectID, true) ;
-				this.cmd("Step") ;
-				this.cmd("SetHighlight", point.objectID, false) ;
-				this.cmd("Step") ;
-			}*/
 			point = point.linked ;
 		}
 		// 高亮
 		{
-			this.cmd("SetState", "在队尾插入") ;
+			show_notice("在队尾插入", 'info');
 			this.cmd("Step") ;
 			this.cmd("SetHighlight", point.objectID, true) ;
 			this.cmd("Step") ;
@@ -172,8 +166,8 @@ LinkedQueue.prototype.insertNode = function(valueArr) {
 			this.tailArrow.y = this.startheadArrowY ; 
 			// 连接
 			{
-				// this.cmd("SetState", "该位置是尾节点,直接插入") ;
-				// this.cmd("Step") ;
+				show_notice("该位置是尾节点,直接插入", 'success');
+				this.cmd("Step") ;
 				this.cmd("Connect", point.objectID, newNode.objectID, this.forgroundColor) ;
 				this.cmd("Step") ;
 				this.cmd("Move", newNode.objectID, newNode.x, newNode.y) ;
@@ -189,15 +183,15 @@ LinkedQueue.prototype.insertNode = function(valueArr) {
 			point.linked = newNode ;
 			// 连接
 			{
-				this.cmd("SetState", "断开"+point.value+"的指针域") ;
+				show_notice("该位置不是尾节点,断开"+point.value+"的指针域", 'info');
 				this.cmd("Step") ;
 				this.cmd("Disconnect", point.objectID, newNode.linked.objectID) ;
 				this.cmd("Step") ;
-				this.cmd("SetState", "设置插入节点"+value+"的指针指向后续节点"+newNode.linked.value) ;
+				show_notice("设置插入节点"+value+"的指针指向后续节点"+newNode.linked.value, 'info');
 				this.cmd("Step") ;
 				this.cmd("Connect", newNode.objectID, newNode.linked.objectID, this.foregroundColor) ;
 				this.cmd("Step") ;
-				this.cmd("SetState", "设置"+point.value+"的指针指向插入节点"+value) ;
+				show_notice("设置"+point.value+"的指针指向插入节点"+value, 'info');
 				this.cmd("Step") ;
 				this.cmd("Connect", point.objectID, newNode.objectID, this.foregroundColor) ;
 				this.cmd("Step") ;
@@ -214,7 +208,7 @@ LinkedQueue.prototype.insertNode = function(valueArr) {
 					 'center', 'center', this.head.x, this.head.y) ;
 			this.cmd("SetForegroundColor", this.head.objectID, this.foregroundColor) ;
 			this.cmd("SetBackgroundColor", this.head.objectID, this.backgroundColor) ;
-			this.cmd("SetState", "插入成功") ;
+			show_notice("插入成功", 'success');
 			this.cmd("Step") ;
 		}
 	}
@@ -225,11 +219,11 @@ LinkedQueue.prototype.insertNode = function(valueArr) {
 LinkedQueue.prototype.deleteNode = function(pos) {
 	console.log('length:'+this.head.value);
 	if (this.head.value <= 0) {
-		this.cmd("SetState", "队列无元素可出队");
+		show_notice("队列无元素可出队", 'error');
 		return this.commands;
 	}
 	if(pos >= this.length || pos <= 0) {
-		alert("位置错误！位置超出范围。\n当前范围 1-"+this.head.value);
+		show_notice("位置错误！位置超出范围。\n当前范围 1-"+this.head.value, 'error');
 		// alert('Position error! The position is out of range.\nCurrent range ' + 1 +' to '+this.head.value) ;
 	}
 	else {
@@ -237,27 +231,16 @@ LinkedQueue.prototype.deleteNode = function(pos) {
 		var point = this.head ;
 		var next ;
 		for(var i=0 ; i<pos-1; i++) {
-			// 高亮
-			/*{
-				this.cmd("SetState", "搜索到位置"+i) ;
-				this.cmd("Step") ;
-				this.cmd("SetHighlight", point.objectID, true) ;
-				this.cmd("Step") ;
-				this.cmd("SetHighlight", point.objectID, false) ;
-				this.cmd("Step") ;
-			}*/
 			point = point.linked ;
 		}
 		next = point.linked ;
 		// 高亮
 		{
-			this.cmd("SetState", "在队头删除") ;
+			show_notice("在队头删除", 'info');
 			this.cmd("Step") ;
 			this.cmd("SetHighlight", point.objectID, true) ;
 			this.cmd("Step") ;
 			this.cmd("SetHighlight", point.objectID, false) ;
-			this.cmd("Step") ;
-			this.cmd("SetState", "在队头删除") ;
 			this.cmd("Step") ;
 			this.cmd("SetHighlight", next.objectID, true) ;
 			this.cmd("Step") ;
@@ -275,7 +258,7 @@ LinkedQueue.prototype.deleteNode = function(pos) {
 			}
 			// 断开连接并删除
 			{
-				this.cmd("SetState", "该位置是尾节点,直接删除") ;
+				show_notice("该位置是尾节点,直接删除", 'success');
 				this.cmd("Step") ;
 				this.cmd("Disconnect", point.objectID, next.objectID) ;
 				this.cmd("Step") ;
@@ -290,19 +273,19 @@ LinkedQueue.prototype.deleteNode = function(pos) {
 		else { // 如果不是尾节点
 			// 连接、断开连接并删除
 			{
-				this.cmd("SetState", "断开"+point.value+"的指针域") ;
+				show_notice("该位置不是尾节点,断开"+point.value+"的指针域", 'info');
 				this.cmd("Step") ;
 				this.cmd("Disconnect", point.objectID, next.objectID) ;
 				this.cmd("Step") ;
-				this.cmd("SetState", "设置"+point.value+"的指针指向后续节点"+next.linked.value) ;
+				show_notice("设置"+point.value+"的指针指向后续节点"+next.linked.value, 'info');
 				this.cmd("Step") ;
 				this.cmd("Connect", point.objectID, next.linked.objectID, this.foregroundColor) ;
 				this.cmd("Step") ;
-				this.cmd("SetState", "断开删除节点"+next.value+"的指针域") ;
+				show_notice("断开删除节点"+next.value+"的指针域", 'info');
 				this.cmd("Step") ;
 				this.cmd("Disconnect", next.objectID, next.linked.objectID) ;
 				this.cmd("Step") ;
-				this.cmd("SetState", "删除节点"+next.value) ;
+				show_notice("删除节点"+next.value, 'success');
 				this.cmd("Step") ;
 				this.cmd("Delete", next.objectID) ;
 				this.cmd("Step") ;
@@ -320,7 +303,7 @@ LinkedQueue.prototype.deleteNode = function(pos) {
 					 'center', 'center', this.head.x, this.head.y) ;
 			this.cmd("SetForegroundColor", this.head.objectID, this.foregroundColor) ;
 			this.cmd("SetBackgroundColor", this.head.objectID, this.backgroundColor) ;
-			this.cmd("SetState", "删除成功") ;
+			show_notice("删除成功", 'success');
 			this.cmd("Step") ;
 		}
 	}
@@ -377,4 +360,17 @@ var ListNode = function(objectID, value, x, y, linked) {
 	this.x = x ; // x坐标
 	this.y = y ; // y坐标 
 	this.linked = linked ; // 指针
+}
+
+
+export function list_insert_index(serialNumber,arrayData){
+	if (serialNumber != '' && arrayData != '') {
+		currentLinkedQueue.insertCallBack(serialNumber, arrayData);
+	}
+}
+
+export function list_delete_index(serialNumber){
+	if (serialNumber != '') {
+		currentLinkedQueue.deleteCallBack(serialNumber);
+	}
 }

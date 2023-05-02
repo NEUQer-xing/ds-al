@@ -9,11 +9,6 @@ const router = createRouter({
       component: () => import('../views/home.vue')
     },
     {
-      path: '/factorial',
-      name: 'factorial',
-      component: () => import('../views/list/factorial.vue')
-    },
-    {
       path: '/linearList',
       name: 'linearList',
       component: () => import('../views/list/linearList.vue')

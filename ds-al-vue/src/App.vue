@@ -94,7 +94,6 @@
                             <MenuItem name="1-2" to="singleList">单链表</MenuItem>
                             <MenuItem name="1-3" to="stackList">栈</MenuItem>
                             <MenuItem name="1-4" to="queueList">队列</MenuItem>
-                            <MenuItem name="1-5" to="factorial">阶乘</MenuItem>
                             <MenuItem name="1-6" to="linkedQueue">链式队列</MenuItem>
                         </Submenu>
                         <Submenu name="2">
