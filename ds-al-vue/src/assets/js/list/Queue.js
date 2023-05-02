@@ -1,37 +1,41 @@
-﻿// JavaScript Document
+﻿import {Message,Notice} from 'view-ui-plus';
+function show_notice(notices, type) {
+	var type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	}
+	Notice[type]({
+		title: type_zh, // 标题
+		desc: notices,  // 内容
+		duration: 6  	// 持续时间
+	});
+}
 
 var currentQueue;
+
 // 初始化函数
-function init() {
+export function init() {
 	objectManager = new ObjectManager() ;
 	animationManager = new AnimationManager(objectManager) ;
 	currentQueue = new Queue(animationManager, drawing.width, drawing.height) ;
 }
-
 // 队列
 var Queue= function(animManager, width, height) {
 	this.init(animManager, width, height) ;
-	//this.initControls() ; // 初始化控件
 	this.initAttributes() ; // 初始化属性
 }
 // 继承与构造
 Queue.prototype = new Algorithm();
 Queue.prototype.constructor = Queue;
-
 // 初始化控件
 Queue.prototype.initControls = function() {
-	addLabelToAlgorithmBar("数组大小");
-	this.insertField_maxSize = addInputToAlgorithmBar("text", "");
-	this.initButton = addInputToAlgorithmBar("button", "初始化数组");
 	this.initButton.onclick = this.initCallBack.bind(this) ;
-	addLabelToAlgorithmBar("数值");
-	this.insertField_value = addInputToAlgorithmBar("text", "");
-	this.pushButton =addInputToAlgorithmBar("button", "入队");
-	this.pushButton.onclick = this.pushCallBack.bind(this) ;
-	this.popButton = addInputToAlgorithmBar("button", "出队");
 	this.popButton.onclick = this.popCallBack.bind(this) ;
 }
-
 // 初始化
 Queue.prototype.initAttributes = function() {
 	// 逻辑部分ID
@@ -48,15 +52,7 @@ Queue.prototype.initAttributes = function() {
 	this.startArrayY = 250 ; // 开始的数组的y坐标
     this.startArrowY = 300 ; // 开始的箭头的y坐标
     this.length = 30 ; // 箭头的长度
-	// this.implementAction(this.initStateBox.bind(this), "start") ;
 }
-
-
-// 初始化状态框
-Queue.prototype.initStateBox = function(state) {
-	return this.commands ;
-}
-
 // 初始化回调函数
 Queue.prototype.initCallBack = function(length) {
 	if (parseInt(length) > 0 && parseInt(length) <= 16)
@@ -64,7 +60,7 @@ Queue.prototype.initCallBack = function(length) {
 		this.implementAction(this.initArray.bind(this), length);
 	}
 	else{
-		alert("初始化数组长度应在1-16之间");
+		show_notice("初始化数组长度应在1-16之间", 'error') ;
 	}
 }
 
@@ -104,12 +100,12 @@ Queue.prototype.clearCanvas = function() {
 // 初始化数组
 Queue.prototype.initArray = function(maxSize) {
 	this.clearCanvas() ;
-	this.maxSize = parseInt(maxSize) + 1 ; // 数组最大容量
+	this.maxSize = parseInt(maxSize) + 1; // 队列元素的最大个数 : 因为不是循环队列，所以要多加一个空间
 	this.queue = new Array(this.maxSize) ; // 队列数组
 	this.orderObjectID = new Array(this.maxSize) ; // 队列的物体
     // 设置状态栏
 	{
-		this.cmd("SetState", "创建大小为"+this.maxSize+"的数组") ;
+		show_notice("成功创建大小为"+this.maxSize+"的队列", 'success') ;
 	} 
 	for(var i=0 ; i<this.maxSize ; i++) {
 		this.orderObjectID[i] = this.objectID;
@@ -126,17 +122,16 @@ Queue.prototype.initArray = function(maxSize) {
 // 插入
 Queue.prototype.enQueue = function(value) {
 	if (this.queue == null) {
-		this.cmd("SetState", "请先创建队列");
+		show_notice("请先创建队列", 'error') ;
 		return this.commands;
 	}
 	if((this.rear+1)% this.maxSize==this.front) {
-		this.cmd('SetState', "队列已满，不能继续入队");
-		// alert('Already full!') ;
+		show_notice("队列已满，不能继续入队", 'error') ;		
 	}
 	else {
 		// 出现矩形
 		{
-			this.cmd("SetState", "创建值为"+value+"的数组元素") ;
+			show_notice("入队元素为"+value, 'info') ;
 			this.cmd("Step") ;
 			this.cmd("CreateRectangle", this.objectID, value, this.width, this.height, 
 				'center', 'center', this.startX, this.startY) ;
@@ -146,7 +141,7 @@ Queue.prototype.enQueue = function(value) {
 		}
 		// 查找对应位置
 		{
-			this.cmd("SetState", "数组"+this.rear+"位置无元素, 可插入新元素") ;
+			show_notice("队列尾部仍有位置, 成功插入新元素", 'success') ;
 			this.cmd("Step") ;
 			this.cmd("SetHighlight", this.orderObjectID[this.rear], true) ;
 			this.cmd("Step") ;
@@ -169,17 +164,16 @@ Queue.prototype.enQueue = function(value) {
 // 删除
 Queue.prototype.deQueue = function() {
 	if (this.queue == null) {
-		this.cmd("SetState", "请先创建队列");
+		show_notice("请先创建队列", 'error') ;
 		return this.commands;
 	}
 	if(this.front==this.rear) {
-		this.cmd('SetState', '队列已空，不能继续出队');
-		// alert('Already empty!') ;
+		show_notice("队列已空，不能继续出队", 'error') ;
 	}
 	else {
 		// 查找对应位置
 		{
-			this.cmd("SetState", "在数组"+this.front+"位置删除新元素"+this.queue[this.front].value) ;
+			show_notice("队列头部仍有元素, 可以删除元素", 'info') ;
 			this.cmd("Step") ;
 			this.cmd("SetHighlight", this.queue[this.front].objectID, true) ;
 			this.cmd("Step") ;
@@ -193,7 +187,7 @@ Queue.prototype.deQueue = function() {
 			this.cmd("Step") ;
 			this.cmd("Delete", deleteObjectID) ;
 			this.cmd("Step") ;
-		    this.cmd("SetState", "删除成功") ;
+			show_notice("删除成功!", 'success') ;
 			this.cmd("Step") ;
 		}
 		this.queue[this.front] = null;
@@ -208,4 +202,23 @@ var QueueNode = function(objectID, value, x, y) {
 	this.value = value ; // 值
 	this.x = x ; // x坐标
 	this.y = y ; // y坐标
+}
+
+// 连接组件
+export function list_init_index(dataLength){
+    if (dataLength != '') {
+		currentQueue.initCallBack(dataLength);
+    }
+}
+
+export function list_insert_index(serialNumber,arrayData){
+	if (serialNumber != '' && arrayData != '') {
+		currentQueue.pushCallBack(serialNumber, arrayData);
+	}
+}
+
+export function list_delete_index(serialNumber){
+	if (serialNumber != '') {
+		currentQueue.popCallBack(serialNumber);
+	}
 }
