@@ -99,7 +99,7 @@ AnimatedLine.prototype.draw = function(ctx) {
 	}
 	// 边上写上权重
 	ctx.textAlign = 'center';
-	ctx.font = '10px sans-serif';
+	ctx.font = '20px sans-serif';
 	ctx.textBaseline   = 'middle'; 
 	ctx.fillStyle = this.foregroundColor;
 	ctx.fillText(this.weight, labelPosX, labelPosY);

@@ -154,7 +154,7 @@ AnimatedRectangle.prototype.draw = function (ctx) {
 	ctx.lineWidth = 2;
 	ctx.stroke();
 	// 写文字
-	ctx.font = "10px Arial";
+	ctx.font = "20px Arial";
 	ctx.textAlign = "center";
 	ctx.textBaseline = "middle";
 	ctx.fillStyle = this.foregroundColor;

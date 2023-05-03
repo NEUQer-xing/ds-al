@@ -15,7 +15,7 @@ AnimatedLabel.prototype.draw = function(ctx) {
 	// 设置透明度
 	ctx.globalAlpha = 1.0 ;
 	// 画文字
-	ctx.font = "10px Arial" ;
+	ctx.font = "20px Arial" ;
 	ctx.textAlign = "center" ;
 	ctx.textBaseline = "middle" ;
 	ctx.fillStyle = this.foregroundColor ;

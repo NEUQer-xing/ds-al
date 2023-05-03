@@ -1,17 +1,47 @@
-// JavaScript Document
+import {Message,Notice} from 'view-ui-plus';
+function show_notice(notices, type) {
+	var type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	} else if(type == 'warning') {
+		type_zh = '警告' ;
+	}
+	Notice[type]({
+		title: type_zh, // 标题
+		desc: notices,  // 内容
+		duration: 6  	// 持续时间
+	});
+}
+function show_notice_forever(notices, type) {
+	var type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	}
+	Notice[type]({
+		title: type_zh, // 标题
+		desc: notices,  // 内容
+		duration: 0  	// 持续时间
+	});
+}
 
 var currentBST;
 // 初始化函数
-function init() {
+export function init(drawing) {
 	objectManager = new ObjectManager() ;
 	animationManager = new AnimationManager(objectManager) ;
 	currentBST = new BinarySearchTree(animationManager, drawing.width, drawing.height) ;
 }
 
-// 顺序表
 var BinarySearchTree = function(animManager, width, height) {
 	this.init(animManager, width, height) ;
-	// this.initControls() ; // 初始化控件
 	this.initAttributes() ; // 初始化属性
 }
 // 继承与构造
@@ -20,17 +50,10 @@ BinarySearchTree.prototype.constructor = BinarySearchTree;
 
 // 初始化控件
 BinarySearchTree.prototype.initControls = function() {
-	addLabelToAlgorithmBar("节点数值");
-	this.insertField = addInputToAlgorithmBar("text", "");
-	this.insertButton =	addInputToAlgorithmBar("button", "插入节点");
 	this.insertButton.onclick = this.insertCallBack.bind(this) ;
-	this.searchButton = addInputToAlgorithmBar("button", "查找节点");
 	this.searchButton.onclick = this.searchCallBack.bind(this) ;
-	this.deleteButton = addInputToAlgorithmBar("button", "删除节点");
 	this.deleteButton.onclick = this.deleteCallBack.bind(this) ;
-	this.dfsButton = addInputToAlgorithmBar("button", "深度搜索");
 	this.dfsButton.onclick = this.DFSCallBack.bind(this) ;
-	this.bfsButton = addInputToAlgorithmBar("button", "广度搜索");
 	this.bfsButton.onclick = this.BFSCallBack.bind(this) ;
 }
 
@@ -48,38 +71,25 @@ BinarySearchTree.prototype.initAttributes = function() {
 	this.tomato = '#FF6347' ; // tomato色
 	this.palegreen = '#32CD32' ; // palegreen色
 	this.startX = 100 ; // 新节点的x坐标
-	this.startY = 150 ; // 新节点的y坐标
-	this.startRootX = 500; // 根结点的x坐标
+	this.startY = 150; // 新节点的y坐标
+	this.startRootX = 350; // 根结点的x坐标
 	this.array = [];
-	// 初始化状态框
-	// this.implementAction(this.initStateBox.bind(this), "start");
 }
 
-// 初始化状态框
-BinarySearchTree.prototype.initStateBox = function(state) {
-	// 创建状态框
-	{
-		this.cmd("CreateStateBox", 0, state, 20, 20, 400, 40) ;
-		this.cmd("SetForegroundColor", 0, this.foregroundColor) ;
-		this.cmd("SetBackgroundColor", 0, this.backgroundColor) ;
-		this.cmd("Step") ;
-	}
-	return this.commands ;
-}
 
 // 插入回调函数
 BinarySearchTree.prototype.insertCallBack = function (value) {
+	value = String(value);
 	var lligle = true;
 	if (value.length == 0) {
 		lligle = false;
 	}
 	for (var i = 0; i < value.length; i++) {
 		if (value.charAt(i) > '9' || value.charAt(i) < '0') {
-			alert('必须输入整数');
+			show_notice('必须输入整数', 'error') ;
 			lligle = false;
 		}
 	}
-	// alert(lligle);
 	if (lligle == true) {
 		var insertValue = parseInt(value);
 		var isExist = false;
@@ -89,9 +99,8 @@ BinarySearchTree.prototype.insertCallBack = function (value) {
 				break;
 			}
 		}
-		// alert(isExist);
 		if (isExist == true) {
-			alert('该数字已经出现');
+			show_notice('该数字已经出现', 'error') ;
 		}
 		else {
 			this.implementAction(this.insertNode.bind(this), insertValue);
@@ -108,11 +117,10 @@ BinarySearchTree.prototype.searchCallBack = function (value) {
 	}
 	for (var i = 0; i < value.length; i++) {
 		if (value.charAt(i) > '9' || value.charAt(i) < '0') {
-			alert('必须输入整数');
+			show_notice('必须输入整数', 'error') ;
 			lligle = false;
 		}
 	}
-	// alert(lligle);
 	if (lligle == true) {
 		var searchValue = parseInt(value);
 		this.implementAction(this.searchNode.bind(this), searchValue);
@@ -127,13 +135,11 @@ BinarySearchTree.prototype.deleteCallBack = function(value) {
 	}
 	for (var i = 0; i < value.length; i++) {
 		if (value.charAt(i) > '9' || value.charAt(i) < '0') {
-			alert('必须输入整数');
+			show_notice('必须输入整数', 'error') ;
 			lligle = false;
 		}
 	}
-	// alert(lligle);
 	if (lligle == true) {
-		// alert(this.array);
 		var deleteValue = parseInt(value);
 		this.implementAction(this.deleteNode.bind(this), deleteValue);
 		for (var i = 0; i < this.array.length; i++) {
@@ -142,19 +148,19 @@ BinarySearchTree.prototype.deleteCallBack = function(value) {
 				break;
 			}
 		}
-		// alert(this.array);
 	}
 }
 
 // 深搜回调函数
-BinarySearchTree.prototype.DFSCallBack = function(event) {
-	this.implementAction(this.DeepFirstSearch.bind(this), 2);	
+BinarySearchTree.prototype.DFSCallBack = function(value) {
+	this.implementAction(this.DeepFirstSearch.bind(this), value);	
 }
 
 // 广搜回调函数
-BinarySearchTree.prototype.BFSCallBack = function(event) {
+BinarySearchTree.prototype.BFSCallBack = function() {
 	this.implementAction(this.BroadFirstSearch.bind(this));	
 }
+
 
 // 插入
 BinarySearchTree.prototype.insertNode = function(value) {
@@ -165,7 +171,7 @@ BinarySearchTree.prototype.insertNode = function(value) {
 		this.objectID ++ ;
 		// 创建根节点
 		{
-			this.cmd("SetState", "创建根节点"+value) ;
+			show_notice('成功创建根节点'+value, 'success') ;
 			this.cmd("Step") ;
 			this.cmd("CreateCircle", this.root.objectID, this.root.value, this.root.x, this.root.y, this.radius) ;
 			this.cmd("SetForegroundColor", this.root.objectID, this.foregroundColor) ;
@@ -179,7 +185,7 @@ BinarySearchTree.prototype.insertNode = function(value) {
 		this.objectID ++ ;
 		// 创建新节点
 		{
-			this.cmd("SetState", "创建新节点"+value) ;
+			show_notice('成功创建新节点'+value, 'info') ;
 			this.cmd("Step") ;
 			this.cmd("CreateCircle", newNode.objectID, newNode.value, newNode.x, newNode.y, this.radius) ;
 			this.cmd("SetForegroundColor", newNode.objectID, this.foregroundColor) ;
@@ -191,7 +197,7 @@ BinarySearchTree.prototype.insertNode = function(value) {
 			if(newNode.value >= temp.value && temp.rightChild != null) {
 				// 找到节点
 				{
-					this.cmd("SetState", "节点比较"+newNode.value+">="+temp.value) ;
+					show_notice('节点比较'+newNode.value+">="+temp.value, 'info') ;
 					this.cmd("Step") ;
 					this.cmd("SetHighlight", temp.objectID, true) ;
 					this.cmd("Step") ;
@@ -203,7 +209,7 @@ BinarySearchTree.prototype.insertNode = function(value) {
 			else if(newNode.value < temp.value && temp.leftChild != null){
 				// 找到节点
 				{
-					this.cmd("SetState", "节点比较"+newNode.value+"<"+temp.value) ;
+					show_notice('节点比较'+newNode.value+"<"+temp.value, 'info') ;
 					this.cmd("Step") ;
 					this.cmd("SetHighlight", temp.objectID, true) ;
 					this.cmd("Step") ;
@@ -220,14 +226,14 @@ BinarySearchTree.prototype.insertNode = function(value) {
 		if(newNode.value >= temp.value) {
 			// 设置状态框
 			{
-				this.cmd("SetState", "节点比较"+newNode.value+">="+temp.value) ;
+				show_notice('节点比较'+newNode.value+">="+temp.value, 'info') ;
 				this.cmd("Step") ;
 			}
 		}
 		else {
 			// 设置状态框
 			{
-				this.cmd("SetState", "节点比较"+newNode.value+"<"+temp.value) ;
+				show_notice('节点比较'+newNode.value+"<"+temp.value, 'info') ;
 				this.cmd("Step") ;
 			}
 		}
@@ -247,7 +253,7 @@ BinarySearchTree.prototype.insertNode = function(value) {
 			newNode.parent = temp ;
 			// 插入
 			{
-				this.cmd("SetState", "新节点"+newNode.value+"插入到父节点"+temp.value+"的右孩子") ;
+				show_notice('新节点'+newNode.value+'插入到父节点'+temp.value+'的右孩子', 'success') ;
 				this.cmd("Step") ;
 			}
 		}
@@ -257,7 +263,7 @@ BinarySearchTree.prototype.insertNode = function(value) {
 			newNode.parent = temp ;
 			// 插入
 			{
-				this.cmd("SetState", "新节点"+newNode.value+"插入到父节点"+temp.value+"的左孩子") ;
+				show_notice('新节点'+newNode.value+'插入到父节点'+temp.value+'的左孩子', 'success') ;
 				this.cmd("Step") ;
 			}
 		}
@@ -270,7 +276,7 @@ BinarySearchTree.prototype.insertNode = function(value) {
 BinarySearchTree.prototype.searchNode = function(value) {
 	// 如果根节点为空
 	if(this.root == null || this.root == undefined) {
-		this.cmd("SetState", "空树无法查找") ;
+		show_notice('空树无法查找', 'warning') ;
 		this.cmd("Step") ;
 	}
 	else {
@@ -281,7 +287,7 @@ BinarySearchTree.prototype.searchNode = function(value) {
 			if(value > temp.value) {
 				// 找到节点
 				{
-					this.cmd("SetState", "节点比较: "+value+">"+temp.value+", 移动到右孩子") ;
+					show_notice('节点比较'+value+">"+temp.value, 'info') ;
 					this.cmd("Step") ;
 					this.cmd("SetHighlight", temp.objectID, true) ;
 					this.cmd("Step") ;
@@ -293,7 +299,7 @@ BinarySearchTree.prototype.searchNode = function(value) {
 			else if(value < temp.value){
 				// 找到节点
 				{
-					this.cmd("SetState", "节点比较: "+value+"<"+temp.value+", 移动到右孩子") ;
+					show_notice('节点比较'+value+"<"+temp.value, 'info') ;
 					this.cmd("Step") ;
 					this.cmd("SetHighlight", temp.objectID, true) ;
 					this.cmd("Step") ;
@@ -305,7 +311,7 @@ BinarySearchTree.prototype.searchNode = function(value) {
 			else {
 				// 找到节点
 				{
-					this.cmd("SetState", "节点比较: "+value+"="+temp.value+", 找到节点") ;
+					show_notice('节点比较'+value+"="+temp.value, 'info') ;
 					this.cmd("Step") ;
 					this.cmd("SetHighlight", temp.objectID, true) ;
 					this.cmd("Step") ;
@@ -325,26 +331,27 @@ BinarySearchTree.prototype.searchNode = function(value) {
 		if(!finded) {
 			// 未找到节点
 			{
-				this.cmd("SetState", "未找到节点"+value) ;
+				show_notice_forever('未找到节点'+value, 'error') ;
 				this.cmd("Step") ;
 			}
 		}
 		else {
 			// 找到节点
 			{
-				this.cmd("SetState", "找到节点"+value) ;
+				show_notice_forever('找到节点'+value, 'success') ;
 				this.cmd("Step") ;
 			}
 		}
 	}
 	return this.commands ;
 }
-	
+
+
 // 删除
 BinarySearchTree.prototype.deleteNode = function(value) {
 	// 如果根节点为空
 	if(this.root == null || this.root == undefined) {
-		this.cmd("SetState", "空树无法删除") ;
+		show_notice('空树无法删除', 'error') ;
 		this.cmd("Step") ;
 	}
 	else {
@@ -355,7 +362,7 @@ BinarySearchTree.prototype.deleteNode = function(value) {
 			if(value > temp.value) {
 				// 找到节点
 				{
-					this.cmd("SetState", "节点比较: "+value+">"+temp.value+", 移动到右孩子") ;
+					show_notice('节点比较'+value+">"+temp.value, 'info') ;
 					this.cmd("Step") ;
 					this.cmd("SetHighlight", temp.objectID, true) ;
 					this.cmd("Step") ;
@@ -367,7 +374,7 @@ BinarySearchTree.prototype.deleteNode = function(value) {
 			else if(value < temp.value) {
 				// 找到节点
 				{
-					this.cmd("SetState", "节点比较: "+value+"<"+temp.value+", 移动到右孩子") ;
+					show_notice('节点比较'+value+"<"+temp.value, 'info') ;
 					this.cmd("Step") ;
 					this.cmd("SetHighlight", temp.objectID, true) ;
 					this.cmd("Step") ;
@@ -379,14 +386,14 @@ BinarySearchTree.prototype.deleteNode = function(value) {
 			else {
 				// 找到节点
 				{
-					this.cmd("SetState", "节点比较: "+value+"="+temp.value) ;
+					show_notice('节点比较'+value+"="+temp.value, 'info') ;
 					this.cmd("Step") ;
 					this.cmd("SetHighlight", temp.objectID, true) ;
 					this.cmd("Step") ;
 					this.cmd("SetHighlight", temp.objectID, false) ;
 					this.cmd("Step") ;
 					this.cmd("SetHighlightColor", temp.objectID, this.palegreen) ;
-					this.cmd("SetState", "找到节点，准备删除") ;
+					show_notice	('找到节点，准备删除', 'info') ;
 					this.cmd("Step") ;
 					this.cmd("SetHighlight", temp.objectID, true) ;
 					this.cmd("Step") ;
@@ -399,7 +406,7 @@ BinarySearchTree.prototype.deleteNode = function(value) {
 					if(temp.leftChild == null && temp.rightChild == null) {
 						// 直接删除
 						{
-							this.cmd("SetState", "该节点没有子节点，直接删除") ;
+							show_notice('该节点没有子节点，直接删除', 'success') ;
 							this.cmd("Step") ;
 							this.cmd("Delete", temp.objectID) ;
 							this.cmd("Step") ;
@@ -458,7 +465,7 @@ BinarySearchTree.prototype.deleteNode = function(value) {
 						// 找到最右侧孩子
 						{
 							this.cmd("SetHighlightColor", rightest.objectID, this.palegreen) ;
-							this.cmd("SetState", "找到左子树的最右侧孩子") ;
+							show_notice('找到左子树的最右侧孩子', 'info') ;
 							this.cmd("Step") ;
 							this.cmd("SetHighlight", rightest.objectID, true) ;
 							this.cmd("Step") ;
@@ -490,7 +497,7 @@ BinarySearchTree.prototype.deleteNode = function(value) {
 					if(temp.leftChild == null && temp.rightChild == null) {
 						// 直接删除
 						{
-							this.cmd("SetState", "该节点没有子节点，直接删除") ;
+							show_notice('该节点没有子节点，直接删除', 'success') ;
 							this.cmd("Step") ;
 							this.cmd("Disconnect", temp.parent.objectID, temp.objectID) ;
 							this.cmd("Step") ;
@@ -590,7 +597,7 @@ BinarySearchTree.prototype.deleteNode = function(value) {
 						// 找到最右侧孩子
 						{
 							this.cmd("SetHighlightColor", rightest.objectID, this.palegreen) ;
-							this.cmd("SetState", "找到左子树的最右侧孩子") ;
+							show_notice('找到左子树的最右侧孩子', 'info') ;
 							this.cmd("Step") ;
 							this.cmd("SetHighlight", rightest.objectID, true) ;
 							this.cmd("Step") ;
@@ -645,14 +652,14 @@ BinarySearchTree.prototype.deleteNode = function(value) {
 		if(!finded) {
 			// 未找到节点
 			{
-				this.cmd("SetState", "未找到节点"+value+"，无法删除") ;
+				show_notice_forever('未找到节点'+value+'，无法删除', 'error') ;
 				this.cmd("Step") ;
 			}
 		}
 		else {
 			// 删除完成
 			{
-				this.cmd("SetState", "删除完成") ;
+				show_notice_forever('删除完成', 'success') ;
 				this.cmd("Step") ;
 			}
 		}
@@ -710,18 +717,27 @@ BinarySearchTree.prototype.resizeWidth = function(tree) {
 
 // 深度优先搜索(1:先序, 2:中序, 3:后序)
 BinarySearchTree.prototype.DeepFirstSearch = function(order) {
-	// 先序搜索
+	if(this.root==null) {
+		show_notice('树为空，无法遍历', 'error') ;
+		return ;
+	}
 	if(order == 1) {
-		this.stateBox = "start" ;
-		this.PreOrderRecursive(this.root) ;
+		this.stateBox = "已经访问的节点:" ; // stateBox 代码运行提示
+		show_notice('开始先序遍历', 'success') ;
+		this.PreOrderRecursive(this.root);
+		show_notice_forever('遍历完成,'+this.stateBox+' ! ', 'success') ;
 	}
 	else if(order == 2) {
-		this.stateBox = "start" ;
-		this.MidOrderRecursive(this.root) ;
+		this.stateBox = "已经访问的节点:"
+		show_notice('开始中序遍历', 'success') ;
+		this.MidOrderRecursive(this.root);
+		show_notice_forever('遍历完成,'+this.stateBox+' ! ', 'success') ;
 	}
 	else if(order == 3) {
-		this.stateBox = "start" ;
-		this.PostOrderRecursive(this.root) ;
+		this.stateBox = "已经访问的节点:"
+		show_notice('开始后序遍历', 'success') ;
+		this.PostOrderRecursive(this.root);
+		show_notice_forever('遍历完成,'+this.stateBox+' ! ', 'success') ;
 	}
 	return this.commands ;
 }
@@ -744,11 +760,9 @@ BinarySearchTree.prototype.PreOrderRecursive = function(tree) {
 			this.cmd("Step") ;
 		}
 		// 设置状态框
-		this.stateBox = this.stateBox + ", " + tree.value ;
-		{
-			this.cmd("SetState", this.stateBox) ;
-			this.cmd("Step") ;
-		}
+		this.stateBox = this.stateBox + "  " + tree.value ;
+		show_notice(this.stateBox, 'info') ;
+		this.cmd("Step") ;
 		this.PreOrderRecursive(tree.leftChild) ;
 		this.PreOrderRecursive(tree.rightChild) ;
 	}
@@ -773,16 +787,14 @@ BinarySearchTree.prototype.MidOrderRecursive = function(tree) {
 			this.cmd("Step") ;
 		}
 		// 设置状态框
-		this.stateBox = this.stateBox + ", " + tree.value ;
-		{
-			this.cmd("SetState", this.stateBox) ;
-			this.cmd("Step") ;
-		}
+		this.stateBox = this.stateBox + "  " + tree.value ;
+		show_notice(this.stateBox, 'info') ;
+		this.cmd("Step") ;
 		this.MidOrderRecursive(tree.rightChild) ;
 	}
 }
 
-// 中序递归函数
+// 后序递归函数
 BinarySearchTree.prototype.PostOrderRecursive = function(tree) {
 	if(tree != null) {
 		// 高亮连线
@@ -802,17 +814,20 @@ BinarySearchTree.prototype.PostOrderRecursive = function(tree) {
 			this.cmd("Step") ;
 		}
 		// 设置状态框
-		this.stateBox = this.stateBox + ", " + tree.value ;
-		{
-			this.cmd("SetState", this.stateBox) ;
-			this.cmd("Step") ;
-		}
+		this.stateBox = this.stateBox+"  "+tree.value ;
+		show_notice(this.stateBox, 'info') ;
+		this.cmd("Step") ;
 	}
 }
 
 // 广度优先搜索
 BinarySearchTree.prototype.BroadFirstSearch = function() {
-	this.stateBox = "start" ;
+	if(this.root==null) {
+		show_notice('树为空，无法遍历', 'error') ;
+		return ;
+	}
+	show_notice('开始广度优先搜索', 'success') ;
+	this.stateBox = "已经访问的节点:";
 	var queue = new Array() ;
 	queue.push(this.root) ; // 根节点入队
 	// 如果队列非空
@@ -826,11 +841,10 @@ BinarySearchTree.prototype.BroadFirstSearch = function() {
 			this.cmd("Step") ;
 		}
 		// 设置状态框
-		this.stateBox = this.stateBox + ", " + temp.value ;
-		{
-			this.cmd("SetState", this.stateBox) ;
-			this.cmd("Step") ;
-		}
+		this.stateBox = this.stateBox +"  "+ temp.value ;
+		show_notice(this.stateBox, 'info') ;
+		this.cmd("Step") ;
+
 		// 如果左孩子不空则左孩子入队
 		if(temp.leftChild != null) {
 			queue.push(temp.leftChild) ;
@@ -840,6 +854,7 @@ BinarySearchTree.prototype.BroadFirstSearch = function() {
 			queue.push(temp.rightChild) ;
 		}
 	}
+	show_notice_forever('遍历完成,'+this.stateBox+' ! ', 'success') ;
 	return this.commands ;
 }
 
@@ -852,4 +867,36 @@ var TreeNode = function(objectID, value, x, y, leftChild, rightChild, parent) {
 	this.leftChild = leftChild ; // 左孩子
 	this.rightChild = rightChild ; // 右孩子
 	this.parent = parent ; // 父亲
+}
+
+
+
+// 连接组件
+export function insert_js(insert_value){
+	if (insert_value != '') {
+		console.log(insert_value);
+		currentBST.insertCallBack(insert_value);
+	}
+}
+export function search_js(search_value){
+	if (search_value != '') {
+		currentBST.searchCallBack(search_value);
+	}
+}
+export function delete_js(delete_value){
+	if (delete_value != '') {
+		currentBST.deleteCallBack(delete_value);
+	}
+}
+export function dfs_qian_js(value){
+	currentBST.DFSCallBack(value);
+}
+export function dfs_zhong_js(value){
+	currentBST.DFSCallBack(value);
+}
+export function dfs_hou_js(value){
+	currentBST.DFSCallBack(value);
+}
+export function bfs_js(){
+	currentBST.BFSCallBack();
 }

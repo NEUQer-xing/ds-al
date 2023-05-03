@@ -92,6 +92,7 @@ function AnimationManager(objectManager) {
 			}
 			// 画标签
 			else if(nextCommand[0].toUpperCase() == "CREATELABEL") {
+
 				this.objectManager.addLabelObject(parseInt(nextCommand[1]), 
 													 nextCommand[2]) ;
 				this.objectManager.setPosition(parseInt(nextCommand[1]), 
@@ -100,7 +101,7 @@ function AnimationManager(objectManager) {
 			}
 			// 设置状态框
 			else if(nextCommand[0].toUpperCase() == "SETSTATE") {
-				alert(nextCommand[1]);
+				// SETSTATE 就是 代码运行提示
 			}
 			// 设置标签
 			else if(nextCommand[0].toUpperCase() == "SETLABEL") {
