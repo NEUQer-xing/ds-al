@@ -1,8 +1,43 @@
-// JavaScript Document
+import {Message,Notice} from 'view-ui-plus';
+function show_notice(notices, type , during_time) {
+	var type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	} else if(type == 'warning') {
+		type_zh = '警告' ;
+	}
+	var times = during_time == undefined ? 6 : during_time ;
+	Notice[type]({
+		title: type_zh, // 标题
+		desc: notices,  // 内容
+		duration: times  	// 持续时间
+	});
+}
+function show_message(content, type, during_time ) {
+	var type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	}
+	var times = during_time == undefined ? 0: during_time ;
+	Message[type]({
+		content: content, // 内容
+		duration: times , 	// 持续时间
+		background: true, // 是否显示背景色
+		closable: true, // 是否显示关闭按钮
+	});
+}
 
 var currentHuffman;
 // 初始化函数
-function init() {
+export function init() {
 	objectManager = new ObjectManager() ;
 	animationManager = new AnimationManager(objectManager) ;
 	currentHuffman = new Huffman(animationManager, drawing.width, drawing.height) ;
@@ -12,7 +47,6 @@ function init() {
 // Huffman树
 var Huffman = function(animManager, width, height) {
 	this.init(animManager, width, height) ;
-	// this.initControls() ; // 初始化控件
 	this.initAttributes() ; // 初始化属性
 }
 // 继承与构造
@@ -21,8 +55,6 @@ Huffman.prototype.constructor = Huffman;
 
 // 初始化控件
 Huffman.prototype.initControls = function() {
-	this.insertField = addInputToAlgorithmBar("text", "");
-	this.createButton =	addInputToAlgorithmBar("button", "建立Huffman树");
 	this.createButton.onclick = this.createButtonCallBack.bind(this) ;
 }
 
@@ -32,9 +64,9 @@ Huffman.prototype.initAttributes = function() {
 	this.root = null ;
 	// 图形部分
 	this.objectID = 1 ; // 图形的序号
-	this.radius = 20 ; // 圆的半径
-	this.intervalX = 45 ; // x间隙,在形成树的时候应用
-	this.intervalY = 45 ; // y间隙,在形成树的时候应用
+	this.radius = 25 ; // 圆的半径
+	this.intervalX = 55 ; // x间隙,在形成树的时候应用
+	this.intervalY = 55 ; // y间隙,在形成树的时候应用
 	this.foregroundColor = '#1E90FF' ; // 前景色
 	this.backgroundColor = '#B0E0E6' ; // 背景色
 	this.tomato = '#FF6347' ; // tomato色
@@ -47,17 +79,6 @@ Huffman.prototype.initAttributes = function() {
 	this.valueableNumOfArticle = 0;
 }
 
-// 初始化状态框
-Huffman.prototype.initStateBox = function(state) {
-	// 创建状态框
-	{
-		this.cmd("CreateStateBox", 0, state, 20, 20, 400, 40) ;
-		this.cmd("SetForegroundColor", 0, this.foregroundColor) ;
-		this.cmd("SetBackgroundColor", 0, this.backgroundColor) ;
-		this.cmd("Step") ;
-	}
-	return this.commands ;
-}
 /*
 	调用函数this.autoCreateHuffmanTree()实现自动创建Huffman Tree
 */
@@ -99,17 +120,16 @@ Huffman.prototype.autoCreateHuffmanTree = function() {
 }
 // 插入回调函数
 Huffman.prototype.createButtonCallBack = function(text) {
-	// var insertValue = this.insertField.value;
 	var insertValue = text;
 	if (insertValue != "")
 	{
-		// this.insertField.value = "";
 		this.implementAction(this.createHuffman.bind(this), insertValue);
 	}
 }
 // 创建Huffman
 Huffman.prototype.createHuffman = function(theArticle) {
-	this.cmd("SetState", "输入的字符串是："+theArticle);
+	show_notice('创建Huffman树的字符串为: '+theArticle,'success') ;
+	show_message('创建Huffman树的字符串为: '+theArticle,'info') ;
 	this.cmd("Step");
 	this.cmd("Step");
 	var MAX_ARTICLE_LENGTH = 2000;
@@ -177,8 +197,7 @@ Huffman.prototype.createHuffman = function(theArticle) {
 			this.objectID ++;
 			this.hfmNodeArray.push(CONSTtimeOfArticle[i]);
 			{//JK7986
-				this.cmd("SetState", "创建节点："+String.fromCharCode(CONSTtimeOfArticle[i].ASCIICode)+" 其出现次数为： "+CONSTtimeOfArticle[i].Times+" >>"+theArticle) ;
-				// console.log(theArticle);
+				show_notice( '创建节点：'+String.fromCharCode(CONSTtimeOfArticle[i].ASCIICode)+' 其出现次数为： '+CONSTtimeOfArticle[i].Times+' >>'+theArticle,'info') ;
 				this.cmd("Step") ;
 				this.cmd("CreateCircle", CONSTtimeOfArticle[i].objectID, CONSTtimeOfArticle[i].value, CONSTtimeOfArticle[i].x, CONSTtimeOfArticle[i].y, this.radius) ;
 				this.cmd("SetForegroundColor", CONSTtimeOfArticle[i].objectID, this.foregroundColor) ;
@@ -215,7 +234,7 @@ Huffman.prototype.createHuffman = function(theArticle) {
 			for(var pointXIndex = 0; pointXIndex < tempvalueableNumOfArticle; pointXIndex++){
 				this.hfmNodeArray[tempCONSTtimeOfArticle[pointXIndex].objectID-1].x = CONST_x[pointXIndex];//使每次排序后，顶端节点x坐标位置保持在一定范围内
 			}
-			this.cmd("SetState", "创建节点，其出现次数(频率)为其子节点之和："+newFather.value) ;
+			show_notice( '创建节点，其出现次数(频率)为其子节点之和：'+newFather.value+' >>'+theArticle,'info') ;
 			this.cmd("CreateCircle", newFather.objectID, newFather.value, this.startNewX, this.startNewY, this.radius) ;
 			this.cmd("SetForegroundColor", newFather.objectID, this.foregroundColor) ;
 			this.cmd("SetBackgroundColor", newFather.objectID, this.backgroundColor) ;
@@ -224,7 +243,7 @@ Huffman.prototype.createHuffman = function(theArticle) {
 			this.cmd("Connect", newFather.objectID, newFather.rightChildObID, this.foregroundColor) ;
 			this.cmd("Step") ;
 			for(var Pt = 0; Pt<tempvalueableNumOfArticle ; Pt++){
-				this.cmd("SetState", "新建立根结点，并进行排序") ;
+				show_notice( '新建立根结点，并进行排序 >>'+theArticle,'info') ;
 				this.root = tempCONSTtimeOfArticle[Pt];
 				if(Pt != 0){
 					this.resizeWidth(this.root);
@@ -258,7 +277,7 @@ Huffman.prototype.createHuffman = function(theArticle) {
 		}
 	}
 	{//FUNCTION_5 在规定左0右1的条件下，展示叶节点的Huffman码
-		this.cmd("SetState", "Huffman树构建完毕，由根结点出发遍历至叶节点得出Huffman编码") ;
+		show_notice( 'Huffman树构建完毕，由根结点出发遍历至叶节点得出Huffman编码 >>'+theArticle,'success') ;
 		for(var stackHighIndex = 0 ; stackHighIndex < this.valueableNumOfArticle ; stackHighIndex++ ){
 			var stackHigh = new Array();
 			stackHigh.push(this.hfmNodeArray[stackHighIndex]);
@@ -278,11 +297,11 @@ Huffman.prototype.createHuffman = function(theArticle) {
 				this.cmd("Step") ;
 				this.cmd("SetHighlightColor", stackHigh[invertedIndex].objectID, this.tomato) ;
 			}
-			this.cmd("SetState", "输入字符："+String.fromCharCode(this.hfmNodeArray[stackHighIndex].ASCIICode)+"   Huffman编码："+this.hfmNodeArray[stackHighIndex].hfmCode);
+			show_notice( '字符：'+String.fromCharCode(this.hfmNodeArray[stackHighIndex].ASCIICode)+'  的Huffman编码为：'+this.hfmNodeArray[stackHighIndex].hfmCode,'success',0) ;
 			//标注出霍夫曼码
 		}
 	}
-	this.cmd("SetState", "算法执行完毕！");
+		show_notice( 'Huffman编码完成 !','success') ;
 	}
 	return this.commands ;
 }
@@ -345,4 +364,13 @@ function CONSTHfmNode(objectID,ASCIICode,Times,x,y,leftChildObID,rightChildObID,
 		this.value = null;
 		this.fatherObID = fatherObID;
 		this.hfmCode = hfmCode;
+}
+
+
+// 连接组件
+export function insert_js(insert_value){
+	currentHuffman.createButtonCallBack(insert_value);
+}
+export function init_js(){
+	currentHuffman.autoCreateHuffmanTree();
 }
