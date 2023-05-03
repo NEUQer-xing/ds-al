@@ -9,6 +9,7 @@
         </div>
       </Col>
       <Col span="7">
+        <introduce>二叉搜索树</introduce>
         <control @control_speed="speed_func"></control>
         <bst_menu
             @node_insert_emit="node_insert"
@@ -40,6 +41,7 @@
   import chatgpt_main from "@/components/chatgpt/chatgpt_main.vue";
   import note_main from "@/components/markdown_note/note_main.vue";
   import bst_menu from "@/components/tree/bst_menu.vue";
+  import introduce from "@/components/introduce.vue";
 
   // js引入函数
   import { ref, onMounted } from "vue";

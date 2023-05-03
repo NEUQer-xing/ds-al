@@ -8,6 +8,7 @@
         </div>
       </Col>
       <Col span="7">
+        <introduce>队列</introduce>
         <control @control_speed="speed_func"></control>
         <queue_menu
           @list_init="init_list"
@@ -33,6 +34,7 @@
   import chatgpt from "@/components/chatgpt.vue";
   import chatgpt_main from "@/components/chatgpt/chatgpt_main.vue";
   import note_main from "@/components/markdown_note/note_main.vue";
+  import introduce from "@/components/introduce.vue";
   import { ref, onMounted } from "vue";
   import { speed_func_control } from "@/assets/js/play_control.js";
   import {

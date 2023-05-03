@@ -9,6 +9,7 @@
         </div>
       </Col>
       <Col span="7">
+        <introduce>堆</introduce>
         <control @control_speed="speed_func"></control>
         <heap_tree_menu
             @node_insert_emit="node_insert"
@@ -35,6 +36,7 @@
   import chatgpt_main from "@/components/chatgpt/chatgpt_main.vue";
   import note_main from "@/components/markdown_note/note_main.vue";
   import heap_tree_menu from "@/components/tree/heap_tree_menu.vue";
+  import introduce from "@/components/introduce.vue";
 
   // js引入函数
   import { ref, onMounted } from "vue";
