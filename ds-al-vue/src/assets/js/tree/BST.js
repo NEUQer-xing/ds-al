@@ -16,7 +16,7 @@ function show_notice(notices, type) {
 		duration: 6  	// 持续时间
 	});
 }
-function show_notice_forever(notices, type) {
+function show_message_forever(content, type) {
 	var type_zh ;
 	if(type == 'success') {
 		type_zh = '成功' ;
@@ -25,10 +25,11 @@ function show_notice_forever(notices, type) {
 	} else if(type == 'info') {
 		type_zh = '提示' ;
 	}
-	Notice[type]({
-		title: type_zh, // 标题
-		desc: notices,  // 内容
-		duration: 0  	// 持续时间
+	Message[type]({
+		content: content, // 内容
+		duration: 0 , 	// 持续时间
+		background: true, // 是否显示背景色
+		closable: true, // 是否显示关闭按钮
 	});
 }
 
@@ -331,14 +332,14 @@ BinarySearchTree.prototype.searchNode = function(value) {
 		if(!finded) {
 			// 未找到节点
 			{
-				show_notice_forever('未找到节点'+value, 'error') ;
+				show_message_forever('未找到节点'+value, 'error') ;
 				this.cmd("Step") ;
 			}
 		}
 		else {
 			// 找到节点
 			{
-				show_notice_forever('找到节点'+value, 'success') ;
+				show_message_forever('找到节点'+value, 'success') ;
 				this.cmd("Step") ;
 			}
 		}
@@ -652,14 +653,14 @@ BinarySearchTree.prototype.deleteNode = function(value) {
 		if(!finded) {
 			// 未找到节点
 			{
-				show_notice_forever('未找到节点'+value+'，无法删除', 'error') ;
+				show_message_forever('未找到节点'+value+'，无法删除', 'error') ;
 				this.cmd("Step") ;
 			}
 		}
 		else {
 			// 删除完成
 			{
-				show_notice_forever('删除完成', 'success') ;
+				show_message_forever('删除完成', 'success') ;
 				this.cmd("Step") ;
 			}
 		}
@@ -725,19 +726,19 @@ BinarySearchTree.prototype.DeepFirstSearch = function(order) {
 		this.stateBox = "已经访问的节点:" ; // stateBox 代码运行提示
 		show_notice('开始先序遍历', 'success') ;
 		this.PreOrderRecursive(this.root);
-		show_notice_forever('遍历完成,'+this.stateBox+' ! ', 'success') ;
+		show_message_forever('遍历完成,'+this.stateBox+' ! ', 'success') ;
 	}
 	else if(order == 2) {
 		this.stateBox = "已经访问的节点:"
 		show_notice('开始中序遍历', 'success') ;
 		this.MidOrderRecursive(this.root);
-		show_notice_forever('遍历完成,'+this.stateBox+' ! ', 'success') ;
+		show_message_forever('遍历完成,'+this.stateBox+' ! ', 'success') ;
 	}
 	else if(order == 3) {
 		this.stateBox = "已经访问的节点:"
 		show_notice('开始后序遍历', 'success') ;
 		this.PostOrderRecursive(this.root);
-		show_notice_forever('遍历完成,'+this.stateBox+' ! ', 'success') ;
+		show_message_forever('遍历完成,'+this.stateBox+' ! ', 'success') ;
 	}
 	return this.commands ;
 }
@@ -854,7 +855,7 @@ BinarySearchTree.prototype.BroadFirstSearch = function() {
 			queue.push(temp.rightChild) ;
 		}
 	}
-	show_notice_forever('遍历完成,'+this.stateBox+' ! ', 'success') ;
+	show_message_forever('遍历完成,'+this.stateBox+' ! ', 'success') ;
 	return this.commands ;
 }
 
@@ -874,7 +875,6 @@ var TreeNode = function(objectID, value, x, y, leftChild, rightChild, parent) {
 // 连接组件
 export function insert_js(insert_value){
 	if (insert_value != '') {
-		console.log(insert_value);
 		currentBST.insertCallBack(insert_value);
 	}
 }

@@ -101,7 +101,7 @@
                                 <Icon type="ios-git-merge" />
                                 <span>树</span>
                             </template>
-                            <MenuItem name="2-1" to="BST">线索二叉树</MenuItem>
+                            <MenuItem name="2-1" to="BST">二叉搜索树</MenuItem>
                             <MenuItem name="2-2" to="heap_tree">堆</MenuItem>
                             <MenuItem name="2-3" to="huo_fu_man_tree">霍夫曼树</MenuItem>
                             <MenuItem name="2-4" to="avl_tree">AVL树</MenuItem>

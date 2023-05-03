@@ -1,8 +1,41 @@
-// JavaScript Document
+import {Message,Notice} from 'view-ui-plus';
+function show_notice(notices, type) {
+	var type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	} else if(type == 'warning') {
+		type_zh = '警告' ;
+	}
+	Notice[type]({
+		title: type_zh, // 标题
+		desc: notices,  // 内容
+		duration: 6  	// 持续时间
+	});
+}
+function show_message_forever(content, type) {
+	var type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	}
+	Message[type]({
+		content: content, // 内容
+		duration: 0 , 	// 持续时间
+		background: true, // 是否显示背景色
+		closable: true, // 是否显示关闭按钮
+	});
+}
 
 var currentHeap;
 // 初始化函数
-function init() {
+export function init() {
 	objectManager = new ObjectManager() ;
 	animationManager = new AnimationManager(objectManager) ;
 	currentHeap = new Heap(animationManager, drawing.width, drawing.height) ;
@@ -11,7 +44,6 @@ function init() {
 // 堆
 var Heap = function(animManager, width, height) {
 	this.init(animManager, width, height) ;
-	// this.initControls() ; // 初始化控件
 	this.initAttributes() ; // 初始化属性
 }
 // 继承与构造
@@ -20,11 +52,7 @@ Heap.prototype.constructor = Heap;
 
 // 初始化控件
 Heap.prototype.initControls = function() {
-	addLabelToAlgorithmBar("节点数值");
-	this.insertField = addInputToAlgorithmBar("text", "");
-	this.insertButton =	addInputToAlgorithmBar("button", "插入节点");
 	this.insertButton.onclick = this.insertCallBack.bind(this) ;
-	this.deleteButton = addInputToAlgorithmBar("button", "删除节点");
 	this.deleteButton.onclick = this.deleteCallBack.bind(this) ;
 }
 
@@ -45,21 +73,7 @@ Heap.prototype.initAttributes = function() {
 	this.palegreen = '#32CD32' ; // palegreen色
 	this.startX = 100 ; // 新节点的x坐标
 	this.startY = 150 ; // 新节点的y坐标
-	this.startRootX = 500 ; // 根结点的x坐标
-	// 初始化状态框
-	// this.implementAction(this.initStateBox.bind(this), "start");
-}
-
-// 初始化状态框
-Heap.prototype.initStateBox = function(state) {
-	// 创建状态框
-	{
-		this.cmd("CreateStateBox", 0, state, 20, 20, 400, 40) ;
-		this.cmd("SetForegroundColor", 0, this.foregroundColor) ;
-		this.cmd("SetBackgroundColor", 0, this.backgroundColor) ;
-		this.cmd("Step") ;
-	}
-	return this.commands ;
+	this.startRootX = 350 ; // 根结点的x坐标
 }
 
 // 插入回调函数
@@ -98,6 +112,7 @@ Heap.prototype.insertNode = function(value) {
 			this.cmd("SetBackgroundColor", this.root.objectID, this.backgroundColor) ;
 			this.cmd("Step") ;
 		}
+		show_notice('成功创建根节点', 'success');
 	}
 	else {
 		// 创建新节点
@@ -134,6 +149,7 @@ Heap.prototype.insertNode = function(value) {
 		// 向上筛选
 		this.shiftUp(this.nodeArray[this.arrayLength]) ;
 		this.arrayLength ++ ;
+		show_notice('成功插入节点', 'success');
 	}
 	return this.commands ;
 }
@@ -142,6 +158,7 @@ Heap.prototype.insertNode = function(value) {
 Heap.prototype.deleteNode = function(value) {
 	// 如果根节点为空
 	if(this.root == null || this.root == undefined) {
+		show_message_forever('根节点为空，无法删除', 'error');
 	}
 	else {
 		// 找到要删除的节点
@@ -245,6 +262,7 @@ Heap.prototype.deleteNode = function(value) {
 			this.shiftDown(delNode) ;
 			this.arrayLength -- ;
 		}
+		show_notice('成功删除节点', 'success');
 	}
 	return this.commands ;
 }
@@ -496,4 +514,17 @@ var HeapNode = function(objectID, value, x, y, leftChild, rightChild, parent) {
 	this.leftChild = leftChild ; // 左孩子
 	this.rightChild = rightChild ; // 右孩子
 	this.parent = parent ; // 父亲
+}
+
+
+// 连接组件
+export function insert_js(insert_value){
+	if (insert_value != '') {
+		currentHeap.insertCallBack(insert_value);
+	}
+}
+export function delete_js(delete_value){
+	if (delete_value != '') {
+		currentHeap.deleteCallBack(delete_value);
+	}
 }
