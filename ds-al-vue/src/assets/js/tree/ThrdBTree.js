@@ -1,59 +1,56 @@
-// JavaScript Document
+import {Message,Notice} from 'view-ui-plus';
+function show_notice(notices, type , during_time) {
+	var type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	} else if(type == 'warning') {
+		type_zh = '警告' ;
+	}
+	var times = during_time == undefined ? 6 : during_time ;
+	Notice[type]({
+		title: type_zh, // 标题
+		desc: notices,  // 内容
+		duration: times  	// 持续时间
+	});
+}
+function show_message(content, type, during_time ) {
+	var type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	}
+	var times = during_time == undefined ? 0: during_time ;
+	Message[type]({
+		content: content, // 内容
+		duration: times , 	// 持续时间
+		background: true, // 是否显示背景色
+		closable: true, // 是否显示关闭按钮
+	});
+}
 
 var currentThrdBTree;
 // 初始化函数
-function init() {
+export function init() {
 	objectManager = new ObjectManager() ;
 	animationManager = new AnimationManager(objectManager) ;
 	currentThrdBTree = new thrdBTree(animationManager, drawing.width, drawing.height) ;
-	//currentThrdBTree.implementAction(currentThrdBTree.initStateBox.bind(currentThrdBTree), "start");
 }
     
 // thrdBTree树
 var thrdBTree = function(animManager, width, height) {
 	this.init(animManager, width, height) ;
-	// this.initControls() ; // 初始化控件
 	this.initAttributes() ; // 初始化属性
 }
 // 继承与构造
 thrdBTree.prototype = new Algorithm();
 thrdBTree.prototype.constructor = thrdBTree;
-
-// 初始化控件
-thrdBTree.prototype.initControls = function() {
-	var listOptionChild = ['','leftChild','rightChild'];
-	addLabelToAlgorithmBar("节点");
-	this.startInsertField = addInputToAlgorithmBar("text", "");
-	addLabelToAlgorithmBar("的");
-	this.childSelect = addSelectToAlgorithmBar(listOptionChild);
-	this.childSelect.id = "childSelect";
-	this.childSelect.onchange;
-	addLabelToAlgorithmBar("子节点是");
-	this.endInsertField = addInputToAlgorithmBar("text", "");
-	//addLabelToAlgorithmBar("插入点");
-	//this.insertInsertField = addInputToAlgorithmBar("text", "");
-	
-	this.createButton =	addInputToAlgorithmBar("button", "生成边");
-	this.createButton.onclick = this.createButtonCallBack.bind(this) ;//current ThrdBTree.createButtonCallBack()
-	this.createButton.id = "crButton";
-	//this.insertButton = addInputToAlgorithmBar("button", "确定插入该节点");
-	//this.insertButton.onclick = this.insertButtonCallBack.bind(this) ;
-	//this.insertButton.id = "inButton";
-	this.changeButton =	addInputToAlgorithmBar("button", "加入线索");
-	this.changeButton.onclick = this.changeButtonCallBack.bind(this) ;
-	this.changeButton.id = "chButton";
-	this.newButton = addInputToAlgorithmBar("button", "刷新当前页面（将清空所有输入~）");
-	this.newButton.onclick = this.newButtonCallBack.bind(this) ;
-}
-/*thrdBTree.prototype.offSelectOrNot = function() {
-	if(this.treeStyle.value == 'Tree'){
-		document.getElementById("childSelect").disabled = true;
-		document.getElementById("mySelect").disabled = true;
-	}
-	else if(this.treeStyle.value == 'bTree'){
-		document.getElementById("mySelect").disabled = true;
-	}
-}*/
 
 // 初始化属性
 thrdBTree.prototype.initAttributes = function() {
@@ -61,9 +58,9 @@ thrdBTree.prototype.initAttributes = function() {
 	this.root = null ;
 	// 图形部分
 	this.objectID = 1 ; // 图形的序号
-	this.radius = 20 ; // 圆的半径
-	this.intervalX = 45 ; // x间隙,在形成树的时候应用
-	this.intervalY = 45 ; // y间隙,在形成树的时候应用
+	this.radius = 30 ; // 圆的半径
+	this.intervalX = 65 ; // x间隙,在形成树的时候应用
+	this.intervalY = 65 ; // y间隙,在形成树的时候应用
 	this.foregroundColor = '#1E90FF' ; // 前景色
 	this.backgroundColor = '#B0E0E6' ; // 背景色
 	this.tomato = '#FF6347' ; // tomato色
@@ -81,88 +78,7 @@ thrdBTree.prototype.initAttributes = function() {
 	//this.okOrNot = false;
 	this.nullIndex = this.objectID;
 }
-
-// 初始化状态框
-
-// 插入回调函数
-thrdBTree.prototype.insertButtonCallBack = function(event) {
-	var leftOrRight = this.childSelect.value; 
-	var startInsertValue = this.startInsertField.value;
-	var endInsertValue = this.endInsertField.value;
-	var insertInsertValue = this.insertInsertField.value;
-	if (startInsertValue != "" && endInsertValue != "" && insertInsertValue != "" && leftOrRight != "")
-	{
-		// this.startInsertField.value = "";
-		// this.endInsertField.value = "";
-		// this.insertInsertField.value = "";
-		this.implementAction(this.insertThrdBTree.bind(this), [startInsertValue, endInsertValue, insertInsertValue, leftOrRight] );
-	}
-}
-thrdBTree.prototype.newButtonCallBack = function(event) {
-	location.reload();
-}
-thrdBTree.prototype.insertThrdBTree = function() {
-	var startValue = arguments[0][0];
-	var endValue = arguments[0][1];
-	var insertValue = arguments[0][2];
-	var lfOrRgt = arguments[0][3];
-	var isStartFind = this.isFind(startValue);
-	var isEndFind = this.isFind(endValue);
-	if(startValue == endValue){
-		alert("节点重复~请重新输入~~~");
-		return this.commands ;
-	}
-	if(isStartFind != -1 && isEndFind != -1 && this.thrdBTreeNodeArray[isEndFind].faObID == isStartFind+1){
-		this.thrdBTreeNodeArray[this.objectID-1] = new thrdBTreeNode(this.objectID, isStartFind+1, 0, 0, 0, this.objectID-1, insertValue);
-		this.cmd("CreateCircle", this.objectID, insertValue, this.iniXc, this.iniYc, this.radius) ;
-		this.cmd("SetForegroundColor", this.objectID, this.foregroundColor) ;
-		this.cmd("Step") ;
-		this.cmd("disConnect",isStartFind+1,isEndFind+1, this.foregroundColor) ;
-		this.cmd("Step") ;
-		this.cmd("Connect",isStartFind+1,this.objectID, this.foregroundColor) ;
-		this.cmd("Step") ;
-		this.cmd("Connect",this.objectID,isEndFind+1, this.foregroundColor) ;
-		this.cmd("Step") ;
-		if(this.thrdBTreeNodeArray[isStartFind].chObIDArray[0] == isEndFind+1){
-			this.thrdBTreeNodeArray[isStartFind].chObIDArray[0] = this.objectID;
-		}else if(this.thrdBTreeNodeArray[isStartFind].chObIDArray[1] == isEndFind+1){
-			this.thrdBTreeNodeArray[isStartFind].chObIDArray[1] = this.objectID;
-		}
-		this.thrdBTreeNodeArray[isEndFind].faObID = this.objectID;
-		if(lfOrRgt == 'leftChild'){
-			this.thrdBTreeNodeArray[this.objectID-1].chObIDArray[0] = isEndFind+1;
-		}else if(lfOrRgt == 'rightChild'){
-			this.thrdBTreeNodeArray[this.objectID-1].chObIDArray[1] = isEndFind+1;
-		}
-		this.objectID++;
-		this.done();
-		for(var indexRoot = 0; indexRoot < this.thrdBTreeNodeArray.length; indexRoot++){
-			if(this.thrdBTreeNodeArray[indexRoot].objectID == this.thrdBTreeNodeArray[indexRoot].faObID){
-				this.rootArray.push(indexRoot);
-			}
-		}
-		{ // 画图
-			for(var Pt = 0; Pt<this.rootArray.length ; Pt++){
-				this.root = this.thrdBTreeNodeArray[this.rootArray[Pt]];
-				if(Pt != 0){
-					this.resizeWidth(this.root);
-					this.thrdBTreeNodeArray[this.rootArray[Pt]].x = this.thrdBTreeNodeArray[this.rootArray[Pt-1]].x + this.thrdBTreeNodeArray[this.rootArray[Pt-1]].rightWidth + this.thrdBTreeNodeArray[this.rootArray[Pt]].leftWidth ;
-				}
-				if(this.rootArray.length == 1){
-					this.root.x = 500;
-				}
-				this.resizeTree(this.root.x);
-			}
-		}
-		this.rootArray.length = 0;
-	}else{
-		alert("插入不正确~~~");
-	}
-	return this.commands ;
-}
-/*
-	调用函数this.autoThrdBTree可实现自动生成二叉树，再点击转换按钮即可线索化
-*/
+/*实现自动生成二叉树，再点击转换按钮即可线索化*/
 thrdBTree.prototype.autoThrdBTree = function() {
 	var Range = 3 - 1;
 	var Rand = Math.random();
@@ -180,7 +96,6 @@ thrdBTree.prototype.TranTree1 = function(){
 	var endInsertValue;
 	var leftOrRight;
 	var constArray = [];
-	//alert("请刷新当前页面再进行下一步操作");
 	constArray[0] = ['a','b','leftChild'];	constArray[1] = ['b','d','leftChild'];
 	constArray[2] = ['b','e','rightChild'];	constArray[3] = ['e','f','rightChild'];
 	constArray[4] = ['a','c','rightChild'];	constArray[5] = ['c','g','leftChild'];
@@ -196,7 +111,6 @@ thrdBTree.prototype.TranTree2 = function(){
 	var endInsertValue;
 	var leftOrRight;
 	var constArray = [];
-	//alert("请刷新当前页面再进行下一步操作");
 	constArray[0] = ['a','b','leftChild'];	constArray[1] = ['b','c','leftChild'];
 	constArray[2] = ['c','d','leftChild'];	constArray[3] = ['d','e','leftChild'];
 	for(var i = 0; i<4;++i){
@@ -211,7 +125,6 @@ thrdBTree.prototype.TranTree3 = function(){
 	var endInsertValue;
 	var leftOrRight;
 	var constArray = [];
-	//alert("请刷新当前页面再进行下一步操作");
 	constArray[0] = ['a','b','rightChild'];	constArray[1] = ['b','c','rightChild'];
 	constArray[2] = ['c','d','rightChild'];	constArray[3] = ['d','e','rightChild'];
 	for(var i = 0; i<4;++i){
@@ -221,19 +134,14 @@ thrdBTree.prototype.TranTree3 = function(){
 		this.implementAction(this.createThrdBTree.bind(this), [startInsertValue, endInsertValue, leftOrRight] );
 	}
 }
+
 thrdBTree.prototype.createButtonCallBack = function(parentNode,nodePosition,childNode) {
-	//this.autoThrdBTree();
 	nodePosition = (nodePosition=="left")?("leftChild"):((nodePosition=="right")?("rightChild"):nodePosition);
-	// var leftOrRight = this.childSelect.value;
-	// var startInsertValue = this.startInsertField.value;
-	// var endInsertValue = this.endInsertField.value;
 	var leftOrRight = nodePosition;
 	var startInsertValue = parentNode;
 	var endInsertValue = childNode;
 	if (startInsertValue != "" && endInsertValue != "" && leftOrRight != "")
 	{
-		// this.startInsertField.value = "";
-		// this.endInsertField.value = "";
 		this.implementAction(this.createThrdBTree.bind(this), [startInsertValue, endInsertValue, leftOrRight] );
 	}
 }
@@ -242,9 +150,6 @@ thrdBTree.prototype.changeButtonCallBack = function(event) {
 	this.done();
 	this.midOrderFun();
 	this.alertt();
-	// document.getElementById("crButton").disabled = true;
-	// document.getElementById("inButton").disabled = true;
-	// document.getElementById("chButton").disabled = true;
 }
 // 查找重复
 thrdBTree.prototype.isFind = function(value){
@@ -267,28 +172,28 @@ thrdBTree.prototype.createThrdBTree = function() {
 	var isStartFind = this.isFind(startValue);
 	var isEndFind = this.isFind(endValue);
 	if(startValue == endValue){
-		alert("节点重复~请重新输入~~~");
+		show_notice("节点重复~请重新输入~~~",'error',3);
 		return this.commands ;
 	}
 	if(-1 != isStartFind && -1 != isEndFind && this.thrdBTreeNodeArray[isEndFind].faObID != this.thrdBTreeNodeArray[isEndFind].objectID){ // 判断是否存在环！！！！！！
-		alert("输入两节点均存在~请重新输入~~~");
+		show_notice("输入两节点均存在~请重新输入~~~",'error',3);
 		return this.commands ;
 	}
 	if(-1 == isStartFind && -1 != isEndFind){
 		if(this.thrdBTreeNodeArray[this.thrdBTreeNodeArray[isEndFind].faObID-1].value != startValue){
 			if(this.thrdBTreeNodeArray[isEndFind].faObID != this.thrdBTreeNodeArray[isEndFind].objectID){
-				alert("输入两节点均存在~请重新输入~~~");
+				show_notice("输入两节点均存在~请重新输入~~~",'error',3);
 				return this.commands ;
 			}
 		}
 	}
 	if(-1 != isStartFind && -1 == isEndFind){
 		if(this.thrdBTreeNodeArray[isStartFind].chObIDArray[0] != null && lfOrRgt == "leftChild"){
-			alert("输入两节点均存在~请重新输入~~~");
+			show_notice("输入两节点均存在~请重新输入~~~",'error',3);
 			return this.commands ;
 		}
 		if(this.thrdBTreeNodeArray[isStartFind].chObIDArray[1] != null && lfOrRgt == "rightChild"){
-			alert("输入两节点均存在~请重新输入~~~");
+			show_notice("输入两节点均存在~请重新输入~~~",'error',3);
 			return this.commands ;
 		}
 	}
@@ -416,7 +321,8 @@ thrdBTree.prototype.done = function() { // 后处理函数,为没有孩子的节
 }
 thrdBTree.prototype.alertt = function() { 
 	// 画出线索
-	// 方法：按照中序遍历的方法遍历每个节点，每个节点的2个子节点位置都产生指针，如果没有子节点则产生线索，并按照位置依次画出分辨前驱，后继
+	// 方法：按照中序遍历的方法遍历每个节点，每个节点的2个子节点位置都产生指针，
+	//如果没有子节点则产生线索，并按照位置依次画出分辨前驱，后继
 	this.cmd("CreateCircle", this.nullIndex, "NULL", this.iniXc, this.iniYc, this.radius) ;
 	this.cmd("SetForegroundColor", this.objectID, this.foregroundColor) ;
 	this.cmd("Step") ;
@@ -533,4 +439,20 @@ function thrdBTreeNode(objectID, faObID, lengthOfChild, x, y, index, value){
 	this.y = y;
 	this.index = index;
 	this.value = value;
+}
+
+
+export function start_init_js(){
+	currentThrdBTree.autoThrdBTree();
+}
+export function insert_js(value){
+	/*style : 'tree',
+	parent_value: parent_value.value,
+	child_value: child_value.value,
+	left_right: left_right.value*/
+	currentThrdBTree.createButtonCallBack(value.parent_value,value.left_right,value.child_value);
+}
+export function start_action_js(){
+	show_message("开始线索化",'info');
+	currentThrdBTree.changeButtonCallBack();
 }

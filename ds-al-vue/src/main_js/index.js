@@ -707,61 +707,6 @@ $(function () {
             $('.bstTreeNumber').val('');
         }
     });
-
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //树和森林的转换
-    var actionFlag = 0;
-    //选择btree或者tree
-    $('#treeStyle').change(function () {
-        var treeStyle = $(this).val();
-        if (treeStyle == 'bTree') {
-            $('#zuoyou').removeAttr('disabled');
-            $('.BCreateLine').find('p').css('color', '#fff');
-            actionFlag = 0;
-        } else {
-            $('#zuoyou').attr('disabled', 'true');
-            $('.BCreateLine').find('p').css('color', 'graytext');
-            actionFlag = 1;
-        }
-        currentBT2T.selectStyleButtonCallBack(treeStyle);
-    });
-    var canInsert = 1;
-    //生成边
-    $('.BCreateLine').click(function () {
-        var parentNode = $('.parentNodeDetail').val();
-        var nodePosition = $('#zuoyou').val();
-        var childNode = $('.childNodeDetail').val();
-        if ((actionFlag == 0) && (canInsert == 1)) {
-            currentBT2T.createButtonCallBack(parentNode, nodePosition, childNode);
-        } else {
-            alert('不能生成边');
-        }
-    });
-    //转换
-    $('.transformP').click(function () {
-        currentBT2T.changeButtonCallBack();
-        canAutoPlay = 0;
-        //alert("Inner function1 canAutoPlay" + canAutoPlay);
-    });
-    //刷新
-    var canAutoPlay = 1;
-    $('.updateP').click(function () {
-        currentBT2T.newButtonCallBack();
-    });
-    
-    // 自动演示
-    $('.BT2TAction').click(function () {
-        init();
-        currentBT2T.autoBTreeToTree();
-        currentBT2T.changeButtonCallBack("bTree");
-    });
-
-    $('.T2BTAction').click(function () {
-        init();
-        currentBT2T.createConstTreeCallBack(0);
-        currentBT2T.changeButtonCallBack("Tree");
-    });
-
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //线索二叉树
     var ThrdBtreeStartFlag = 0;
