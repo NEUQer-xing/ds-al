@@ -1,4 +1,40 @@
-// JavaScript Document
+import {Message,Notice} from 'view-ui-plus';
+function show_notice(notices, type , during_time) {
+	var type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	} else if(type == 'warning') {
+		type_zh = '警告' ;
+	}
+	var times = during_time == undefined ? 6 : during_time ;
+	Notice[type]({
+		title: type_zh, // 标题
+		desc: notices,  // 内容
+		duration: times  	// 持续时间
+	});
+}
+function show_message(content, type, during_time ) {
+	var type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	}
+	var times = during_time == undefined ? 0: during_time ;
+	Message[type]({
+		content: content, // 内容
+		duration: times , 	// 持续时间
+		background: true, // 是否显示背景色
+		closable: true, // 是否显示关闭按钮
+	});
+}
+
 
 var currentBT2T;
 // 初始化函数
@@ -31,10 +67,10 @@ BT2T.prototype.selectStyleButtonCallBack = function (style) {
 BT2T.prototype.offSelectOrNot = function (style) {
   this.treeStyle = style;
   if (this.treeStyle == "Tree") {
-    alert("输入用三叉树代替树转换为二叉树算法");
-    this.createTreeCallBack();
+    show_message("输入树转换为二叉树", "info");
   } else if (this.treeStyle == "bTree") {
-    alert("输入的二叉树根结点无右孩子，至多转换为三叉树，且转换后至多为4层");
+    show_message("输入二叉树转换为树", "info");
+    show_notice("输入的二叉树根结点无右孩子，至多转换为三叉树，且转换后至多为4层",'warning',0);
   }
 };
 // 初始化属性
@@ -55,7 +91,7 @@ BT2T.prototype.initAttributes = function () {
   this.iniXr = 400;
   this.iniYr = 100;
   this.startX = 300; //产生新父节点的x坐标
-  this.startY = 150; //产生新父节点的y坐标
+  this.startY = 250; //产生新父节点的y坐标
   this.BT2TNodeArray = new Array(); //包括树的全部节点
   this.rootArray = new Array();
   this.valueableNumOfArticle = 0;
@@ -1100,4 +1136,19 @@ export function tree_to_btree_js() {
 export function btree_to_tree_js() {
   currentBT2T.createBTreeCallBack(); // 自动生成一棵二叉树
   currentBT2T.changeButtonCallBack("bTree");
+}
+export function select_js(style){
+  show_notice("选择了"+style,'info');
+  currentBT2T.selectStyleButtonCallBack(style);
+}
+export function insert_js(value){
+    /*style : 'tree',
+      parent_value: parent_value.value,
+      child_value: child_value.value,
+      left_right: left_right.value*/
+  currentBT2T.createButtonCallBack(value.parent_value,value.left_right,value.child_value);
+}
+export function start_change_js(style){
+  show_message("开始转换:"+style,'info');
+  currentBT2T.changeButtonCallBack(style);
 }

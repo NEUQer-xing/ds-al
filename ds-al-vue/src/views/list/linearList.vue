@@ -1,33 +1,25 @@
 <template>
   <Row>
     <Col span="17">
-      <div class="showBox" style="overflow: scroll">
-        <canvas ref="canvasRef" width="2000" height="1000" id="drawing">
-          Canvas
-        </canvas>
-      </div>
+    <div class="showBox" style="overflow: scroll">
+      <canvas ref="canvasRef" width="2000" height="1000" id="drawing">
+        Canvas
+      </canvas>
+    </div>
     </Col>
     <Col span="7">
-      <introduce>顺序表</introduce>
-      <control 
-            @control_speed="speed_func"
-            @control_scale="scale_func"
-            @control_scale_reset="scale_reset"
-        ></control>
-      <orderlist_menu
-        @list_init="init_list"
-        @list_insert="insert"
-        @list_delete="Delete"
-      ></orderlist_menu>
-      <note @call_note_emit="show_note"></note>
-      <chatgpt @call_gpt_emit="show_gpt"></chatgpt>
-    </Col>  
+    <introduce>顺序表</introduce>
+    <control @control_speed="speed_func" @control_scale="scale_func" @control_scale_reset="scale_reset"></control>
+    <orderlist_menu @list_init="init_list" @list_insert="insert" @list_delete="Delete"></orderlist_menu>
+    <note @call_note_emit="show_note"></note>
+    <chatgpt @call_gpt_emit="show_gpt"></chatgpt>
+    </Col>
   </Row>
   <Drawer title="AI助理" placement="left" :closable="false" v-model="gpt" width="30">
-            <chatgpt_main></chatgpt_main>
+    <chatgpt_main></chatgpt_main>
   </Drawer>
   <Drawer title="学习笔记" placement="bottom" :closable="false" v-model="notes" height="70">
-            <note_main></note_main>
+    <note_main></note_main>
   </Drawer>
 </template>
 
@@ -40,7 +32,11 @@ import chatgpt_main from "@/components/chatgpt/chatgpt_main.vue";
 import note_main from "@/components/markdown_note/note_main.vue";
 import introduce from "@/components/introduce.vue";
 import { ref, onMounted } from "vue";
-import { speed_func_control } from "@/assets/js/play_control.js";
+import {
+  speed_func_control,
+  scale_func_control,
+  scale_reset_control
+} from "@/assets/js/play_control.js";
 import {
   init,
   list_init_index,
@@ -72,13 +68,11 @@ function speed_func(play_speed) {
 }
 // 画布缩放
 function scale_func(canvas_scale) {
-    ctx.value.clearRect(0, 0, drawing_size.width, drawing_size.height);
-    ctx.value.scale(canvas_scale.value, canvas_scale.value);
+  scale_func_control(canvas_scale, ctx.value, drawing_size);
 }
 // 恢复
 function scale_reset(canvas_scale) {
-    ctx.value.clearRect(0, 0, drawing_size.width, drawing_size.height);
-    ctx.value.scale(1 / canvas_scale.value, 1 / canvas_scale.value);
+  scale_reset_control(canvas_scale, ctx.value, drawing_size);
 }
 
 // 具体操作

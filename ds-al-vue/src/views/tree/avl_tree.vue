@@ -10,15 +10,8 @@
         </Col>
         <Col span="7">
         <introduce>平衡二叉搜索树( AVL )</introduce>
-        <control 
-            @control_speed="speed_func"
-            @control_scale="scale_func"
-            @control_scale_reset="scale_reset"
-        ></control>
-        <avl_tree_menu 
-            @node_init_emit="node_init"
-            @node_insert_emit="node_insert" 
-            @node_delete_emit="node_delete"
+        <control @control_speed="speed_func" @control_scale="scale_func" @control_scale_reset="scale_reset"></control>
+        <avl_tree_menu @node_init_emit="node_init" @node_insert_emit="node_insert" @node_delete_emit="node_delete"
             @node_search_emit="node_search">
         </avl_tree_menu>
         <note @call_note_emit="show_note"></note>
@@ -46,7 +39,11 @@ import introduce from "@/components/introduce.vue";
 
 // js引入函数
 import { ref, onMounted } from "vue";
-import { speed_func_control } from "@/assets/js/play_control.js";
+import {
+    speed_func_control,
+    scale_func_control,
+    scale_reset_control
+} from "@/assets/js/play_control.js";
 import {
     init,
     init_js,
@@ -81,13 +78,11 @@ function speed_func(play_speed) {
 }
 // 画布缩放
 function scale_func(canvas_scale) {
-    ctx.value.clearRect(0, 0, drawing_size.width, drawing_size.height);
-    ctx.value.scale(canvas_scale.value, canvas_scale.value);
+    scale_func_control(canvas_scale, ctx.value, drawing_size);
 }
 // 恢复
 function scale_reset(canvas_scale) {
-    ctx.value.clearRect(0, 0, drawing_size.width, drawing_size.height);
-    ctx.value.scale(1 / canvas_scale.value, 1 / canvas_scale.value);
+    scale_reset_control(canvas_scale, ctx.value, drawing_size);
 }
 
 // 具体操作
