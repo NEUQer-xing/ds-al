@@ -650,60 +650,6 @@ $(function () {
     });
 
     //------------------------------------------树-----------------------------------
-    //AVL树
-    var avlStartFlag = 0;
-    $('.treeStartHide').click(function () {
-        if (avlStartFlag == 0) {
-            $(this).children().css('transform', 'rotate(180deg)');
-            setTimeout('$(".avlTreeStarts").show()', 100);
-            $('.avlTreeStarts').animate({
-                'width': '140px',
-            }, 200);
-            avlStartFlag = 1;
-        } else {
-            $(this).children().css('transform', 'rotate(360deg)');
-            setTimeout('$(".avlTreeStarts").hide()', 100);
-            $('.subA1').hide();
-            $('.avlTreeStarts').animate({
-                'width': '0px',
-            }, 200);
-            avlStartFlag = 0;
-        }
-
-    });
-    $('.avlTreeStarts p').click(function () {
-        var str = $(this).attr('class');
-        var s = str[str.length - 1];
-        for (var i = 1; i < 4; i++) {
-            if (i != s) {
-                $('.subA' + i).hide();
-            }
-            else {
-                $('.subA' + s).show();
-            }
-        };
-    });
-    //插入
-    /*$('.avlAction').click(function(){
-        var avlNum=$('.avlNumber').val();
-        if(avlNum){
-            currentAVLTree.insertCallBack(avlNum);
-            $('.avlNumber').val('');
-        }
-    });
-    */
-    // 随机生成
-    $('.avlAction').click(function () {
-        init();
-        currentAVLTree.randomAVLCallBack();
-    });
-    // 随机删除
-    $('.avlDelete').click(function () {
-        init();
-        currentAVLTree.deleteAVLCallBack();
-    });
-
-
     //线索二叉树
     var bstTreeStartFlag = 0;
     $('.treeStartHide').click(function () {
@@ -764,38 +710,6 @@ $(function () {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //树和森林的转换
-    var BT2TStartFlag = 0;
-    $('.treeBT2TStartHide').click(function () {
-        if (BT2TStartFlag == 0) {
-            $(this).children().css('transform', 'rotate(180deg)');
-            setTimeout('$(".BT2TStarts").show()', 100);
-            $('.BT2TStarts').animate({
-                'width': '140px',
-            }, 200);
-            BT2TStartFlag = 1;
-        } else {
-            $(this).children().css('transform', 'rotate(360deg)');
-            setTimeout('$(".BT2TStarts").hide()', 100);
-            $('.subD1').hide();
-            $('.BT2TStarts').animate({
-                'width': '0px',
-            }, 200);
-            BT2TStartFlag = 0;
-        }
-
-    });
-    $('.BT2TStarts p').click(function () {
-        var str = $(this).attr('class');
-        var s = str[str.length - 1];
-        for (var i = 1; i < 5; i++) {
-            if (i != s) {
-                $('.subD' + i).hide();
-            }
-            else {
-                $('.subD' + s).show();
-            }
-        };
-    });
     var actionFlag = 0;
     //选择btree或者tree
     $('#treeStyle').change(function () {
@@ -834,21 +748,7 @@ $(function () {
     $('.updateP').click(function () {
         currentBT2T.newButtonCallBack();
     });
-    //自动演示
-    /*$('#autoBT2T').click(function(){
-        //alert("Inner function2 canAutoPlay" + canAutoPlay);
-        if(canAutoPlay == 1){
-            currentBT2T.autoBTreeToTree();
-            canInsert = 0;
-            canAutoPlay = 0;
-        }
-        else{
-            // alert("请刷新");
-            init();
-            currentBT2T.autoBTreeToTree();
-        }
-    });*/
-
+    
     // 自动演示
     $('.BT2TAction').click(function () {
         init();

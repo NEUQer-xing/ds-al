@@ -1,11 +1,118 @@
 <template>
-  
+    <!-- 二叉搜索树 -->
+    <Row>
+        <Col span="17">
+        <div class="showBox" style="overflow: scroll">
+            <canvas ref="canvasRef" width="2000" height="1000" id="drawing">
+                Canvas
+            </canvas>
+        </div>
+        </Col>
+        <Col span="7">
+        <introduce>树与二叉树的转换</introduce>
+        <control 
+            @control_speed="speed_func"
+            @control_scale="scale_func"
+            @control_scale_reset="scale_reset"
+        ></control>
+        <zhuan_huan_menu 
+            @tree_to_btree_emit="tree_to_btree"
+            @btree_to_tree_emit="btree_to_tree"
+            >
+        </zhuan_huan_menu>
+        <note @call_note_emit="show_note"></note>
+        <chatgpt @call_gpt_emit="show_gpt"></chatgpt>
+        </Col>
+    </Row>
+    <Drawer title="AI助理" placement="left" :closable="false" v-model="gpt" width="30">
+        <chatgpt_main></chatgpt_main>
+    </Drawer>
+    <Drawer title="学习笔记" placement="bottom" :closable="false" v-model="notes" height="70">
+        <note_main></note_main>
+    </Drawer>
 </template>
+  
+<script setup>
 
-<script lang="ts" setup >
+// 组件引入
+import control from "@/components/control.vue";
+import note from "@/components/note.vue";
+import chatgpt from "@/components/chatgpt.vue";
+import chatgpt_main from "@/components/chatgpt/chatgpt_main.vue";
+import note_main from "@/components/markdown_note/note_main.vue";
+import zhuan_huan_menu from "@/components/tree/zhuan_huan_menu.vue";
+import introduce from "@/components/introduce.vue";
+
+// js引入函数
+import { ref, onMounted } from "vue";
+import { speed_func_control } from "@/assets/js/play_control.js";
+import {
+    init,
+    tree_to_btree_js,
+    btree_to_tree_js,
+} from "@/assets/js/tree/BT2T.js";
+
+// 代码开始
+const canvasRef = ref(null);
+var drawing_size = {
+    width: 0,
+    height: 0,
+};
+
+const ctx = ref(null);
+// 初始化页面
+onMounted(() => {
+    // canvasRef只是个引用,需要通过.value来获取值,才可以当作html中的canvas来进行使用
+    // 获取画布的大小
+    drawing_size.width = canvasRef.value.width;
+    drawing_size.height = canvasRef.value.height;
+    // console.log(`成功渲染出组件!`)
+    // console.log(drawing_size)
+    init(drawing_size);
+    ctx.value = canvasRef.value.getContext("2d");
+});
+
+// 播放速度
+function speed_func(play_speed) {
+    speed_func_control(play_speed);
+}
+// 画布缩放
+function scale_func(canvas_scale) {
+    ctx.value.clearRect(0, 0, drawing_size.width, drawing_size.height);
+    ctx.value.scale(canvas_scale.value, canvas_scale.value);
+}
+// 恢复
+function scale_reset(canvas_scale) {
+    ctx.value.clearRect(0, 0, drawing_size.width, drawing_size.height);
+    ctx.value.scale(1 / canvas_scale.value, 1 / canvas_scale.value);
+}
+
+// 具体操作
+function tree_to_btree() {
+    tree_to_btree_js();
+}
+function btree_to_tree() {
+    btree_to_tree_js();
+}
+function node_insert(insert_value) {
+    insert_js(insert_value.value);
+}
+
+// 显示gpt
+const gpt = ref(false);
+function show_gpt() {
+    gpt.value = true;
+}
+
+// 显示notes
+const notes = ref(false);
+function show_note() {
+    notes.value = true;
+}
 
 </script>
-
+  
 <style>
-
+@import url("@/assets/css/index.css");
 </style>
+  

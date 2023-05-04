@@ -9,7 +9,11 @@
       </Col>
       <Col span="7">
         <introduce>栈</introduce>
-        <control @control_speed="speed_func"></control>
+        <control 
+            @control_speed="speed_func"
+            @control_scale="scale_func"
+            @control_scale_reset="scale_reset"
+        ></control>
         <stack_menu
           @list_init="init_list"
           @list_insert="insert"
@@ -49,7 +53,7 @@
     width: 0,
     height: 0,
   };
-  
+  const ctx = ref(null);
   // 初始化页面
   onMounted(() => {
     // canvasRef只是个引用,需要通过.value来获取值,才可以当作html中的canvas来进行使用
@@ -59,12 +63,23 @@
     // console.log(`成功渲染出组件!`)
     // console.log(drawing_size)
     init(drawing_size);
+    ctx.value = canvasRef.value.getContext("2d");
   });
   
   // 播放速度
   function speed_func(play_speed) {
     speed_func_control(play_speed);
   }
+  // 画布缩放
+function scale_func(canvas_scale) {
+    ctx.value.clearRect(0, 0, drawing_size.width, drawing_size.height);
+    ctx.value.scale(canvas_scale.value, canvas_scale.value);
+}
+// 恢复
+function scale_reset(canvas_scale) {
+    ctx.value.clearRect(0, 0, drawing_size.width, drawing_size.height);
+    ctx.value.scale(1 / canvas_scale.value, 1 / canvas_scale.value);
+}
   
   // 具体操作
   function init_list(init_value) {
