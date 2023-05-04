@@ -862,65 +862,6 @@ $(function () {
         currentBT2T.changeButtonCallBack("Tree");
     });
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //霍夫曼树
-    var HuffmanStartFlag = 0;
-    $('.HuffmanStartHide').click(function () {
-        if (HuffmanStartFlag == 0) {
-            $(this).children().css('transform', 'rotate(180deg)');
-            setTimeout('$(".HuffmanStarts").show()', 100);
-            $('.HuffmanStarts').animate({
-                'width': '140px',
-            }, 200);
-            HuffmanStartFlag = 1;
-        } else {
-            $(this).children().css('transform', 'rotate(360deg)');
-            setTimeout('$(".HuffmanStarts").hide()', 100);
-            $('.subE1').hide();
-            $('.HuffmanStarts').animate({
-                'width': '0px',
-            }, 200);
-            HuffmanStartFlag = 0;
-        }
-
-    });
-    $('.HuffmanStarts p').click(function () {
-        var str = $(this).attr('class');
-        var s = str[str.length - 1];
-        for (var i = 1; i < 5; i++) {
-            if (i != s) {
-                $('.subE' + i).hide();
-            }
-            else {
-                $('.subE' + s).show();
-            }
-        };
-    });
-    var canAuto = 1;
-    var canInsert = 1;
-    //建立Huffman树
-    $('.createHuffman').click(function () {
-        var inputText = $('.inputText').val();
-        if (inputText && (canInsert == 1)) {
-            currentHuffman.createButtonCallBack(inputText);
-            canAuto = 0;
-        } else {
-            alert("请刷新");
-        }
-    });
-    //自动演示
-    $('#autoHuffman').click(function () {
-        if (canAuto == 1) {
-            currentHuffman.autoCreateHuffmanTree();
-            canInsert = 0;
-            canAuto = 0;
-        } else {
-            // alert("请刷新");
-            init();
-            currentHuffman.autoCreateHuffmanTree();
-        }
-    });
-
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //线索二叉树
     var ThrdBtreeStartFlag = 0;

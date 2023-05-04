@@ -1,8 +1,43 @@
-// JavaScript Document
+import {Message,Notice} from 'view-ui-plus';
+function show_notice(notices, type , during_time) {
+	var type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	} else if(type == 'warning') {
+		type_zh = '警告' ;
+	}
+	var times = during_time == undefined ? 6 : during_time ;
+	Notice[type]({
+		title: type_zh, // 标题
+		desc: notices,  // 内容
+		duration: times  	// 持续时间
+	});
+}
+function show_message(content, type, during_time ) {
+	var type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	}
+	var times = during_time == undefined ? 0: during_time ;
+	Message[type]({
+		content: content, // 内容
+		duration: times , 	// 持续时间
+		background: true, // 是否显示背景色
+		closable: true, // 是否显示关闭按钮
+	});
+}
 
 var currentAVLTree;
 // 初始化函数
-function init() {
+export function init() {
 	objectManager = new ObjectManager() ;
 	animationManager = new AnimationManager(objectManager) ;
 	currentAVLTree = new AVLTree(animationManager, drawing.width, drawing.height) ;
@@ -11,7 +46,6 @@ function init() {
 // 顺序表
 var AVLTree = function(animManager, width, height) {
 	this.init(animManager, width, height) ;
-	// this.initControls() ; // 初始化控件
 	this.initAttributes() ; // 初始化属性
 }
 // 继承与构造
@@ -20,9 +54,6 @@ AVLTree.prototype.constructor = AVLTree;
 
 // 初始化控件
 AVLTree.prototype.initControls = function() {
-	addLabelToAlgorithmBar("节点数值");
-	this.insertField = addInputToAlgorithmBar("text", "");
-	this.insertButton =	addInputToAlgorithmBar("button", "插入节点");
 	this.insertButton.onclick = this.insertCallBack.bind(this) ;
 }
 
@@ -41,35 +72,19 @@ AVLTree.prototype.initAttributes = function() {
 	this.palegreen = '#32CD32' ; // palegreen色
 	this.startX = 600 ; // 新节点的x坐标
 	this.startY = 150 ; // 新节点的y坐标
-	this.startRootX = 800; // 根结点的x坐标
-	// this.array = [[3, 2, 1, 4]];
-	
-	this.array = [[3, 2, 1, 4, 5, 6, 7, 16, 15, 14, 13, 12, 11, 10, 8, 9],
-		[7, 4, 2, 1, 3, 6, 5, 13, 11, 9, 8, 10, 12, 15, 14, 16],
-		[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-		[1, 3, 2, 5, 6, 4, 8, 10, 9, 12, 11, 14, 16, 15, 13, 7],
-		[9, 8, 10, 11, 12, 13, 14, 15, 16, 7, 6, 5, 4, 1, 2, 3],
-		[16, 14, 15, 12, 10, 8, 9, 11, 13, 5, 6, 3, 1, 2, 4, 7],
-		[16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
-		[7, 13, 15, 16, 14, 11, 12, 9, 10, 8, 4, 6, 5, 2, 3, 1]];
-	
+	this.startRootX = 500; // 根结点的x坐标
+	this.array = [
+		[3, 2, 1, 4, 5, 6, 7, 16, 15],
+		[7, 4, 2, 1, 3, 6, 5, 13, 11],
+		[1, 3, 2, 5, 6, 4, 8, 10, 9],
+		[9, 8, 10, 11, 12, 13, 14, 15],
+		[16, 14, 15, 12, 10, 8, 9, 11],
+		[16, 15, 14, 13, 12, 11, 10],
+		[7, 13, 15, 16, 14, 11, 12]];
 	this.index = 0;
 	this.ifdelete = false;
-	// 初始化状态框
-	// this.implementAction(this.initStateBox.bind(this), "start");
 }
 
-// 初始化状态框
-AVLTree.prototype.initStateBox = function(state) {
-	// 创建状态框
-	{
-		this.cmd("CreateStateBox", 0, state, 20, 20, 400, 40) ;
-		this.cmd("SetForegroundColor", 0, this.foregroundColor) ;
-		this.cmd("SetBackgroundColor", 0, this.backgroundColor) ;
-		this.cmd("Step") ;
-	}
-	return this.commands ;
-}
 
 // 随机生成回调函数
 AVLTree.prototype.randomAVLCallBack = function (value) {
@@ -77,13 +92,16 @@ AVLTree.prototype.randomAVLCallBack = function (value) {
 }
 
 // 随机生成
-AVLTree.prototype.randomAVL = function (value) {
+AVLTree.prototype.randomAVL = function () {
 	this.index = Math.round(Math.random() * this.array.length) % this.array.length;
 	this.ifdelete = true;
+	let state = '随机生成的序列为:';
 	for (var i = 0; i < this.array[this.index].length; i++) {
 		this.insertNode(this.array[this.index][i]);
+		state += this.array[this.index][i] + ' ';
 	}
-	this.deleteNode();
+	//this.deleteNode();
+	show_message(state, "warning");
 	return this.commands;
 }
 
@@ -94,40 +112,38 @@ AVLTree.prototype.insertCallBack = function (value) {
 		this.implementAction(this.insertNode.bind(this), insertValue);
 	}
 }
-
 // 删除回调函数
 AVLTree.prototype.deleteAVLCallBack = function (value) {
-	this.implementAction(this.deleteNode.bind(this), 0);
-}
-
-// 删除回调函数
-AVLTree.prototype.deleteCallBack = function (value) {
-	// 随机删除
-	if (this.ifdelete == true) {
-		node = Math.round(Math.random() * this.array[this.index].length) % this.array[this.index].length;
-		value = this.array[this.index][node];
-		this.array[this.index].splice(node, 1);
-		this.implementAction(this.deleteNode.bind(this), value);
+	var deleteValue = parseInt(value);
+	if (deleteValue != "" && !isNaN(deleteValue)) {
+		this.implementAction(this.deleteNode.bind(this), deleteValue);
 	}
-	else {
-		alert("不可删除");
+	//this.implementAction(this.deleteNode.bind(this), 0);
+}
+// 查找回调函数
+AVLTree.prototype.searchCallBack = function (value) {
+	var searchValue = parseInt(value);
+	if (searchValue != "" && !isNaN(searchValue)) {
+		this.implementAction(this.searchNode.bind(this), searchValue);
 	}
 }
-
-// 删除
-AVLTree.prototype.deleteNode = function () {
-	node = Math.round(Math.random() * this.array[this.index].length) % this.array[this.index].length;
-	value = this.array[this.index][node];
-	this.cmd("SetState", "删除节点" + value);
+// 查找
+AVLTree.prototype.searchNode = function (value) {
 	this.cmd("Step");
 	this.cmd("Step");
 	var temp = this.root;
+	if(temp==null){
+		show_message("树为空，无法查找", "error");
+		show_notice("树为空，无法查找", "error");
+		return ;
+	}
+	show_notice("查找节点" + value, "info");
 	// 开始查找
 	while (true) {
-		if (value >= temp.value && temp.rightChild != null) {
+		if (value > temp.value && temp.rightChild != null) {
 			// 找到节点
 			{
-				this.cmd("SetState", "节点比较" + value + ">=" + temp.value);
+				show_notice("节点比较" + value + ">=" + temp.value, "info");
 				this.cmd("Step");
 				this.cmd("SetHighlight", temp.objectID, true);
 				this.cmd("Step");
@@ -139,7 +155,7 @@ AVLTree.prototype.deleteNode = function () {
 		else if (value < temp.value && temp.leftChild != null) {
 			// 找到节点
 			{
-				this.cmd("SetState", "节点比较" + value + "<" + temp.value);
+				show_notice("节点比较" + value + "<" + temp.value, "info");
 				this.cmd("Step");
 				this.cmd("SetHighlight", temp.objectID, true);
 				this.cmd("Step");
@@ -152,36 +168,86 @@ AVLTree.prototype.deleteNode = function () {
 			break;
 		}
 	}
-	// 找到节点
-	if (value >= temp.value) {
-		// 设置状态框
+	if (value == temp.value) {
+		// 找到节点
 		{
-			this.cmd("SetState", "节点比较" + value + ">=" + temp.value);
+			show_notice("节点比较" + value + "==" + temp.value, "info");
+			this.cmd("Step");
+			this.cmd("SetHighlight", temp.objectID, true);
+			this.cmd("Step");
+			this.cmd("SetHighlight", temp.objectID, false);
 			this.cmd("Step");
 		}
+		//show_message("查找成功", "success");
+		show_notice("查找成功", "success",0);
 	}
 	else {
-		// 设置状态框
+		// 未找到节点
 		{
-			this.cmd("SetState", "节点比较" + value + "<" + temp.value);
+			show_notice("节点比较" + value + "!=" + temp.value, "info");
 			this.cmd("Step");
 		}
+		//show_message("查找失败", "error");
+		show_notice("查找失败", "error",0);
 	}
-	// 设置高亮
-	{
-		this.cmd("SetHighlight", temp.objectID, true);
-		this.cmd("Step");
-		this.cmd("SetHighlight", temp.objectID, false);
-		this.cmd("Step");
+	return this.commands;
+}
+// 删除
+AVLTree.prototype.deleteNode = function (value) {
+	this.cmd("Step");
+	this.cmd("Step");
+	var temp = this.root;
+	if(temp==null){
+		show_message("树为空，无法删除", "error");
+		show_notice("树为空，无法删除", "error");
+		return ;
 	}
-	this.cmd("SetState", "删除节点" + temp.value);
-	
+	show_notice("删除节点" + value, "info");
+	// 开始查找
+	while (true) {
+		if (value > temp.value && temp.rightChild != null) {
+			// 找到节点
+			{
+				show_notice("节点比较" + value + ">=" + temp.value, "info");
+				this.cmd("Step");
+				this.cmd("SetHighlight", temp.objectID, true);
+				this.cmd("Step");
+				this.cmd("SetHighlight", temp.objectID, false);
+				this.cmd("Step");
+			}
+			temp = temp.rightChild;
+		}
+		else if (value < temp.value && temp.leftChild != null) {
+			// 找到节点
+			{
+				show_notice("节点比较" + value + "<" + temp.value, "info");
+				this.cmd("Step");
+				this.cmd("SetHighlight", temp.objectID, true);
+				this.cmd("Step");
+				this.cmd("SetHighlight", temp.objectID, false);
+				this.cmd("Step");
+			}
+			temp = temp.leftChild;
+		}
+		else {
+			break;
+		}
+	}
+
+	this.cmd("Step");
+	this.cmd("Step");
+	if(temp.value != value) {
+		show_notice("没有找到节点" + value + '删除失败 !', "error");
+		show_message("没有找到节点" + value + '删除失败 !', "error");
+		return ;
+	}
+	show_notice("删除节点" + temp.value, "info");
 	if(temp.parent == null) { // 删除的是根节点
 		// 如果只有根节点
 		if(temp.leftChild == null && temp.rightChild == null) {
 			// 直接删除
 			{
-				this.cmd("SetState", "该节点没有子节点，直接删除") ;
+				show_notice("节点"+value+"没有子节点，直接删除", "info");
 				this.cmd("Step") ;
 				this.cmd("Delete", temp.objectID) ;
 				this.cmd("Step") ;
@@ -240,7 +306,7 @@ AVLTree.prototype.deleteNode = function () {
 			// 找到最右侧孩子
 			{
 				this.cmd("SetHighlightColor", rightest.objectID, this.palegreen) ;
-				this.cmd("SetState", "找到左子树的最右侧孩子") ;
+				show_notice("找到左子树的最右侧孩子", "info");
 				this.cmd("Step") ;
 				this.cmd("SetHighlight", rightest.objectID, true) ;
 				this.cmd("Step") ;
@@ -273,7 +339,7 @@ AVLTree.prototype.deleteNode = function () {
 		if(temp.leftChild == null && temp.rightChild == null) {
 			// 直接删除
 			{
-				this.cmd("SetState", "该节点没有子节点，直接删除") ;
+				show_notice("节点"+value+"没有子节点，直接删除", "info");
 				this.cmd("Step") ;
 				this.cmd("Disconnect", temp.parent.objectID, temp.objectID) ;
 				this.cmd("Step") ;
@@ -373,7 +439,7 @@ AVLTree.prototype.deleteNode = function () {
 			// 找到最右侧孩子
 			{
 				this.cmd("SetHighlightColor", rightest.objectID, this.palegreen) ;
-				this.cmd("SetState", "找到左子树的最右侧孩子") ;
+				show_notice("找到左子树的最右侧孩子", "info");
 				this.cmd("Step") ;
 				this.cmd("SetHighlight", rightest.objectID, true) ;
 				this.cmd("Step") ;
@@ -470,6 +536,7 @@ AVLTree.prototype.deleteNode = function () {
 		// update position of every points
 		this.resizeTree();
 	}
+	show_notice("成功删除节点"+value, 'success',0) ;
 	return this.commands;
 }
 
@@ -481,7 +548,7 @@ AVLTree.prototype.insertNode = function (value) {
 		this.objectID ++ ;
 		// 创建根节点
 		{
-			this.cmd("SetState", "创建根节点"+value) ;
+			show_notice("创建根节点"+value, 'success') ;
 			this.cmd("Step") ;
 			this.cmd("CreateCircle", this.root.objectID, this.root.value, this.root.x, this.root.y, this.radius) ;
 			this.cmd("SetForegroundColor", this.root.objectID, this.foregroundColor) ;
@@ -495,7 +562,7 @@ AVLTree.prototype.insertNode = function (value) {
 		this.objectID ++ ;
 		// 创建新节点
 		{
-			this.cmd("SetState", "创建新节点"+value) ;
+			show_notice("创建新节点"+value, 'success') ;
 			this.cmd("Step") ;
 			this.cmd("CreateCircle", newNode.objectID, newNode.value, newNode.x, newNode.y, this.radius) ;
 			this.cmd("SetForegroundColor", newNode.objectID, this.foregroundColor) ;
@@ -507,7 +574,7 @@ AVLTree.prototype.insertNode = function (value) {
 			if(newNode.value >= temp.value && temp.rightChild != null) {
 				// 找到节点
 				{
-					this.cmd("SetState", "节点比较"+newNode.value+">="+temp.value) ;
+					show_notice("节点比较"+newNode.value+">="+temp.value, 'info') ;
 					this.cmd("Step") ;
 					this.cmd("SetHighlight", temp.objectID, true) ;
 					this.cmd("Step") ;
@@ -519,7 +586,7 @@ AVLTree.prototype.insertNode = function (value) {
 			else if(newNode.value < temp.value && temp.leftChild != null){
 				// 找到节点
 				{
-					this.cmd("SetState", "节点比较"+newNode.value+"<"+temp.value) ;
+					show_notice("节点比较"+newNode.value+"<"+temp.value, 'info') ;
 					this.cmd("Step") ;
 					this.cmd("SetHighlight", temp.objectID, true) ;
 					this.cmd("Step") ;
@@ -536,14 +603,14 @@ AVLTree.prototype.insertNode = function (value) {
 		if(newNode.value >= temp.value) {
 			// 设置状态框
 			{
-				this.cmd("SetState", "节点比较"+newNode.value+">="+temp.value) ;
+				show_notice("节点比较"+newNode.value+">="+temp.value, 'info') ;
 				this.cmd("Step") ;
 			}
 		}
 		else {
 			// 设置状态框
 			{
-				this.cmd("SetState", "节点比较"+newNode.value+"<"+temp.value) ;
+				show_notice("节点比较"+newNode.value+"<"+temp.value, 'info') ;
 				this.cmd("Step") ;
 			}
 		}
@@ -563,7 +630,7 @@ AVLTree.prototype.insertNode = function (value) {
 			newNode.parent = temp ;
 			// 插入
 			{
-				this.cmd("SetState", "新节点"+newNode.value+"插入到父节点"+temp.value+"的右孩子") ;
+				show_notice("新节点"+newNode.value+"插入到父节点"+temp.value+"的右孩子", 'success',0) ;
 				this.cmd("Step") ;
 			}
 		}
@@ -573,7 +640,7 @@ AVLTree.prototype.insertNode = function (value) {
 			newNode.parent = temp ;
 			// 插入
 			{
-				this.cmd("SetState", "新节点"+newNode.value+"插入到父节点"+temp.value+"的左孩子") ;
+				show_notice("新节点"+newNode.value+"插入到父节点"+temp.value+"的左孩子", 'success',0) ;
 				this.cmd("Step") ;
 			}
 		}
@@ -630,162 +697,6 @@ AVLTree.prototype.insertNode = function (value) {
 	return this.commands ;
 }
 
-// 删除
-AVLTree.prototype.insertNode = function (value) {
-	// 如果根节点为空
-	if (this.root == null || this.root == undefined) {
-		this.root = new TreeNode(this.objectID, value, this.startRootX, this.startY, 0, null, null, null);
-		this.objectID++;
-		// 创建根节点
-		{
-			this.cmd("SetState", "创建根节点" + value);
-			this.cmd("Step");
-			this.cmd("CreateCircle", this.root.objectID, this.root.value, this.root.x, this.root.y, this.radius);
-			this.cmd("SetForegroundColor", this.root.objectID, this.foregroundColor);
-			this.cmd("SetBackgroundColor", this.root.objectID, this.backgroundColor);
-			this.cmd("Step");
-		}
-	}
-	else {
-		var temp = this.root;
-		var newNode = new TreeNode(this.objectID, value, this.startX, this.startY, null, null, null);
-		this.objectID++;
-		// 创建新节点
-		{
-			this.cmd("SetState", "创建新节点" + value);
-			this.cmd("Step");
-			this.cmd("CreateCircle", newNode.objectID, newNode.value, newNode.x, newNode.y, this.radius);
-			this.cmd("SetForegroundColor", newNode.objectID, this.foregroundColor);
-			this.cmd("SetBackgroundColor", newNode.objectID, this.backgroundColor);
-			this.cmd("Step");
-		}
-		// 开始查找
-		while (true) {
-			if (newNode.value >= temp.value && temp.rightChild != null) {
-				// 找到节点
-				{
-					this.cmd("SetState", "节点比较" + newNode.value + ">=" + temp.value);
-					this.cmd("Step");
-					this.cmd("SetHighlight", temp.objectID, true);
-					this.cmd("Step");
-					this.cmd("SetHighlight", temp.objectID, false);
-					this.cmd("Step");
-				}
-				temp = temp.rightChild;
-			}
-			else if (newNode.value < temp.value && temp.leftChild != null) {
-				// 找到节点
-				{
-					this.cmd("SetState", "节点比较" + newNode.value + "<" + temp.value);
-					this.cmd("Step");
-					this.cmd("SetHighlight", temp.objectID, true);
-					this.cmd("Step");
-					this.cmd("SetHighlight", temp.objectID, false);
-					this.cmd("Step");
-				}
-				temp = temp.leftChild;
-			}
-			else {
-				break;
-			}
-		}
-		// 找到节点
-		if (newNode.value >= temp.value) {
-			// 设置状态框
-			{
-				this.cmd("SetState", "节点比较" + newNode.value + ">=" + temp.value);
-				this.cmd("Step");
-			}
-		}
-		else {
-			// 设置状态框
-			{
-				this.cmd("SetState", "节点比较" + newNode.value + "<" + temp.value);
-				this.cmd("Step");
-			}
-		}
-		// 设置高亮
-		{
-			this.cmd("SetHighlight", temp.objectID, true);
-			this.cmd("Step");
-			this.cmd("SetHighlight", temp.objectID, false);
-			this.cmd("Step");
-			this.cmd("Connect", temp.objectID, newNode.objectID, this.foregroundColor);
-			this.cmd("Step");
-		}
-		// 节点插入到相应位置
-		if (parseInt(newNode.value) >= parseInt(temp.value)) {
-			// 插入到右侧
-			temp.rightChild = newNode;
-			newNode.parent = temp;
-			// 插入
-			{
-				this.cmd("SetState", "新节点" + newNode.value + "插入到父节点" + temp.value + "的右孩子");
-				this.cmd("Step");
-			}
-		}
-		else {
-			// 插入到左侧
-			temp.leftChild = newNode;
-			newNode.parent = temp;
-			// 插入
-			{
-				this.cmd("SetState", "新节点" + newNode.value + "插入到父节点" + temp.value + "的左孩子");
-				this.cmd("Step");
-			}
-		}
-		// 更新树的每个节点的位置
-		this.resizeTree();
-		// 计算每个节点的高度
-		this.calHeight(this.root);
-		// 更新每个节点的平衡因子
-		this.calBalFactor(this.root);
-		// 从该节点向上回溯
-		var isTurn = false;
-		var stack = new Array(); // 栈存储路径
-		temp = newNode;
-		while (temp != null) {
-			stack.push(temp);
-			if (temp.balfactor >= 2 || temp.balfactor <= -2) {
-				isTurn = true;
-				break;
-			}
-			temp = temp.parent;
-		}
-		if (isTurn) {
-			var first = stack.pop();
-			var second = stack.pop();
-			var third = stack.pop();
-			// set highlight
-			{
-				this.cmd("SetHighlight", first.objectID, true);
-				this.cmd("SetHighlight", second.objectID, true);
-				this.cmd("SetHighlight", third.objectID, true);
-				this.cmd("Step");
-				this.cmd("SetHighlight", first.objectID, false);
-				this.cmd("SetHighlight", second.objectID, false);
-				this.cmd("SetHighlight", third.objectID, false);
-				this.cmd("Step");
-			}
-			// start turning
-			if (first.leftChild == second && second.leftChild == third) {
-				this.singleRightTurn(first, second);
-			}
-			else if (first.rightChild == second && second.rightChild == third) {
-				this.singleLeftTurn(first, second);
-			}
-			else if (first.leftChild == second && second.rightChild == third) {
-				this.leftRightTurn(first, second, third);
-			}
-			else if (first.rightChild == second && second.leftChild == third) {
-				this.rightLeftTurn(first, second, third);
-			}
-		}
-		// update position of every points
-		this.resizeTree();
-	}
-	return this.commands;
-}
 
 // single right turn method
 AVLTree.prototype.singleRightTurn = function(first, second) {
@@ -1167,4 +1078,19 @@ var TreeNode = function(objectID, value, x, y, balfactor, leftChild, rightChild,
 	this.leftChild = leftChild ; // 左孩子
 	this.rightChild = rightChild ; // 右孩子
 	this.parent = parent ; // 父亲
+}
+
+
+// 连接组件
+export function init_js(){
+	currentAVLTree.randomAVLCallBack();
+}
+export function insert_js(insert_value){
+	currentAVLTree.insertCallBack(insert_value);
+}
+export function search_js(search_value){
+	currentAVLTree.searchCallBack(search_value);
+}
+export function delete_js(delete_value){
+	currentAVLTree.deleteAVLCallBack(delete_value);
 }
