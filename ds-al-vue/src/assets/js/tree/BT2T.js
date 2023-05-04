@@ -67,9 +67,9 @@ BT2T.prototype.selectStyleButtonCallBack = function (style) {
 BT2T.prototype.offSelectOrNot = function (style) {
   this.treeStyle = style;
   if (this.treeStyle == "Tree") {
-    show_message("输入树转换为二叉树", "info");
+    show_message("输入树转换为二叉树", "info",3);
   } else if (this.treeStyle == "bTree") {
-    show_message("输入二叉树转换为树", "info");
+    show_message("输入二叉树转换为树", "info",3);
     show_notice("输入的二叉树根结点无右孩子，至多转换为三叉树，且转换后至多为4层",'warning',0);
   }
 };
@@ -484,7 +484,7 @@ BT2T.prototype.createBT2T = function () {
   var isStartFind = this.isFind(startValue);
   var isEndFind = this.isFind(endValue);
   if (startValue == endValue) {
-    alert("节点重复，请重新输入！");
+    show_notice("节点重复，请重新输入！",'error');
     return this.commands;
   }
   if (
@@ -494,7 +494,7 @@ BT2T.prototype.createBT2T = function () {
       this.BT2TNodeArray[isEndFind].objectID
   ) {
     // 判断是否存在环！！！！！！
-    alert("输入两节点均存在，请重新输入！");
+    show_notice("输入两节点均存在，请重新输入！",'error');
     return this.commands;
   }
   if (-1 == isStartFind && -1 != isEndFind) {
@@ -506,7 +506,7 @@ BT2T.prototype.createBT2T = function () {
         this.BT2TNodeArray[isEndFind].faObID !=
         this.BT2TNodeArray[isEndFind].objectID
       ) {
-        alert("输入两节点均存在，请重新输入！");
+        show_notice("输入两节点均存在，请重新输入！",'error');
         return this.commands;
       }
     }
@@ -516,14 +516,14 @@ BT2T.prototype.createBT2T = function () {
       this.BT2TNodeArray[isStartFind].chObIDArray[0] != null &&
       lfOrRgt == "leftChild"
     ) {
-      alert("输入两节点均存在，请重新输入！");
+      show_notice("输入两节点均存在，请重新输入！",'error');
       return this.commands;
     }
     if (
       this.BT2TNodeArray[isStartFind].chObIDArray[1] != null &&
       lfOrRgt == "rightChild"
     ) {
-      alert("输入两节点均存在，请重新输入！");
+      show_notice("输入两节点均存在，请重新输入！",'error');
       return this.commands;
     }
   }
@@ -751,12 +751,7 @@ BT2T.prototype.drawTree = function () {
     }
     flag = 1;
     CONSTINDEX++;
-    //alert("When Root is: "+this.BT2TNodeArray[this.rootArray[indexroot]].value);
   }
-  /*for(var i = 0; i < tempIndexInOrder.length; i++){
-		alert("Order is: " + this.BT2TNodeArray[tempIndexInOrder[i]].value);
-	}*/
-  //alert("Function End!");
   var maxX = 0;
   var maxY = 0;
   var keyIndex = new Array();
@@ -868,7 +863,7 @@ BT2T.prototype.alertt = function (keyWord) {
   }
   if (maxChildOfBT2T <= 2 && keyWord == "bTree") {
     if (this.BT2TNodeArray[rootIndex].chObIDArray[1] != null) {
-      alert("输入二叉树根结点有右孩子，会生成2棵以上的树，请重新输入！");
+      show_notice("输入二叉树根结点有右孩子，会生成2棵以上的树，请重新输入！",'warning');
       return this.commands;
     }
     //alert("二叉树 到 树");
@@ -877,7 +872,7 @@ BT2T.prototype.alertt = function (keyWord) {
     //alert("树 到 二叉树");
     this.tree2BTree();
   } else {
-    alert("输入节点数与选择种类不同，请检查，并刷新页面改正！");
+    show_notice("输入节点数与选择种类不同，请检查，并刷新页面改正！",'warning');
   }
 };
 
@@ -1112,7 +1107,6 @@ BT2T.prototype.resizeWidth = function (tree) {
     this.resizeWidth(this.BT2TNodeArray[tree.chObIDArray[1] - 1]),
     this.intervalX
   ); // 右边宽度
-  //alert("Father: "+tree.value+"  l: "+tree.leftWidth+"r: "+tree.rightWidth);
   return parseInt(tree.leftWidth + tree.rightWidth);
 };
 
@@ -1138,7 +1132,8 @@ export function btree_to_tree_js() {
   currentBT2T.changeButtonCallBack("bTree");
 }
 export function select_js(style){
-  show_notice("选择了"+style,'info');
+  var mess = style=='Tree'?'树--->二叉树':'二叉树--->树';
+  show_notice("选择了: "+mess,'success');
   currentBT2T.selectStyleButtonCallBack(style);
 }
 export function insert_js(value){
@@ -1149,6 +1144,7 @@ export function insert_js(value){
   currentBT2T.createButtonCallBack(value.parent_value,value.left_right,value.child_value);
 }
 export function start_change_js(style){
-  show_message("开始转换:"+style,'info');
+  var mess = style=='Tree'?'树--->二叉树':'二叉树--->树';
+  show_message("开始转换: "+mess,'info');
   currentBT2T.changeButtonCallBack(style);
 }

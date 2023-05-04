@@ -52,7 +52,7 @@
                         </RadioGroup>
                         <space>
                             <Input v-model="parent_value" placeholder="父节点值"/>
-                            <Select v-model="left_right" placeholder="位置">
+                            <Select v-model="left_right" placeholder="位置" :disabled=is_select_disable>
                                 <Option v-for="item in left_right_items" :value="item.value" :key="item.value">
                                     {{ item.label }}
                                 </Option>
@@ -86,6 +86,7 @@
     const tree_or_btree_selete = ref();
     const left_right = ref();
     const tag_show = ref('插入节点-构造树');
+    const is_select_disable = ref(true); // 是否禁用选择框
     const left_right_items = ref([
         {
             value: 'left',
@@ -100,9 +101,11 @@
         if(tree_or_btree_selete.value == '树转二叉树'){
             tag_show.value = '插入节点-构造树';
             emit('select_emit','Tree');
+            is_select_disable.value = true;
         }else if(tree_or_btree_selete.value == '二叉树转树'){
             tag_show.value = '插入节点-构造二叉树';
             emit('select_emit','bTree');
+            is_select_disable.value = false;
         }
     }
 
@@ -119,7 +122,7 @@
                 style : 'Tree',
                 parent_value: parent_value.value,
                 child_value: child_value.value,
-                left_right: left_right.value
+                left_right: 'left' // 树只有左侧,无左右子树之分
             });
         }else if(tree_or_btree.value=='二叉树转树'){
             emit('node_insert_emit',{
