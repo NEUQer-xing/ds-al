@@ -1,8 +1,35 @@
-// JavaScript Document
+import {Message,Notice} from 'view-ui-plus';
+function show_notice(notices, type , during_time) {
+	let type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	} else if(type == 'warning') {
+		type_zh = '警告' ;
+	}
+	var times = during_time == undefined ? 6 : during_time ;
+	Notice[type]({
+		title: type_zh, // 标题
+		desc: notices,  // 内容
+		duration: times  	// 持续时间
+	});
+}
+function show_message(content, type, during_time ) {
+	var times = during_time == undefined ? 0: during_time ;
+	Message[type]({
+		content: content, // 内容
+		duration: times , 	// 持续时间
+		background: true, // 是否显示背景色
+		closable: true, // 是否显示关闭按钮
+	});
+}
 
 var currentSort;
 // 初始化函数
-function init() {
+export function init() {
 	objectManager = new ObjectManager() ;
 	animationManager = new AnimationManager(objectManager) ;
 	currentSort = new Sort(animationManager, drawing.width, drawing.height) ;
@@ -11,7 +38,6 @@ function init() {
 // 排序
 var Sort = function(animManager, width, height) {
 	this.init(animManager, width, height) ;
-	// this.initControls() ; // 初始化控件
 	this.initAttributes() ; // 初始化属性
 }
 // 继承与构造
@@ -20,12 +46,7 @@ Sort.prototype.constructor = Sort;
 
 // 初始化控件
 Sort.prototype.initControls = function() {
-	addLabelToAlgorithmBar("数组长度");
-	this.insertField = addInputToAlgorithmBar("text", "");
-	this.initButton = addInputToAlgorithmBar("button", "随机生成数组");
 	this.initButton.onclick = this.initCallBack.bind(this) ;
-
-	this.RadixSortButton = addInputToAlgorithmBar("button", "基数排序");
 	this.RadixSortButton.onclick = this.RadixSortCallBack.bind(this) ;
 }
 
@@ -41,38 +62,18 @@ Sort.prototype.initAttributes = function() {
 	this.tomato = '#FF6347' ; // tomato色
 	this.palegreen = '#32CD32' ; // palegreen色
 	this.startX = 30 ; // 开始的x坐标
-	this.startY = 150 ; // 开始的y坐标
-	this.startArrayY = 130 ; // 开始的数组的y坐标
-	this.startLabelY=400;//标签的y坐标
-	// 初始化状态框
-	// this.implementAction(this.initStateBox.bind(this), "start");
-}
-
-// 初始化状态框
-Sort.prototype.initStateBox = function(state) {
-	// 创建状态框
-	{
-		this.cmd("CreateStateBox", 0, state, 20, 20, 400, 40) ;
-		this.cmd("SetForegroundColor", 0, this.foregroundColor) ;
-		this.cmd("SetBackgroundColor", 0, this.backgroundColor) ;
-		this.cmd("Step") ;
-	}
-	return this.commands ;
+	this.startArrayY = 250 ; // 开始的数组的y坐标
+	this.startLabelY=350;//标签的y坐标
 }
 
 // 初始化回调函数
 Sort.prototype.initCallBack = function(length) {
 	// var insertValue = this.insertField.value;
 	var insertValue = length;
-	if (insertValue != "")
-	{
-		// set text value
-		// this.insertField.value = "";
 		this.implementAction(this.initArray.bind(this), insertValue);
-	}
-	else{
-	    alert("请输入数组长度");
-	}
+}
+Sort.prototype.initCallBack_by_user = function(array) {
+	this.implementAction(this.initArray_by_user.bind(this), array);
 }
 
 
@@ -106,11 +107,11 @@ Sort.prototype.clearCanvas = function() {
 Sort.prototype.initArray = function(value) {
 	value = parseInt(value);
 	if (isNaN(value)) {
-		this.cmd('SetState', '数组长度应介于2-24。');
+		show_message('数组长度应介于2-24。', 'error');
 		return this.commands;
 	}
 	if (value < 2 || value > 24) {
-		this.cmd('SetState', '数组长度应介于2-24。');
+		show_message('数组长度应介于2-24。', 'error');
 		return this.commands;
 	}
 	this.clearCanvas();
@@ -119,7 +120,7 @@ Sort.prototype.initArray = function(value) {
 	this.arrayData =new Array(value) ; 
 	// 设置状态栏
 	{
-		this.cmd("SetState", "创建大小为"+value+"的数组") ;
+		show_notice('创建大小为'+value+'的数组', 'success');
 		this.cmd("Step") ;
 	}
 	for(var i=0 ; i<this.maxSize ; i++) {
@@ -134,10 +135,52 @@ Sort.prototype.initArray = function(value) {
 			this.cmd("SetBackgroundColor", this.arrayList[i].objectID, '#FFFFFF') ;
 		}
 	}
-	//this.cmd("Step") ;
+	this.cmd("Step") ;
 	this.labelArr=new Array(10);
 	for(var j=0;j<10;j++){
-	    this.labelArr[j]=new ArrayNode(this.objectID,j,parseInt(this.startX+j*2*this.width),180);
+	    this.labelArr[j]=new ArrayNode(this.objectID,j,parseInt(this.startX+j*2*this.width),this.startLabelY);
+		this.objectID++;
+		this.cmd("CREATEPOINTER",this.labelArr[j].objectID,this.labelArr[j].value,20,"down",this.labelArr[j].x,this.labelArr[j].y);
+	}
+	this.cmd("Step") ;
+	
+	return this.commands ;
+}
+
+// 用户自定义数组
+Sort.prototype.initArray_by_user = function(array_date_by_user) {
+	var value = array_date_by_user.length;
+	if (isNaN(value)) {
+		show_message('数组长度应介于2-24。', 'error');
+		return this.commands;
+	}
+	if (value < 2 || value > 24) {
+		show_message('数组长度应介于2-24。', 'error');
+		return this.commands;
+	}
+	this.clearCanvas();
+    this.maxSize=value;
+	this.arrayList = new Array(value) ; // 数组框
+	this.arrayData =new Array(value) ; 
+	show_notice('创建大小为'+value+'的数组,数组内容为:'+array_date_by_user, 'success');
+	this.cmd("Step") ;
+
+	for(var i=0 ; i<this.maxSize ; i++) {
+	    this.arrayData[i] = array_date_by_user[i];
+		this.arrayList[i] = new ArrayNode(this.objectID, this.arrayData[i], parseInt(this.startX+i*(this.width)), this.startArrayY) ;
+		this.objectID ++ ;
+		// 创建矩形
+		{
+			this.cmd("CreateRectangle", this.arrayList[i].objectID, this.arrayList[i].value, this.width, this.height, 
+					 'center', 'bottom', this.arrayList[i].x, this.arrayList[i].y) ;
+			this.cmd("SetForegroundColor", this.arrayList[i].objectID, this.foregroundColor) ;
+			this.cmd("SetBackgroundColor", this.arrayList[i].objectID, '#FFFFFF') ;
+		}
+	}
+	this.cmd("Step") ;
+	this.labelArr=new Array(10);
+	for(var j=0;j<10;j++){
+	    this.labelArr[j]=new ArrayNode(this.objectID,j,parseInt(this.startX+j*2*this.width),this.startLabelY);
 		this.objectID++;
 		this.cmd("CREATEPOINTER",this.labelArr[j].objectID,this.labelArr[j].value,20,"down",this.labelArr[j].x,this.labelArr[j].y);
 	}
@@ -162,8 +205,7 @@ Sort.prototype.RadixSort = function(value) {
 	var count=new Array(10);//计数器
 	var count1=new Array(10);
 	for(i=1;i<=d;i++){
-	    //alert(i);
-		this.cmd("SetState", "进行第"+i+"轮排序") ;
+		show_notice('进行第'+i+'轮排序','info');
 		this.cmd("Step") ;
 	    for(j=0;j<10;j++){
 		    count[j]=0;     //每次分配前清空计数器
@@ -172,7 +214,6 @@ Sort.prototype.RadixSort = function(value) {
 		for(j=0;j<this.maxSize;j++){
 		    k=parseInt((this.arrayList[j].value/radix)%10);//计算每个记录对应的桶号
 			count[k]++;                //统计每个桶中的记录数
-			//count1[k]++;
 		}
 		for(j=1;j<10;j++){
 		    count[j]=count[j]+count[j-1];//将tmp中的位置一次分配给每个桶
@@ -187,12 +228,10 @@ Sort.prototype.RadixSort = function(value) {
 			count[k]--;
 			count1[k]++;
 		}
-		this.cmd("SetState", "进行第"+i+"次收集") ;
+		show_notice('进行第'+i+'次收集','info');
 		this.cmd("Step") ;
 		for(j=0;j<this.maxSize;j++)//将临时数组的内容复制到data中
 		{
-		   // var temp=this.arrayList[j];
-		    
 		    this.arrayList[j]=tmp[j];
 			this.cmd("Move", this.arrayList[j].objectID, this.arrayList[j].x, this.arrayList[j].y) ;
 			this.cmd("step");
@@ -200,7 +239,7 @@ Sort.prototype.RadixSort = function(value) {
 		radix=radix*10;
 		this.cmd("step");
 	}
-	//alert("1");
+	show_notice('排序完成','success');
     return this.commands;
 }
 
@@ -224,4 +263,19 @@ var ArrayNode = function(objectID, value, x, y) {
 	this.value = value ; // 值
 	this.x = x ; // x坐标
 	this.y = y ; // y坐标
+}
+
+export function creat_random_array_js(length){
+	currentSort.initCallBack(length);
+}
+export function creat_custom_array_js(array){
+	show_notice('成功初始化数组'+array,'success');
+	currentSort.initCallBack_by_user(array);
+}
+export function start_sort_js(a,b){
+	if(a==0&&b==0){
+		show_message("请先初始化数组",'error');
+		return;
+	}
+	currentSort.radixSortCallBack();
 }

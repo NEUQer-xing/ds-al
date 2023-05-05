@@ -8,11 +8,11 @@
         </div>
         </Col>
         <Col span="7">
-        <introduce> 基 数 排 序</introduce>
+        <introduce>比较排序 ==> {{ sort_style_tag }}</introduce>
         <control @control_speed="speed_func" @control_scale="scale_func" @control_scale_reset="scale_reset"></control>
-        <jishu_sort_menu @show_style_emit="show_style" @creat_random_array_emit="creat_random_array"
+        <compare_sort_menu @show_style_emit="show_style" @creat_random_array_emit="creat_random_array"
         @creat_custom_array_emit="creat_custom_array" @start_sort_emit="start_sort">
-        </jishu_sort_menu>
+        </compare_sort_menu>
         <note @call_note_emit="show_note"></note>
         <chatgpt @call_gpt_emit="show_gpt"></chatgpt>
         </Col>
@@ -27,7 +27,7 @@
   
 <script setup>
 import control from "@/components/control.vue";
-import jishu_sort_menu from "@/components/sort/jishu_sort_menu.vue";
+import compare_sort_menu from "@/components/sort/compare_sort_menu.vue";
 import note from "@/components/note.vue";
 import chatgpt from "@/components/chatgpt.vue";
 import chatgpt_main from "@/components/chatgpt/chatgpt_main.vue";
@@ -44,7 +44,7 @@ import {
     creat_random_array_js,
     creat_custom_array_js,
     start_sort_js,
-} from "@/assets/js/sort/RadixSort.js";
+} from "@/assets/js/sort/CompareSort.js";
 
 const canvasRef = ref(null);
 var drawing_size = {
@@ -71,14 +71,18 @@ function scale_reset(canvas_scale) {
 }
 
 // 具体操作
+const sort_style_tag = ref();
+function show_style(style) {
+    sort_style_tag.value = style;
+}
 function creat_random_array(length) {
     creat_random_array_js(length);
 }
 function creat_custom_array(array) {
     creat_custom_array_js(array);
 }
-function start_sort(a,b) {
-    start_sort_js(a,b);
+function start_sort(sort_style,a,b) {
+    start_sort_js(sort_style,a,b);
 }
 
 // 显示gpt

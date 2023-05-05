@@ -125,17 +125,7 @@
                                 <Icon type="md-stats" />
                                 <span>排序</span>
                             </template>
-                            <Submenu name="4-1">
-                                <template #title>
-                                    比较排序
-                                </template>
-                                <MenuItem name="4-1-1" to="mao_pao">冒泡排序</MenuItem>
-                                <MenuItem name="4-1-2" to="xuan_ze">选择排序</MenuItem>
-                                <MenuItem name="4-1-3" to="cha_ru">插入排序</MenuItem>
-                                <MenuItem name="4-1-4" to="xi_er">希尔排序</MenuItem>
-                                <MenuItem name="4-1-5" to="gui_bing">归并排序</MenuItem>
-                                <MenuItem name="4-1-6" to="quick_sort">快速排序</MenuItem>
-                            </Submenu>
+                            <MenuItem name="4-1" to="compare_sort">比较排序</MenuItem>
                             <MenuItem name="4-2" to="heap_sort">堆排序</MenuItem>
                             <MenuItem name="4-3" to="ji_shu">基数排序</MenuItem>
                         </Submenu>

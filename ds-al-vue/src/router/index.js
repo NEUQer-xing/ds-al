@@ -64,8 +64,25 @@ const router = createRouter({
       path: '/xian_suo_tree',
       name: 'xian_suo_tree', // 线索二叉树
       component:() => import('../views/tree/xian_suo_tree.vue')
-    }
+    },
     // 图
+
+    // 排序
+    {
+      path: '/compare_sort', 
+      name: 'compare_sort', // 比较排序
+      component:() => import('../views/sort/compare_sort.vue')
+    },
+    {
+      path: '/heap_sort',
+      name: 'heap_sort', // 堆排序
+      component:() => import('../views/sort/heap_sort.vue')
+    },
+    {
+      path: '/ji_shu',
+      name: 'ji_shu', // 基数排序
+      component:() => import('../views/sort/ji_shu.vue')
+    },
     
   ]
 })

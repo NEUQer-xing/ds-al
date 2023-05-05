@@ -1,8 +1,36 @@
 // JavaScript Document
+import {Message,Notice} from 'view-ui-plus';
+function show_notice(notices, type , during_time) {
+	let type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	} else if(type == 'warning') {
+		type_zh = '警告' ;
+	}
+	var times = during_time == undefined ? 6 : during_time ;
+	Notice[type]({
+		title: type_zh, // 标题
+		desc: notices,  // 内容
+		duration: times  	// 持续时间
+	});
+}
+function show_message(content, type, during_time ) {
+	var times = during_time == undefined ? 0: during_time ;
+	Message[type]({
+		content: content, // 内容
+		duration: times , 	// 持续时间
+		background: true, // 是否显示背景色
+		closable: true, // 是否显示关闭按钮
+	});
+}
 
 var currentSort;
 // 初始化函数
-function init() {
+export function init() {
 	objectManager = new ObjectManager() ;
 	animationManager = new AnimationManager(objectManager) ;
 	currentSort = new Sort(animationManager, drawing.width, drawing.height) ;
@@ -11,76 +39,42 @@ function init() {
 // 排序
 var Sort = function(animManager, width, height) {
 	this.init(animManager, width, height) ;
-	// this.initControls() ; // 初始化控件
 	this.initAttributes() ; // 初始化属性
 }
 // 继承与构造
 Sort.prototype = new Algorithm();
 Sort.prototype.constructor = Sort;
 
-// 初始化控件
-Sort.prototype.initControls = function() {
-	addLabelToAlgorithmBar("数组长度");
-	this.insertField = addInputToAlgorithmBar("text", "");
-	this.initButton = addInputToAlgorithmBar("button", "随机生成数组");
-	this.initButton.onclick = this.initCallBack.bind(this) ;
-
-	this.HeapSortButton = addInputToAlgorithmBar("button", "堆排序");
-	this.HeapSortButton.onclick = this.HeapSortCallBack.bind(this) ;
-}
-
 // 初始化属性
 Sort.prototype.initAttributes = function() {
 	// 逻辑部分
 	// 图形部分
 	this.objectID = 1 ;
-	this.width = 40 ; // 矩形的宽度
-	this.height = 40 ; // 矩形的高度
+	this.width = 50 ; // 矩形的宽度
+	this.height = 60 ; // 矩形的高度
 	this.foregroundColor = '#1E90FF' ; // 前景色
 	this.backgroundColor = '#B0E0E6' ; // 背景色
 	this.tomato = '#FF6347' ; // tomato色
 	this.palegreen = '#32CD32' ; // palegreen色
-	this.startX = 30 ; // 开始的x坐标
-	this.startY = 150 ; // 开始的y坐标
+	this.startX = 50 ; // 开始的x坐标
 	this.startArrayY = 130 ; // 开始的数组的y坐标
-	this.startLabelY=400;//标签的y坐标
-	this.heapStartX = 800;
-	this.heapStartY = 200;
-	// 初始化状态框
-	// this.implementAction(this.initStateBox.bind(this), "start");
+	this.heapStartX = 500;
+	this.heapStartY = 300;
 }
 
-// 初始化状态框
-Sort.prototype.initStateBox = function(state) {
-	// 创建状态框
-	{
-		this.cmd("CreateStateBox", 0, state, 20, 20, 400, 40) ;
-		this.cmd("SetForegroundColor", 0, this.foregroundColor) ;
-		this.cmd("SetBackgroundColor", 0, this.backgroundColor) ;
-		this.cmd("Step") ;
-	}
-	return this.commands ;
-}
 
 // 初始化回调函数
 Sort.prototype.initCallBack = function(value) {
-	// var insertValue = this.insertField.value;
 	var insertValue = value;
-	if (insertValue != "")
-	{
-		// set text value
-		// this.insertField.value = "";
-		this.implementAction(this.initArray.bind(this), insertValue);
-	}
-	else{
-	    alert("请输入数组长度");
-	}
+	this.implementAction(this.initArray.bind(this), insertValue);
+}
+Sort.prototype.initCallBack_by_user = function(array) {
+	this.implementAction(this.initArray_by_user.bind(this), array);
 }
 
 
-// 基数排序回调函数
+
 Sort.prototype.HeapSortCallBack = function(event) {
-	//this.implementAction(this.MoveToStart.bind(this));
 	this.implementAction(this.HeapSort.bind(this),this.maxSize);
 }
 
@@ -102,11 +96,11 @@ Sort.prototype.clearCanvas = function() {
 Sort.prototype.initArray = function(value) {
 	value = parseInt(value);
 	if (isNaN(value)) {
-		this.cmd('SetState', '数组长度应介于2-24。');
+		show_message('数组长度应介于2-24。', 'error');
 		return this.commands;
 	}
 	if (value < 2 || value > 24) {
-		this.cmd('SetState', '数组长度应介于2-24。');
+		show_message('数组长度应介于2-24。', 'error');
 		return this.commands;
 	}
 	this.clearCanvas();
@@ -115,21 +109,15 @@ Sort.prototype.initArray = function(value) {
 	this.arrayData =new Array(value) ; 
 	// 设置状态栏
 	{
-		this.cmd("SetState", "创建大小为"+value+"的数组") ;
+		show_notice('创建大小为'+value+'的数组', 'success');
 		this.cmd("Step") ;
 	}
 	for(var i=0 ; i<this.maxSize ; i++) {
 	    this.arrayData[i] = Math.floor(1 + Math.random()*99);
 		this.arrayList[i] = new ArrayNode(this.objectID, this.arrayData[i], parseInt(this.startX+i*(this.width)), this.startArrayY) ;
 		this.objectID ++ ;
-		// 创建矩形
 		{
-			/*this.cmd("CreateRectangle", this.arrayList[i].objectID, this.arrayList[i].value, this.width, this.height, 
-					 'center', 'bottom', this.arrayList[i].x, this.arrayList[i].y) ;
-			this.cmd("SetForegroundColor", this.arrayList[i].objectID, this.foregroundColor) ;
-			this.cmd("SetBackgroundColor", this.arrayList[i].objectID, '#FFFFFF') ;*/
-			this.cmd("CREATECIRCLE",this.arrayList[i].objectID,this.arrayList[i].value,this.arrayList[i].x,this.arrayList[i].y,15);
-		    //this.cmd("SetForegroundColor", this.arrayList[i].objectID, "red") ;
+			this.cmd("CREATECIRCLE",this.arrayList[i].objectID,this.arrayList[i].value,this.arrayList[i].x,this.arrayList[i].y,20);
 			this.cmd("SetBackgroundColor", this.arrayList[i].objectID, '#FFFFFF') ;
 		}
 	}
@@ -137,18 +125,48 @@ Sort.prototype.initArray = function(value) {
 	
 	return this.commands ;
 }
-
+Sort.prototype.initArray_by_user = function(array_date_by_user) {
+	var value = array_date_by_user.length;
+	if (isNaN(value)) {
+		show_message('数组长度应介于2-24。', 'error');
+		return this.commands;
+	}
+	if (value < 2 || value > 24) {
+		show_message('数组长度应介于2-24。', 'error');
+		return this.commands;
+	}
+	this.clearCanvas();
+    this.maxSize=value;
+	this.arrayList = new Array(value) ; // 数组框
+	this.arrayData =new Array(value) ; 
+	// 设置状态栏
+	{
+		show_notice('创建大小为'+value+'的数组', 'success');
+		this.cmd("Step") ;
+	}
+	for(var i=0 ; i<this.maxSize ; i++) {
+	    this.arrayData[i] = array_date_by_user[i];
+		this.arrayList[i] = new ArrayNode(this.objectID, this.arrayData[i], parseInt(this.startX+i*(this.width)), this.startArrayY) ;
+		this.objectID ++ ;
+		// 创建矩形
+		{
+			this.cmd("CREATECIRCLE",this.arrayList[i].objectID,this.arrayList[i].value,this.arrayList[i].x,this.arrayList[i].y,20);
+			this.cmd("SetBackgroundColor", this.arrayList[i].objectID, '#FFFFFF') ;
+		}
+	}
+	this.cmd("Step") ;
+	return this.commands ;
+}
 //堆排序
 Sort.prototype.HeapSort = function(value) {
-    this.cmd("SetState","将数组展开呈堆形");
+	show_notice('将数组展开呈堆形', 'info');
 	this.cmd("Step");
 	this.MoveToStart();//将数组展开呈堆形
-    // this.connect(); //连接父子关系
 	this.BulidHeap();//建堆
 	var arraySize=this.maxSize;
 	for(var i=this.maxSize-1;i>0;i--)
 	{
-		this.cmd("SetState","找出当前堆的最大值"+this.arrayList[0].value);
+		show_notice('找出当前堆的最大值'+this.arrayList[0].value, 'info');
 	    this.cmd("Step");
 		this.swap(0,i);
 		this.cmd("SetBackgroundColor",this.arrayList[i].objectID,this.backgroundColor) ;
@@ -171,7 +189,7 @@ Sort.prototype.HeapSort = function(value) {
 }
 //建堆
 Sort.prototype.BulidHeap=function(){
-	for(var i=this.maxSize/2-1;i>=0;i--)
+	for(var i = parseInt(this.maxSize/2-1); i>=0; i-- )
 	{
 		this.SiftDown(i);
 		this.cmd("Step") ;
@@ -180,22 +198,19 @@ Sort.prototype.BulidHeap=function(){
 //向下调整
 Sort.prototype.SiftDown = function (left) {
 
-    this.cmd("SetState","向下调整堆");
+	show_notice('向下调整堆', 'info');
 	this.cmd("Step");
 	var i=left;
 	var j=i*2+1;
+	console.log('i='+i+"j="+j);
 	while(j<this.maxSize){
 		if((j<this.maxSize-1) && (this.arrayList[j].value<this.arrayList[j+1].value))
 			j++;
-	    this.cmd("SetHighlight",this.arrayList[i].objectID,true);
-	    this.cmd("SetHighlight",this.arrayList[j].objectID,true);
 		this.cmd("Step");
-		this.cmd("SetHighlight",this.arrayList[i].objectID,false);
-	    this.cmd("SetHighlight",this.arrayList[j].objectID,false);
 		this.cmd("Step");
 		if(this.arrayList[i].value < this.arrayList[j].value)
 		{
-		    this.cmd("SetState",this.arrayList[i].value+" < "+this.arrayList[j].value+",交换两个元素。");
+			show_notice(this.arrayList[i].value+" < "+this.arrayList[j].value+",交换两个元素。", 'info');
 	        this.cmd("Step");
 			this.swap(i,j);
 			i=j;
@@ -210,7 +225,7 @@ Sort.prototype.swap = function (index1, index2) {
 	
 	var distanceX=this.arrayList[index2].x-this.arrayList[index1].x;
 	var distanceY=this.arrayList[index2].y-this.arrayList[index1].y;
-    minNode=new ArrayNode("","","","");
+    var minNode=new ArrayNode("","","","");
 	minNode=this.arrayList[index2];
     this.arrayList[index2]=this.arrayList[index1];
 	this.arrayList[index1]=minNode;
@@ -227,7 +242,6 @@ Sort.prototype.swap = function (index1, index2) {
 }
 
 Sort.prototype.MoveToStart=function(){
-	
 	var row=0;
 	var i,j;
 	var k=0;
@@ -241,21 +255,14 @@ Sort.prototype.MoveToStart=function(){
 		row= - (this.power(2,j)-1)/2;
 		for(k=this.power(2,j)-1;(k<this.power(2,j+1)-1) && k<this.maxSize;k++)
 		{
-			this.arrayList[k].x=this.heapStartX+row*25*Math.pow(2, i-j);
-			this.arrayList[k].y=this.heapStartY+j*50;
+			this.arrayList[k].x=this.heapStartX+row*30*Math.pow(2, i-j);
+			this.arrayList[k].y=this.heapStartY+j*70; // 控制两个节点之间的y距离
 			this.cmd("Move", this.arrayList[k].objectID, this.arrayList[k].x, this.arrayList[k].y) ;
 			this.cmd("Step");
 			row++;
 		}
 	}
-	/*
-	for (k = 1; k < this.maxSize; k++) {
-		if (k != 0) {
-			this.cmd("Connect", this.arrayList[k].objectID, this.arrayList[Math.floor((k - 1) / 2)].objectID, '#FF6347');
-		}
-	}
 	this.cmd("Step");
-	*/
 	return this.commands ;
 }
 Sort.prototype.power=function(m,n){
@@ -266,19 +273,25 @@ Sort.prototype.power=function(m,n){
 	}
 	return result;
 }
-Sort.prototype.connect=function(){
-	for(var i=0;i<this.maxSize/2;i++)
-	{
-		if(i*2+1<this.maxSize)
-			this.cmd("Connect",this.arrayList[i].objectID,this.arrayList[i*2+1].objectID,"blue");
-		if(i*2+2<this.maxSize)
-			this.cmd("Connect",this.arrayList[i].objectID,this.arrayList[i*2+2].objectID,"blue");
-	}
-}
 // 数组的节点
 var ArrayNode = function(objectID, value, x, y) {
 	this.objectID = objectID ; // 图形序号
 	this.value = value ; // 值
 	this.x = x ; // x坐标
 	this.y = y ; // y坐标
+}
+
+export function creat_random_array_js(length){
+	currentSort.initCallBack(length);
+}
+export function creat_custom_array_js(array){
+	show_notice('成功初始化数组'+array,'success');
+	currentSort.initCallBack_by_user(array);
+}
+export function start_sort_js(a,b){
+	if(a==0&&b==0){
+		show_message("请先初始化数组",'error');
+		return;
+	}
+	currentSort.HeapSortCallBack();
 }
