@@ -113,17 +113,33 @@
                                 <Icon type="ios-keypad" />
                                 <span>图</span>
                             </template>
-                            <MenuItem name="3-1" to="DFS_traverse">DFS遍历</MenuItem>
-                            <MenuItem name="3-2" to="BFS_traverse">BFS遍历</MenuItem>
-                            <MenuItem name="3-3" to="prim">Prim算法</MenuItem>
-                            <MenuItem name="3-4" to="kruskal">Kruskal算法</MenuItem>
-                            <MenuItem name="3-5" to="dijkstra">Dijkstra算法</MenuItem>
-                            <MenuItem name="3-6" to="floyd">Floyd算法</MenuItem>
+                            <Submenu name="3-1">
+                                <template #title>
+                                    图的遍历
+                                </template>
+                                <MenuItem name="3-1-1" to="DFS_traverse">DFS遍历</MenuItem>
+                                <MenuItem name="3-1-2" to="BFS_traverse">BFS遍历</MenuItem>
+                            </Submenu>
+                            <Submenu name="3-2">
+                                <template #title>
+                                    最小生成树
+                                </template>
+                                <MenuItem name="3-2-1" to="prim">Prim算法</MenuItem>
+                                <MenuItem name="3-2-2" to="kruskal">Kruskal算法</MenuItem>
+                            </Submenu>
+                            <Submenu name="3-3">
+                                <template #title>
+                                    最短路径
+                                </template>
+                                <MenuItem name="3-3-1" to="dijkstra">Dijkstra算法</MenuItem>
+                                <MenuItem name="3-3-2" to="floyd">Floyd算法</MenuItem>
+                            </Submenu>
+
                         </Submenu>
                         <Submenu name="4">
                             <template #title>
                                 <Icon type="md-stats" />
-                                <span>排序算法</span>
+                                <span>排序</span>
                             </template>
                             <MenuItem name="4-1" to="compare_sort">比较排序</MenuItem>
                             <MenuItem name="4-2" to="heap_sort">堆排序</MenuItem>
@@ -132,7 +148,7 @@
                         <Submenu name="5">
                             <template #title>
                                 <Icon type="md-search" />
-                                <span>查找算法</span>
+                                <span>查找</span>
                             </template>
                             <MenuItem name="5-1" to="search">查找</MenuItem>
                             <MenuItem name="5-2" to="string_match">字符串匹配</MenuItem>
@@ -150,20 +166,23 @@
 </template>
 
 <script>
+import { Submenu } from 'view-ui-plus';
+
     export default {
-        data () {
-            return {
-                isCollapsed: false
-            };
-        },
-        computed: {
-            menuitemClasses: function () {
-                return [
-                    'menu-item',
-                    this.isCollapsed ? 'collapsed-menu' : ''
-                ]
-            }
+    data() {
+        return {
+            isCollapsed: false
+        };
+    },
+    computed: {
+        menuitemClasses: function () {
+            return [
+                "menu-item",
+                this.isCollapsed ? "collapsed-menu" : ""
+            ];
         }
-    }
+    },
+    components: { Submenu }
+}
 </script>
     
