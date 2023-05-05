@@ -1,11 +1,9 @@
 var type = 0;
 var index = 0;
-var s_succ = '成功了';
 $(function () {
     //--------------------------------------------------------------------------------
     //图部分
     //DFS遍历
-
     var graphStartFlag = 0;
     $('.graphStartHide').click(function () {
         if (graphStartFlag == 0) {
@@ -356,84 +354,4 @@ $(function () {
     });
     // <!-----------------------------新加的代码------------------------>
 
-    //-------------------------------------------------------------------------------
-    //字符串
-    //模式匹配
-    var patternStartFlag = 0;
-    $('.patternStartHide').click(function () {
-        if (patternStartFlag == 0) {
-            $(this).children().css('transform', 'rotate(180deg)');
-            setTimeout('$(".patternStarts").show()', 100);
-            $('.patternStarts').animate({
-                'width': '140px',
-            }, 200);
-            patternStartFlag = 1;
-        } else {
-            $(this).children().css('transform', 'rotate(360deg)');
-            setTimeout('$(".patternStarts").hide()', 100);
-            $('.subW1').hide();
-            $('.subW2').hide();
-            $('.subW3').hide();
-            $('.patternStarts').animate({
-                'width': '0px',
-            }, 200);
-            patternStartFlag = 0;
-        }
-
-    });
-    $('.patternStarts p').click(function () {
-        var str = $(this).attr('class');
-        var s = str[str.length - 1];
-        for (var i = 1; i < 4; i++) {
-            if (i != s) {
-                $('.subW' + i).hide();
-            }
-            else {
-                $('.subW' + s).show();
-            }
-        };
-    });
-    //生成模式串
-    $('.createPattern').click(function () {
-        var str = $('.patternString_de').val();
-        if (str) {
-            currentPatternMatch.patternCallBack(str);
-        } else {
-            alert('请输入模式串');
-        }
-    });
-    //生成目标串
-    $('.createTarget').click(function () {
-        var str = $('.targetString_de').val();
-        if (str) {
-            currentPatternMatch.targetCallBack(str);
-        } else {
-            alert('请输入目标串');
-        }
-    });
-    //KMP匹配
-    $('.match').click(function () {
-        currentPatternMatch.KMPmatchCallBack();
-    });
-    //模式串与目标串开始匹配
-    $('.matchStart').click(function () {
-        currentPatternMatch.matchCallBack();
-    });
-
 });
-function ini() {
-    var url = document.location.search;
-    index = url[1];
-    type = index;
-    $('.navList').children().eq(type).addClass('selected');
-    $('.navList').children().eq(type).siblings().removeClass('selected');
-}
-function back() {
-    window.location.href = "index.html";
-}
-function enterFun(obj) {
-    $(obj).css('background', 'black');
-}
-function leaveFun(obj) {
-    $(obj).css('background', 'rgb(89, 229, 89)');
-}
