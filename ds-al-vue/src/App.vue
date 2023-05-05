@@ -123,7 +123,7 @@
                         <Submenu name="4">
                             <template #title>
                                 <Icon type="md-stats" />
-                                <span>排序</span>
+                                <span>排序算法</span>
                             </template>
                             <MenuItem name="4-1" to="compare_sort">比较排序</MenuItem>
                             <MenuItem name="4-2" to="heap_sort">堆排序</MenuItem>
@@ -132,9 +132,9 @@
                         <Submenu name="5">
                             <template #title>
                                 <Icon type="md-search" />
-                                <span>字符串</span>
+                                <span>查找算法</span>
                             </template>
-                            <MenuItem name="5-1" to="search">查找算法</MenuItem>
+                            <MenuItem name="5-1" to="search">查找</MenuItem>
                             <MenuItem name="5-2" to="string_match">字符串匹配</MenuItem>
                         </Submenu>
                     </Menu>

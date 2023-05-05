@@ -1,8 +1,36 @@
 // JavaScript Document
+import {Message,Notice} from 'view-ui-plus';
+function show_notice(notices, type , during_time) {
+	let type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	} else if(type == 'warning') {
+		type_zh = '警告' ;
+	}
+	var times = during_time == undefined ? 6 : during_time ;
+	Notice[type]({
+		title: type_zh, // 标题
+		desc: notices,  // 内容
+		duration: times  	// 持续时间
+	});
+}
+function show_message(content, type, during_time ) {
+	var times = during_time == undefined ? 0: during_time ;
+	Message[type]({
+		content: content, // 内容
+		duration: times , 	// 持续时间
+		background: true, // 是否显示背景色
+		closable: true, // 是否显示关闭按钮
+	});
+}
 
 var currentSearch;
 // 初始化函数
-function init() {
+export function init() {
 	objectManager = new ObjectManager();
 	animationManager = new AnimationManager(objectManager);
 	currentSearch = new Search(animationManager, drawing.width, drawing.height);
@@ -11,8 +39,7 @@ function init() {
 // 顺序表
 var Search = function(animManager, width, height) {
 	this.init(animManager, width, height);
-	// this.initControls() ; // 初始化控件
-	this.initAttributes(); // 初始化属性
+	this.initAttributes(); 
 }
 
 // 继承与构造
@@ -21,19 +48,9 @@ Search.prototype.constructor = Search;
 
 // 初始化控件
 Search.prototype.initControls = function() {
-	addLabelToAlgorithmBar("数组大小");
-	this.insertField_maxSize = addInputToAlgorithmBar("text", "");
-	this.initMaxSizeButton = addInputToAlgorithmBar("button", "初始化最大容量");
 	this.initMaxSizeButton.onclick = this.initMaxSizeCallBack.bind(this);
-	addLabelToAlgorithmBar("数值");
-	this.insertField_value = addInputToAlgorithmBar("text", "");
-	this.initArrayButton = addInputToAlgorithmBar("button", "初始化数组");
 	this.initArrayButton.onclick = this.initArrayCallBack.bind(this);
-	addLabelToAlgorithmBar("查号数字");
-	this.insertField_number = addInputToAlgorithmBar("text", "");
-	this.initNumberButton = addInputToAlgorithmBar("button", "初始化查找数字");
 	this.initNumberButton.onclick = this.initNumberCallBack.bind(this);
-	this.searchNumberButton = addInputToAlgorithmBar("button", "查找");
 	this.searchNumberButton.onclick = this.searchNumberCallBack.bind(this);
 }
 
@@ -54,29 +71,9 @@ Search.prototype.initAttributes = function() {
 	this.foregroundColor = '#1E90FF'; // 前景色
 	this.backgroundColor = '#B0E0E6'; // 背景色
 	this.startX = 100; // 开始的x坐标
-	this.startY = 150; // 开始的y坐标
-	this.startArrayY = 250; // 开始的数组的y坐标
-	this.implementAction(this.initState.bind(this), "state");
-	// this.implementAction(this.initStateBox.bind(this), "start");
+	this.startY = 200; // 开始的y坐标
+	this.startArrayY = 300; // 开始的数组的y坐标
 }
-
-Search.prototype.initState = function() {
-	this.cmd("SetState", "数组内容只允许输入数字，以空格和逗号分隔");
-	return this.commands;
-}
-
-// 初始化状态框
-Search.prototype.initStateBox = function(state) {
-	// 创建状态框
-	{
-		this.cmd("CreateStateBox", 0, state, 20, 20, 400, 40);
-		this.cmd("SetForegroundColor", 0, this.foregroundColor);
-		this.cmd("SetBackgroundColor", 0, this.backgroundColor);
-		this.cmd("Step");
-	}
-	return this.commands;
-}
-
 //初始化数组边界
 Search.prototype.initMaxSizeCallBack = function(value) {
 	var insertValue = parseInt(value);
@@ -85,21 +82,34 @@ Search.prototype.initMaxSizeCallBack = function(value) {
 	}
 }
 
-// 初始化数组回调函数
-Search.prototype.initArrayCallBack = function(value) {
-	value = value.trim();
-	if (value == '') {
-		alert('数组内容不能为空。');
-	} else {
-		var arrayContent = this.parseIntSeq(value);
-		for (var i=0; i<arrayContent.length && i<this.maxSize; i++) {
-			this.implementAction(this.initArray.bind(this), arrayContent[i]);
-		}
+// 自动初始化数组
+Search.prototype.initArrayCallBack_by_auto = function(value) {
+	var length = parseInt(value);
+	if (length != "" && !isNaN(length)) {
+		this.implementAction(this.initMaxSize.bind(this), length);
+	}else{
+		return ;
 	}
-	// var insertValue = parseInt(value);
-	// if (insertValue != "" && !isNaN(insertValue)) {
-	// 	this.implementAction(this.initArray.bind(this), insertValue);
-	// }
+	var arrayContent = new Array(length);
+	for (var i=0; i<length; i++) {
+		arrayContent[i] = Math.floor(1 + Math.random()*29);
+		this.implementAction(this.initArray.bind(this), arrayContent[i]);
+	}
+}
+
+// 人为初始化数组
+Search.prototype.initArrayCallBack_by_custom = function(array) {
+	var length = array.length;
+	if (length != "" && !isNaN(length)) {
+		this.implementAction(this.initMaxSize.bind(this), length);
+	}else{
+		return ;
+	}
+	var arrayContent = new Array(length);
+	for (var i=0; i<length; i++) {
+		arrayContent[i] = array[i];
+		this.implementAction(this.initArray.bind(this), arrayContent[i]);
+	}
 }
 
 // 初始化查找数字回调函数
@@ -110,9 +120,6 @@ Search.prototype.initNumberCallBack = function(value) {
 // 查找回调函数
 Search.prototype.linearSearchCallBack = function(value) {
 	value = parseInt(value);
-	if (isNaN(value)) {
-		alert('请输入查找的“数字”。');
-	}
 	this.initNumberCallBack(value);
 	this.implementAction(this.linearSearch.bind(this), 0);
 }
@@ -120,24 +127,12 @@ Search.prototype.linearSearchCallBack = function(value) {
 // binary search
 Search.prototype.binarySearchCallBack = function(value) {
 	value = parseInt(value);
-	if (isNaN(value)) {
-		alert('请输入查找的“数字”。');
-	}
 	this.initNumberCallBack(value);
 	this.implementAction(this.binarySearch.bind(this), 0);
 }
 
 //初始化数组边界
 Search.prototype.initMaxSize = function(maxSize) {
-	if (maxSize > 10 || maxSize < 3) {
-		this.cmd("SetState", "数组大小应介于3-10。");
-		return this.commands;
-	}
-	/*if(arraytimer == true){
-		for( var j = 0 ; j < this.maxSize ; j ++){
-			this.cmd("Delete",this.arrayList[j].objectID);
-		}
-	}*/
 	if (this.arraytimer == true) {
 		for (var i = 0; i < this.maxSize + 1; i++) {
 			this.cmd("Delete", i + 1);
@@ -151,15 +146,13 @@ Search.prototype.initMaxSize = function(maxSize) {
 	this.arrayList = new Array(this.maxSize);
 	// 创建状态框明确数组大小
 	{
-		this.cmd("SetState", "数组大小是" + this.maxSize);
+		show_notice("数组大小是" + this.maxSize,'success');
 		this.cmd("Step");
 	}
 	// 创建矩形
 	for (var i = 0; i < this.maxSize; i++) {
 		this.arrayList[i] = new SearchNode(this.objectID, "", parseInt(this.startX + i * (this.width - 1)), this.startArrayY);
 		this.cmd("CreateRectangle", this.arrayList[i].objectID, this.arrayList[i].value, this.width, this.height, 'center', 'center', this.arrayList[i].x, this.arrayList[i].y);
-		this.cmd("SetForegroundColor", this.arrayList[i].objectID, this.foregroundColor);
-		this.cmd("SetBackgroundColor", this.arrayList[i].objectID, this.backgroundColor);
 		this.cmd("Step");
 		this.objectID++;
 	}
@@ -169,23 +162,12 @@ Search.prototype.initMaxSize = function(maxSize) {
 
 // 初始化数组
 Search.prototype.initArray = function(arrayNodeValue) {
-
-	if (isNaN(arrayNodeValue)) {
-		alert("请输入数字：");
-		return 0;
-	}
 	if (this.head < this.maxSize) {
 		// 向矩形内添加元素
 		{
 			this.arrayList[this.head].value = arrayNodeValue; //数组元素值
 			this.cmd("SetLabel", this.arrayList[this.head].objectID, this.arrayList[this.head].value);
 			this.head++;
-		}
-	} else {
-		// 创建状态框数组越界
-		{
-			this.cmd("SetState", "数组越界");
-			this.cmd("Step");
 		}
 	}
 	return this.commands;
@@ -201,7 +183,7 @@ Search.prototype.initNumber = function(number) {
 	}
 	this.haveInitMax = false;
 	if (isNaN(number)) {
-		this.cmd("SetState", "请输入数字");
+		show_message("请输入数字",'warning');
 		return this.commands;
 	}
 	this.number = number;
@@ -220,11 +202,6 @@ Search.prototype.initNumber = function(number) {
 
 //查找函数	
 Search.prototype.linearSearch = function() {
-	/*for (var j = 1; j < this.objectID + 1; j++) {
-		this.cmd("SetForegroundColor", j, this.foregroundColor);
-		this.cmd("SetBackgroundColor", j, this.backgroundColor);
-		this.cmd("Step");
-	}*/
 	for (var i = 0; i < this.maxSize; i++) {
 		//移动矩形
 		{
@@ -234,7 +211,7 @@ Search.prototype.linearSearch = function() {
 		if (this.numNode.value == this.arrayList[i].value) {
 			// 创建状态框找到该元素
 			{
-				this.cmd("SetState", "找到该元素");
+				show_notice("找到该元素",'success');
 				this.cmd("Step");
 			}
 			// 将匹配数字和数组元素背景色变绿
@@ -249,7 +226,7 @@ Search.prototype.linearSearch = function() {
 		} else {
 			// 创建状态框
 			{
-				this.cmd("SetState", "当前数组第" + parseInt(i + 1) + "个元素和查找数字不相等");
+				show_notice("当前数组第" + parseInt(i + 1) + "个元素和查找数字不相等",'info');
 				this.cmd("Step");
 			}
 		}
@@ -268,7 +245,7 @@ Search.prototype.linearSearch = function() {
 	if (i != -1) {
 		// 创建状态框查找失败
 		{
-			this.cmd("SetState", "数组中无此元素");
+			show_notice("数组中无此元素",'error');
 			this.cmd("Step");
 		}
 	}
@@ -278,15 +255,10 @@ Search.prototype.linearSearch = function() {
 
 //查找函数	
 Search.prototype.binarySearch = function() {
-	/*for (var j = 1; j < this.objectID + 1; j++) {
-		this.cmd("SetBackgroundColor", j, this.foregroundColor);
-		this.cmd("SetBackgroundColor", j, this.backgroundColor);
-		this.cmd("Step");
-	}*/
 	// invalid array order
 	for (var i=1; i<this.maxSize; i++) {
 		if (this.arrayList[i].value < this.arrayList[i-1].value) {
-			this.cmd("SetState", "数组不满足升序的要求，不能执行二分查找");
+			show_message("数组不满足升序的要求，不能执行二分查找",'warning');
 			return this.commands;
 		}
 	}
@@ -304,20 +276,20 @@ Search.prototype.binarySearch = function() {
 			right = mid - 1;
 			// 创建状态框
 			{
-				this.cmd("SetState", "当前mid值为" + mid + ",数组第" + parseInt(mid + 1) + "个元素和查找数字不相等");
+				show_notice("当前mid值为" + mid + ",数组第" + parseInt(mid + 1) + "个元素和查找数字不相等",'info');
 				this.cmd("Step");
 			}
 		} else if (this.numNode.value > this.arrayList[mid].value) {
 			left = mid + 1;
 			// 创建状态框
 			{
-				this.cmd("SetState", "当前mid值为" + mid + ",数组第" + parseInt(mid + 1) + "个元素和查找数字不相等");
+				show_notice("当前mid值为" + mid + ",数组第" + parseInt(mid + 1) + "个元素和查找数字不相等",'info');
 				this.cmd("Step");
 			}
 		} else {
 			// 创建状态框找到该元素
 			{
-				this.cmd("SetState", "找到该元素，位置在数组第" + parseInt(mid + 1) + "个位置");
+				show_notice("找到该元素，位置在数组第" + parseInt(mid + 1) + "个位置",'success');
 				this.cmd("Step");
 			}
 			// 将匹配数字和数组元素背景色变绿
@@ -344,40 +316,12 @@ Search.prototype.binarySearch = function() {
 	if (left > right) {
 		// 创建状态框查找失败
 		{
-			this.cmd("SetState", "数组中无此元素");
+			show_notice("数组中无此元素",'error');
 			this.cmd("Step");
 		}
 	}
 	return this.commands;
 }
-
-Search.prototype.parseIntSeq = function(value) {
-	var intSeq = new Array();
-	var stopChar = new Set([' ', ',', '.', ';', '-', ':', '/', '，', '。', '；', '：', '、']);
-	var start = 0;
-	var end = 0;
-	for (var i=0; i<value.length; i++) {
-		if (stopChar.has(value[i])) {
-			end = i-1;
-			if(end >= start) {
-				var val = parseInt(value.substr(start, end-start+1));
-				if (!isNaN(val)) {
-					intSeq.push(val);
-				}
-			}
-			start = i+1;
-		}
-	}
-	end = value.length-1;
-	if (end >= start) {
-		var val = parseInt(value.substr(start, end-start+1));
-		if (!isNaN(val)) {
-			intSeq.push(val);
-		}
-	}
-	return intSeq;
-}
-
 
 // 顺序表的节点
 var SearchNode = function(objectID, value, x, y) {
@@ -385,4 +329,26 @@ var SearchNode = function(objectID, value, x, y) {
 	this.value = value; // 节点元素的值
 	this.x = x; // x坐标
 	this.y = y; // y坐标
+}
+
+export function creat_random_array_js(length){
+	if(length>2&&length<15){
+		currentSearch.initArrayCallBack_by_auto(length);
+	}else{
+		show_message("请输入2-15之间的数字",'error');
+	}
+}
+export function creat_custom_array_js(array){
+	currentSearch.initArrayCallBack_by_custom(array);
+}
+export function start_search_js(search_style,a,b,search_value){
+	if(a==b==0){
+		show_message("请先生成数组",'error');
+		return;
+	}
+	if(search_style=='顺序查找'){
+		currentSearch.linearSearchCallBack(search_value);
+	}else if(search_style=='二分查找'){
+		currentSearch.binarySearchCallBack(search_value);
+	}
 }

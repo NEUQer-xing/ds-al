@@ -420,68 +420,6 @@ $(function () {
         currentPatternMatch.matchCallBack();
     });
 
-    //查找
-    var searchStartFlag = 0;
-    $('.searchStartHide').click(function () {
-        if (searchStartFlag == 0) {
-            $(this).children().css('transform', 'rotate(180deg)');
-            setTimeout('$(".searchStarts").show()', 100);
-            $('.searchStarts').animate({
-                'width': '140px',
-            }, 200);
-            searchStartFlag = 1;
-        } else {
-            $(this).children().css('transform', 'rotate(360deg)');
-            setTimeout('$(".searchStarts").hide()', 100);
-            $('.subY1').hide();
-            $('.subY2').hide();
-            $('.subY3').hide();
-            $('.searchStarts').animate({
-                'width': '0px',
-            }, 200);
-            searchStartFlag = 0;
-        }
-    });
-    $('.searchStarts p').click(function () {
-        var str = $(this).attr('class');
-        var s = str[str.length - 1];
-        for (var i = 1; i < 4; i++) {
-            if (i != s) {
-                $('.subY' + i).hide();
-            }
-            else {
-                $('.subY' + s).show();
-            }
-        };
-    });
-    //设置数组大小
-    $('.setSize').click(function () {
-        var size = $('.arraySize').val();
-        if (!isNaN(size)) {
-            currentSearch.initMaxSizeCallBack(size);
-        }
-    });
-    //设置数组内容
-    $('.createSearchArray').click(function () {
-        var content = $('.contentDetail').val();
-        if (content) {
-            currentSearch.initArrayCallBack(content);
-        }
-    });
-    //二分查找
-    $('.binarySearch').click(function () {
-        var toSearch = $('.whichOne').val();
-        if (toSearch) {
-            currentSearch.binarySearchCallBack(toSearch);
-        }
-    });
-    //顺序查找
-    $('.sequentialSearch').click(function () {
-        var toSearch = $('.whichOne').val();
-        if (toSearch) {
-            currentSearch.linearSearchCallBack(toSearch);
-        }
-    });
 });
 function ini() {
     var url = document.location.search;

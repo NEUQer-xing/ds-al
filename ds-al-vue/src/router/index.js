@@ -66,7 +66,36 @@ const router = createRouter({
       component:() => import('../views/tree/xian_suo_tree.vue')
     },
     // 图
-
+    {
+      path: '/DFS_traverse',
+      name: 'DFS_traverse', // 深度优先遍历
+      component:() => import('../views/graph/DFS_traverse.vue')
+    },
+    {
+      path: '/BFS_traverse',
+      name: 'BFS_traverse', // 广度优先遍历
+      component:() => import('../views/graph/BFS_traverse.vue')
+    },
+    {
+      path: '/Dijkstra',
+      name: 'Dijkstra', // Dijkstra算法
+      component:() => import('../views/graph/Dijkstra.vue')
+    },
+    {
+      path: '/Floyd',
+      name: 'Floyd', // Floyd算法
+      component:() => import('../views/graph/Floyd.vue')
+    },
+    {
+      path: '/prim',
+      name: 'prim', // prim算法
+      component:() => import('../views/graph/prim.vue')
+    },
+    {
+      path: '/kruskal',
+      name: 'kruskal', // kruskal算法
+      component:() => import('../views/graph/kruskal.vue')
+    },
     // 排序
     {
       path: '/compare_sort', 
@@ -83,7 +112,17 @@ const router = createRouter({
       name: 'ji_shu', // 基数排序
       component:() => import('../views/sort/ji_shu.vue')
     },
-    
+    //查找
+    {
+      path: '/search',
+      name: 'search', // 查找.
+      component:() => import('../views/search/search.vue')
+    },
+    {
+      path: '/string_match',
+      name: 'string_match', // 字符串匹配
+      component:() => import('../views/search/string_match.vue')
+    },
   ]
 })
 
