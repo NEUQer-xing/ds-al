@@ -93,9 +93,10 @@ Graph.prototype.initialize = function() {
 	this.objectID = 0 ; // 图形的序号
 	this.DFSCircleID = 0;	// DFS遍历时显示的圆
 	this.hintObjectID;
+	this.circleID; // 节点ID数组
 	this.hintLabelID;
-	this.hintStartX = 600;
-	this.hintStartY = 50;
+	this.hintStartX = 550;
+	this.hintStartY = 30;
 	this.hintInterval = 10;
 	this.hintRectWidth = 80;
 	this.hintRectHeight = 40;
@@ -105,9 +106,7 @@ Graph.prototype.initialize = function() {
 	this.R = 150;		// 所有顶点分布在该圆上
 	this.X0 = 250;		// 分布圆的圆心横坐标
 	this.Y0 = 250; 		// 分布圆的圆心纵坐标
-	
-	this.foregroundColor = '#1E90FF' ; // 前景色
-	this.backgroundColor = '#B0E0E6' ; // 背景色
+	this.foregroundColor = '#2db7f5' ; // 前景色
 }
 
 // 添加边调用函数
@@ -134,13 +133,6 @@ Graph.prototype.randomGraphCallBack = function() {
 		currentGraph.implementAction(currentGraph.getRandomGraph.bind(currentGraph), 0);
 	} while (1.0*currentGraph.edgeNum/currentGraph.vertexNum < 0.6 );
 	// 限制了图的稀疏性
-}
-// 显示边权重调用函数
-Graph.prototype.showEdgeWeightSwitch = function (show) {
-	if (show != null) {
-		currentGraph.showEdgeWeight = show;
-		currentGraph.implementAction(currentGraph.showEdgeWeightFunc.bind(currentGraph), show);
-	}
 }
 
 // 有向图和无向图的转换
@@ -177,6 +169,7 @@ Graph.prototype.initGraph = function(vertexNum) {
 	this.DFSCircleID = vertexNum;
 	// 提示区域显示
 	this.hintObjectID = new Array(vertexNum);
+	this.circleID = new Array(vertexNum);
 	for (var i=0; i<vertexNum; i++) {
 		this.hintObjectID[i] = vertexNum + 1 + i;
 	}
@@ -204,6 +197,7 @@ Graph.prototype.initGraph = function(vertexNum) {
 	}
 	
 	for(var i=0 ; i<this.vertexNum ; i++) {
+		this.circleID[i] = i;
 		this.cmd("CreateCircle", this.objectID, this.objectID,
 				 this.position[this.objectID][0], this.position[this.objectID][1], this.radius);
 		this.cmd("SetForegroundColor", this.objectID, this.foregroundColor);
@@ -211,59 +205,11 @@ Graph.prototype.initGraph = function(vertexNum) {
 		this.objectID ++ ;
 	}
 	// hint label "DFS递归深度"
-	this.cmd("CreateLabel", this.hintLabelID, "DFS递归 (上至下表示访问顺序，左边间隔表示递归深度)", this.hintStartX, this.hintStartY);
+	this.cmd("CreateLabel", this.hintLabelID, "DFS递归--(上下表示访问顺序，左右间隔表示递归深度)", this.hintStartX, this.hintStartY);
 	this.cmd("SetForegroundColor", this.hintLabelID, this.foregroundColor);
-	this.cmd("SetBackgroundColor", this.hintLabelID, this.backgroundColor);
 	return this.commands;
 }
 
-// 是否显示边权重，show为bool类型，表示是否显示权重
-Graph.prototype.showEdgeWeightFunc = function(show) {
-	// 有向图
-	if (this.directed) {
-		// 先删除图上所有的边
-		for (var i=0; i< this.vertexNum; i++) {
-			for (var j=0; j< this.vertexNum; j++) {
-				if (this.matrix[i][j] ) {
-					this.cmd("Disconnect", i, j);
-				}
-			}
-		}
-		// 重新绘边
-		for (var i=0; i<this.vertexNum; i++) {
-			for (var j =0; j<this.vertexNum; j++) {
-				if(this.matrix[i][j]) {
-					var label = show ? this.matrix[i][j] : "";
-					var curve = (this.matrix[j][i] ) ? directedGraphCurveWithDoubleEdge : directedGraphCurveWithSingleEdge;
-					this.cmd("Connect", i, j, this.foregroundColor, 
-							curve, this.directed, label);
-				}
-			}
-		}
-	}
-	// 无向图
-	else {
-		// 先删除图上所有的边
-		for (var i=0; i< this.vertexNum; i++) {
-			for (var j=0; j< i; j++) {
-				if (this.matrix[j][i] ) {
-					this.cmd("Disconnect", j, i);
-				}
-			}
-		}
-		// 重新绘边
-		for (var i=0; i<this.vertexNum; i++) {
-			for (var j =0; j<i; j++) {
-				if(this.matrix[j][i]) {
-					var label = show ? this.matrix[i][j] : "";
-					this.cmd("Connect", j, i, this.foregroundColor, 
-							undirectedGraphCurve, this.directed, label);
-				}
-			}
-		}
-	}
-	return this.commands;
-}
 // 清除图的所有边
 Graph.prototype.clearAllEdges = function () {
 	//alert("clearAllEdges");
@@ -504,7 +450,7 @@ Graph.prototype.clearHintArea = function () {
 Graph.prototype.DFSTraverse = function(startVertex) {
 	// alert("start DFSTraverse()");
 	if (startVertex >= this.vertexNum) {
-		this.cmd("SetState", "输入的顶点应在0-"+(this.vertexNum-1)+"之间");
+		show_message("输入的顶点应在0-"+(this.vertexNum-1)+"之间",'error');
 		return this.commands;
 	}
 	this.visited = new Array(this.vertexNum);
@@ -533,7 +479,7 @@ Graph.prototype.DFSTraverse = function(startVertex) {
 		}
 		visitSeqStr+=this.visitSeq[i]
 	}
-	this.cmd("SetState", "DFS遍历顺序是 "+visitSeqStr);
+	show_notice("DFS遍历顺序是 "+visitSeqStr,'success',0);
 	this.cmd("Step");
 	this.cmd("Delete", this.DFSCircleID);
 	this.cmd("Step");
@@ -547,24 +493,28 @@ Graph.prototype.DFS = function(vertex, fromVertex, count, number) {
 		if (this.visited[i]) 
 			number++;
 	}
-	this.cmd("SetState", "访问顶点"+vertex+"，这是第"+number+"个被访问的顶点，"+"递归深度是"+count);
+	show_notice("访问顶点"+vertex+"，这是第"+number+"个被访问的顶点，"+"递归深度是"+count,'info');
 	this.visited[vertex] = true;
 	this.visitSeq.push(vertex);
 	this.cmd("CreateRectangle", this.hintObjectID[vertex], "DFS("+vertex+")", 
 			this.hintRectWidth, this.hintRectHeight, 'center', 'center', 
-			this.hintStartX + count* 30, this.hintStartY + number*(this.hintInterval+this.hintRectHeight));
+			this.hintStartX + count* 80, this.hintStartY + number*(this.hintInterval+this.hintRectHeight));
+	this.cmd("SetForegroundColor", this.hintObjectID[vertex], this.foregroundColor);
+	this.cmd("SetBackgroundColor", this.hintObjectID[vertex], "#FFFFFF");
+
 	this.cmd("SetForegroundColor", this.DFSCircleID, "#FF0000");
+	this.cmd("Step");
+	this.cmd("Step");
 	this.cmd("SetBackgroundColor", this.DFSCircleID, '#FFFFFF') ;
 
 	this.cmd("Move", this.DFSCircleID, this.position[vertex][0], this.position[vertex][1]);
 	this.cmd("Step");
 	this.cmd("Step");
-	this.cmd("SetState", "检查顶点<"+vertex+">的相连顶点是否被访问");
+	this.cmd("SetBackgroundColor",this.circleID[vertex],"#ff9f0f"); // 设置访问过的顶点的颜色
+	show_notice("检查顶点<"+vertex+">的相连顶点是否被访问",'info');
 	this.cmd("Step");
 	// 记录该顶点有没有没有访问的邻节点, 没有为0
 	for (var edge = this.firstEdge(vertex); edge!=null; edge = this.nextEdge(edge)) {
-		// this.cmd("SetState","检查顶点"+edge.endVertex+"是否被访问");
-		// this.cmd("Step");
 		var fromV = edge.startVertex;
 		var toV = edge.endVertex;
 		if ( !this.directed && fromV > toV) {
@@ -573,7 +523,9 @@ Graph.prototype.DFS = function(vertex, fromVertex, count, number) {
 		}
 		this.cmd("SetLineHighlight", fromV, toV, true);
 		this.cmd("Step");
+		this.cmd("Step");
 		this.cmd("SetLineHighlight", fromV, toV, false);
+		this.cmd("Step");
 		this.cmd("Step");
 		// 找到没有访问的邻节点
 		if( !this.visited[edge.endVertex] ) {
@@ -581,10 +533,10 @@ Graph.prototype.DFS = function(vertex, fromVertex, count, number) {
 		}
 	}
 	if (fromVertex == -1) {
-		this.cmd("SetState", "顶点"+vertex+"的相连顶点访问完成，完成算法");	
+		show_notice("顶点"+vertex+"的相连顶点访问完成，完成算法",'success');
 	}
 	else {
-		this.cmd("SetState", "顶点"+vertex+"的相连顶点访问完成，退回"+fromVertex);
+		show_notice("顶点"+vertex+"的相连顶点访问完成，退回"+fromVertex,'info');
 	}
 	this.cmd("Step");
 	if ( fromVertex != -1 ) {
