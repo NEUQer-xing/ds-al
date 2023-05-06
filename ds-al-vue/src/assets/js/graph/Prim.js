@@ -1,9 +1,22 @@
-// JavaScript Document
-/*
-**	init()函数
-**	GraphEdge类
-**	Graph类
-*/
+import {Message,Notice} from 'view-ui-plus';
+function show_notice(notices, type , during_time) {
+	let type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	} else if(type == 'warning') {
+		type_zh = '警告' ;
+	}
+	var times = during_time == undefined ? 6 : during_time ;
+	Notice[type]({
+		title: type_zh, // 标题
+		desc: notices,  // 内容
+		duration: times  	// 持续时间
+	});
+}
 // 初始化函数
 var currentGraph;
 // 有向图的边画法改变
@@ -11,23 +24,24 @@ var directedGraphCurveWithSingleEdge = 0.0;		// 两个顶点之间只有一条�
 var directedGraphCurveWithDoubleEdge = 0.15;	// 两个顶点之间有两条边， 此时画曲线
 var undirectedGraphCurve = 0.0;
 var initialVertexNum = 6;
-function init() {
+export function init() {
 	objectManager = new ObjectManager() ;
 	animationManager = new AnimationManager(objectManager) ;
 	currentGraph = new Graph(animationManager, drawing.width, drawing.height);
 	currentGraph.implementAction(currentGraph.initGraph.bind(currentGraph), initialVertexNum) ;
 
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 3, 5, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 4, 5, false]) ;
 	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 2, 1, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 1, 6, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [2, 3, 5, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [1, 2, 5, false]) ;
-
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [1, 4, 3, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [2, 4, 6, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [4, 5, 6, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [3, 5, 2, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [2, 5, 4, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [4, 2, 10, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [5, 3, 5, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [3, 1, 4, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [1, 5, 6, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 5, 10, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 1, 5, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [1, 2, 20, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [4, 5, 5, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [4, 3, 10, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [3, 2, 15, false]) ;
 }
 
 // 产生介于上界和下界的随机数，整数，上界和下界都可以取到
@@ -70,15 +84,13 @@ Graph.prototype.initialize = function() {
 	//this.head = -1 ; // 头指针
 	this.directed = false;		// 是否是有向图
 	this.showEdgeWeight = true;	// 是否显示边权重
-	$(".runPrimNumber").val('0');
-	$(".weightPrimNumber").val('10');
 	// 图形部分
 	this.objectID = 0 ; // 图形的序号
 	this.highlightCircleID ;	// 突出显示已经位于树中的顶点
 	this.MSTSetCircleID;	// hint区域圆ID
 	this.setID;	// set, 0:label U, 1:rect U, 2:label U-V, 3:rect U-V
 	this.hintStartX = 600;
-	this.hintStartY = 50;
+	this.hintStartY = 100;
 	this.hintWidth = 150;
 	this.hintInterval = 4;
 
@@ -94,24 +106,24 @@ Graph.prototype.initialize = function() {
 }
 
 // 添加边调用函数
-addEdgeCallBack = function (startVertex, endVertex, weight) {
+Graph.prototype.addEdgeCallBack = function (startVertex, endVertex, weight) {
 	if (isNaN(weight) || weight == null) {
 		weight = 10;
 	}
 	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [startVertex, endVertex, weight]) ;
 }
 // 删除边调用函数
-delEdgeCallBack = function (startVertex, endVertex) {
+Graph.prototype.delEdgeCallBack = function (startVertex, endVertex) {
 	currentGraph.implementAction(currentGraph.delEdge.bind(currentGraph), [startVertex, endVertex]) ;
 }
 // Prim遍历调用函数
-runPrimCallBack = function(startVertex) {
+Graph.prototype.runPrimCallBack = function(startVertex) {
 	startVertex = ( startVertex == null || isNaN(startVertex) ) ? 0: startVertex;
 	currentGraph.implementAction(currentGraph.clearHintArea.bind(currentGraph), 0);
 	currentGraph.implementAction(currentGraph.Prim.bind(currentGraph), startVertex);
 }
 // 产生随机图调用函数
-randomGraphCallBack = function() {
+Graph.prototype.randomGraphCallBack = function() {
 	// 若得到的图不是连通图，then again
 	do {
 		currentGraph.implementAction(currentGraph.clearAllEdges.bind(currentGraph), 0);
@@ -119,14 +131,14 @@ randomGraphCallBack = function() {
 	} while (!currentGraph.isAllConnected());
 }
 // 显示边权重调用函数
-showEdgeWeightSwitch = function (show) {
+Graph.prototype.showEdgeWeightSwitch = function (show) {
 	if (show != null) {
 		currentGraph.showEdgeWeight = show;
 		currentGraph.implementAction(currentGraph.showEdgeWeightFunc.bind(currentGraph), show);
 	}
 }
 // 有向图和无向图的转换
-directedGraphSwitch = function (directed) {
+Graph.prototype.directedGraphSwitch = function (directed) {
 	if (directed != null) {
 		// 先清除所有的边
 		currentGraph.implementAction(currentGraph.clearAllEdges.bind(currentGraph), 0);
@@ -136,7 +148,7 @@ directedGraphSwitch = function (directed) {
 	}
 }
 // 顶点数量取值变化调用函数
-vertexNumSelectChangeCallBack = function (newVertexNum) {
+Graph.prototype.vertexNumSelectChangeCallBack = function (newVertexNum) {
 	if (!isNaN(parseInt(newVertexNum)) && parseInt(newVertexNum) >=3 && parseInt(newVertexNum) <=10) {
 		// 清除所有
 		objectManager = null;
@@ -152,69 +164,6 @@ vertexNumSelectChangeCallBack = function (newVertexNum) {
 	}
 }
 
-// var vertexNumSelect;
-
-// var randomGraphButton;
-// var startVertexText;
-// var endVertexText;
-// var edgeWeightText;
-// var addEdgeButton;
-// var delEdgeButton;
-
-// var PrimStartVertexText;
-// var runPrimButton;
-
-// var showEdgeWeight;
-// var directedGraph;
-// var undirectedGraph;
-
-// 添加控制按钮
-Graph.prototype.addControls = function () {
-	addLabelToAlgorithmBar("顶点数量");
-	var vertexNumList = [3, 4, 5, 6, 7, 8, 9, 10];
-	vertexNumSelect = addSelectToAlgorithmBar(vertexNumList);
-	vertexNumSelect.onchange = vertexNumSelectChangeCallBack;
-	// 添加初始值
-	for (var i=0; i<vertexNumSelect.length; i++) {
-		if (vertexNumSelect.options[i].value == initialVertexNum ) {
-			vertexNumSelect.options[i].selected = true;
-		}
-	}
-
-	addLabelToAlgorithmBar("起点");
-	startVertexText = addInputToAlgorithmBar("text", "");
-	addLabelToAlgorithmBar("终点");
-	endVertexText = addInputToAlgorithmBar("text", "");
-	addLabelToAlgorithmBar("权重");
-	edgeWeightText = addInputToAlgorithmBar("text", "");
-	edgeWeightText.value = "10";
-	addEdgeButton = addInputToAlgorithmBar("button", "添加边");
-	addEdgeButton.onclick = addEdgeCallBack;
-	delEdgeButton = addInputToAlgorithmBar("button", "删除边");
-	delEdgeButton.onclick = delEdgeCallBack;
-	randomGraphButton = addInputToAlgorithmBar("button", "生成随机图");
-	randomGraphButton.onclick = randomGraphCallBack;
-
-	addLabelToAlgorithmBar("Prim起始顶点");
-	PrimStartVertexText = addInputToAlgorithmBar("text", "0");
-	
-	runPrimButton = addInputToAlgorithmBar("button", "Run Prim");
-	runPrimButton.onclick = runPrimCallBack;
-
-	showEdgeWeight = addCheckboxToAlgorithmBar("显示边权重");
-	showEdgeWeight.onclick = showEdgeWeightSwitch;
-	showEdgeWeight.checked = true;
-	showEdgeWeight.disabled = true;
-
-	var directedGraphList = addRadioButtonGroupToAlgorithmBar(["directed Graph","undirected Graph"],"GraphType");
-	directedGraph = directedGraphList[0];
-	undirectedGraph = directedGraphList[1];
-	directedGraph.onclick = directedGraphSwitch;
-	undirectedGraph.onclick = directedGraphSwitch;
-	undirectedGraph.checked = true;
-	directedGraph.disabled = true;
-	undirectedGraph.disabled = true;
-}
 
 // 初始化数组
 Graph.prototype.initGraph = function(vertexNum) {
@@ -478,8 +427,8 @@ Graph.prototype.addEdge = function() {
 // 删除边
 Graph.prototype.delEdge = function() {
 	// 传入参数，要删除的边
-	startVertex = arguments[0][0];
-	endVertex = arguments[0][1];
+	var startVertex = arguments[0][0];
+	var endVertex = arguments[0][1];
 	// 传入参数的合法性判断
 	if (startVertex <0 || startVertex >= this.vertexNum) {
 		alert("start Vertex illeagl.");
@@ -798,4 +747,18 @@ Graph.prototype.Prim = function (startVertex) {
 	}
 	// this.clearHighlightCircle();
 	return this.commands;
+}
+
+export function creat_graph_js(node_count) {
+	currentGraph.vertexNumSelectChangeCallBack(node_count);
+    currentGraph.randomGraphCallBack();
+}
+export function insert_edge_js(start_node,end_node,weight) {
+	currentGraph.addEdgeCallBack(start_node, end_node,weight);
+}
+export function delete_edge_js(start_node,end_node) {
+	currentGraph.delEdgeCallBack(start_node,end_node);
+}
+export function start_creat_mintree_js() {
+	currentGraph.runPrimCallBack();
 }

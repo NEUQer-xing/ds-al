@@ -68,10 +68,8 @@ AnimatedLine.prototype.draw = function(ctx) {
 	
 	var controlX = midX - deltaY * this.curve;
 	var controlY = midY + deltaX * this.curve;
-	//alert("control:"+controlX+","+controlY);
 	// 画边
     ctx.moveTo(startPoint[0], startPoint[1]) ;
-	//ctx.lineTo(endPoint[0], endPoint[1]) ;
 	ctx.quadraticCurveTo(controlX, controlY, endPoint[0], endPoint[1]);	// 画二次贝塞尔曲线
 	ctx.strokeStyle = this.foregroundColor ;
 	ctx.lineWidth = 2 ;
@@ -99,7 +97,7 @@ AnimatedLine.prototype.draw = function(ctx) {
 	}
 	// 边上写上权重
 	ctx.textAlign = 'center';
-	ctx.font = '20px sans-serif';
+	ctx.font = '15px sans-serif';
 	ctx.textBaseline   = 'middle'; 
 	ctx.fillStyle = this.foregroundColor;
 	ctx.fillText(this.weight, labelPosX, labelPosY);
