@@ -18,14 +18,6 @@ function show_notice(notices, type , during_time) {
 	});
 }
 function show_message(content, type, during_time ) {
-	let type_zh ;
-	if(type == 'success') {
-		type_zh = '成功' ;
-	} else if(type == 'error') {
-		type_zh = '错误' ;
-	} else if(type == 'info') {
-		type_zh = '提示' ;
-	}
 	var times = during_time == undefined ? 0: during_time ;
 	Message[type]({
 		content: content, // 内容

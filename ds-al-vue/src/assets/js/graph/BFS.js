@@ -1,9 +1,31 @@
-// JavaScript Document
-/*
-**	init()函数
-**	GraphEdge类
-**	Graph类
-*/
+import {Message,Notice} from 'view-ui-plus';
+function show_notice(notices, type , during_time) {
+	let type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	} else if(type == 'warning') {
+		type_zh = '警告' ;
+	}
+	var times = during_time == undefined ? 6 : during_time ;
+	Notice[type]({
+		title: type_zh, // 标题
+		desc: notices,  // 内容
+		duration: times  	// 持续时间
+	});
+}
+function show_message(content, type, during_time ) {
+	var times = during_time == undefined ? 0: during_time ;
+	Message[type]({
+		content: content, // 内容
+		duration: times , 	// 持续时间
+		background: true, // 是否显示背景色
+		closable: true, // 是否显示关闭按钮
+	});
+}
 // 初始化函数
 var currentGraph;
 // 有向图的边画法改变
@@ -11,7 +33,7 @@ var directedGraphCurveWithSingleEdge = 0.0;	// 两个顶点之间只有一条边
 var directedGraphCurveWithDoubleEdge = 0.15;	// 两个顶点之间有两条边， 此时画曲线
 var undirectedGraphCurve = 0.0;
 var initialVertexNum = 6;	// 图初始的顶点数量
-function init() {
+export function init() {
 	objectManager = new ObjectManager() ;
 	animationManager = new AnimationManager(objectManager) ;
 	currentGraph = new Graph(animationManager, drawing.width, drawing.height);
@@ -59,13 +81,9 @@ Graph.prototype.initialize = function() {
 	//this.head = -1 ; // 头指针
 	this.directed = false;		// 是否是有向图
 	this.showEdgeWeight = false;	// 是否显示边权重
-	// 设置界面
-	$(".radio2").attr("checked", "checked");
-	$(".runNumber").val('0');
-	$(".weightNumber").val('10');
-	// $("#displayWeight").attr("checked", "checked");
 	// 图形部分
 	this.objectID = 0 ; // 图形的序号
+	this.nodeID_arr;	// 顶点的ID数组
 	this.BFSCircleID = 0;	// BFS遍历时显示的圆
 	this.BFSParentCircleID = 0;	// BFS遍历节点的父节点
 	this.hintLabelID = 0;	// label 序号
@@ -74,11 +92,9 @@ Graph.prototype.initialize = function() {
 	this.hintObjectIDCurrent = 0;	// 栈顶指针
 	this.hintObjectIDArray;
 	this.hintHighlightCircleID;
-	this.hintStartX = 600;
-	this.hintStartY = 150;
+	this.hintStartX = 520;
+	this.hintStartY = 160;
 	this.hintInterval = 10;
-	// this.hintRectWidth = 50;
-	// this.hintRectHeight = 30;
 
 	this.radius = 26;	// 顶点圆的半径
 	// 顶点位置的确定
@@ -86,45 +102,38 @@ Graph.prototype.initialize = function() {
 	this.X0 = 250;		// 分布圆的圆心横坐标
 	this.Y0 = 250; 		// 分布圆的圆心纵坐标
 	
-	this.foregroundColor = '#1E90FF' ; // 前景色
+	this.foregroundColor = '#2db7f5' ; // 字体色
 	this.backgroundColor = '#B0E0E6' ; // 背景色
 	this.highlightColor = '#FF0000' ;
 }
 
 // 添加边调用函数
-addEdgeCallBack = function (startVertex, endVertex, weight) {
+Graph.prototype.addEdgeCallBack = function (startVertex, endVertex, weight) {
 	if (isNaN(weight) || weight == null) {
 		weight = 10;
 	}
 	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [startVertex, endVertex, weight]) ;
 }
 // 删除边调用函数
-delEdgeCallBack = function (startVertex, endVertex) {
+Graph.prototype.delEdgeCallBack = function (startVertex, endVertex) {
 	currentGraph.implementAction(currentGraph.delEdge.bind(currentGraph), [startVertex, endVertex]) ;
 }
 // BFS遍历调用函数
-runBFSCallBack = function(startVertex) {
+Graph.prototype.runBFSCallBack = function(startVertex) {
 	startVertex = ( startVertex == null || isNaN(startVertex) ) ? 0: startVertex;
 	currentGraph.implementAction(currentGraph.clearHintArea.bind(currentGraph), 0);
 	currentGraph.implementAction(currentGraph.BFSTraverse.bind(currentGraph), startVertex);
 }
 // 产生随机图调用函数
-randomGraphCallBack = function() {
+Graph.prototype.randomGraphCallBack = function() {
 	do {
 		currentGraph.implementAction(currentGraph.clearAllEdges.bind(currentGraph), 0);
 		currentGraph.implementAction(currentGraph.getRandomGraph.bind(currentGraph), 0);
 	} while (1.0*currentGraph.edgeNum/currentGraph.vertexNum < 0.6);
 	// 限制了图的稀疏性
 }
-// 显示边权重调用函数
-showEdgeWeightSwitch = function (show) {
-	if (show != null) {
-		currentGraph.showEdgeWeight = show;
-		currentGraph.implementAction(currentGraph.showEdgeWeightFunc.bind(currentGraph), show);
-	}
-}
 // 有向图和无向图的转换
-directedGraphSwitch = function (directed) {
+Graph.prototype.directedGraphSwitch = function (directed) {
 	if (directed != null) {
 		// 先清除所有的边
 		currentGraph.implementAction(currentGraph.clearAllEdges.bind(currentGraph), 0);
@@ -134,7 +143,7 @@ directedGraphSwitch = function (directed) {
 	}
 }
 // 顶点数量取值变化调用函数
-vertexNumSelectChangeCallBack = function (newVertexNum) {
+Graph.prototype.vertexNumSelectChangeCallBack = function (newVertexNum) {
 	if (!isNaN(parseInt(newVertexNum)) && parseInt(newVertexNum) >=3 && parseInt(newVertexNum) <=10) {
 		// 清除所有
 		objectManager = null;
@@ -148,66 +157,6 @@ vertexNumSelectChangeCallBack = function (newVertexNum) {
 	} else {
 		alert("顶点数量取值范围应为 3-10 !");
 	}
-}
-
-// var vertexNumSelect;
-
-// var randomGraphButton;
-// var startVertexText;
-// var endVertexText;
-// var edgeWeightText;
-// var addEdgeButton;
-// var delEdgeButton;
-// var BFSTraverseButton;
-// var BFSStartVertexText;
-// var showEdgeWeight;
-// var directedGraph;
-// var undirectedGraph;
-
-// 添加控制按钮
-Graph.prototype.addControls = function () {
-	addLabelToAlgorithmBar("顶点数量");
-	var vertexNumList = [3, 4, 5, 6, 7, 8, 9, 10];
-	vertexNumSelect = addSelectToAlgorithmBar(vertexNumList);
-	vertexNumSelect.onchange = vertexNumSelectChangeCallBack;
-	// 添加初始值
-	for (var i=0; i<vertexNumSelect.length; i++) {
-		if (vertexNumSelect.options[i].value == initialVertexNum ) {
-			vertexNumSelect.options[i].selected = true;
-		}
-	}
-	//alert(vertexNumSelect.selectedIndex);
-
-	addLabelToAlgorithmBar("起点");
-	startVertexText = addInputToAlgorithmBar("text", "");
-	addLabelToAlgorithmBar("终点");
-	endVertexText = addInputToAlgorithmBar("text", "");
-	addLabelToAlgorithmBar("权重");
-	edgeWeightText = addInputToAlgorithmBar("text", "");
-	edgeWeightText.value = "10";
-	addEdgeButton = addInputToAlgorithmBar("button", "添加边");
-	addEdgeButton.onclick = addEdgeCallBack;
-	delEdgeButton = addInputToAlgorithmBar("button", "删除边");
-	delEdgeButton.onclick = delEdgeCallBack;
-	randomGraphButton = addInputToAlgorithmBar("button", "生成随机图");
-	randomGraphButton.onclick = randomGraphCallBack;
-
-	addLabelToAlgorithmBar("BFS起始顶点");
-	BFSStartVertexText = addInputToAlgorithmBar("text", "0");
-	
-	BFSTraverseButton = addInputToAlgorithmBar("button", "Run BFS");
-	BFSTraverseButton.onclick = runBFSCallBack;
-
-	showEdgeWeight = addCheckboxToAlgorithmBar("显示边权重");
-	showEdgeWeight.onclick = showEdgeWeightSwitch;
-	showEdgeWeight.checked = true;
-	
-	var directedGraphList = addRadioButtonGroupToAlgorithmBar(["directed Graph","undirected Graph"],"GraphType");
-	directedGraph = directedGraphList[0];
-	undirectedGraph = directedGraphList[1];
-	directedGraph.onclick = directedGraphSwitch;
-	undirectedGraph.onclick = directedGraphSwitch;
-	undirectedGraph.checked = true;
 }
 
 // 初始化数组
@@ -240,10 +189,10 @@ Graph.prototype.initGraph = function(vertexNum) {
 		this.position[i][0] = Math.round( this.X0 + this.R * Math.sin( 2* Math.PI * i / this.vertexNum ) );
 		this.position[i][1] = Math.round( this.Y0 - this.R * Math.cos( 2 * Math.PI * i / this.vertexNum ) );
 	}
-	//this.graphObjectID = new Array(maxSize) ; // 
+	this.nodeID_arr = new Array(this.vertexNum);	// 存储顶点的ID
 	
 	for(var i=0 ; i<this.vertexNum ; i++) {
-		//this.graphObjectID[i] = -1 ;
+		this.nodeID_arr[i] = i;
 		this.cmd("CreateCircle", this.objectID, this.objectID,
 				 this.position[this.objectID][0], this.position[this.objectID][1], this.radius);
 		this.cmd("SetForegroundColor", this.objectID, this.foregroundColor);
@@ -251,60 +200,11 @@ Graph.prototype.initGraph = function(vertexNum) {
 		this.objectID ++ ;
 	}
 	// BFS Queue label
-	this.cmd("CreateLabel", this.hintLabelID, "BFS Queue", this.hintStartX - this.radius - 40, this.hintStartY);
+	this.cmd("CreateLabel", this.hintLabelID, "BFS Queue", this.hintStartX, this.hintStartY);
 	this.cmd("SetForegroundColor", this.hintLabelID, this.foregroundColor);
-	this.cmd("SetBackgroundColor", this.hintLabelID, this.backgroundColor);
 	return this.commands;
 }
 
-// 是否显示边权重，show为bool类型，表示是否显示权重
-Graph.prototype.showEdgeWeightFunc = function(show) {
-	//alert("show Edge weight");
-	// 有向图
-	if (this.directed) {
-		// 先删除图上所有的边
-		for (var i=0; i< this.vertexNum; i++) {
-			for (var j=0; j< this.vertexNum; j++) {
-				if (this.matrix[i][j] ) {
-					this.cmd("Disconnect", i, j);
-				}
-			}
-		}
-		// 重新绘边
-		for (var i=0; i<this.vertexNum; i++) {
-			for (var j =0; j<this.vertexNum; j++) {
-				if(this.matrix[i][j]) {
-					var label = show ? this.matrix[i][j] : "";
-					var curve = (this.matrix[j][i] ) ? directedGraphCurveWithDoubleEdge : directedGraphCurveWithSingleEdge;
-					this.cmd("Connect", i, j, this.foregroundColor, 
-							curve, this.directed, label);
-				}
-			}
-		}
-	}
-	// 无向图
-	else {
-		// 先删除图上所有的边
-		for (var i=0; i< this.vertexNum; i++) {
-			for (var j=0; j< i; j++) {
-				if (this.matrix[j][i] ) {
-					this.cmd("Disconnect", j, i);
-				}
-			}
-		}
-		// 重新绘边
-		for (var i=0; i<this.vertexNum; i++) {
-			for (var j =0; j<i; j++) {
-				if(this.matrix[j][i]) {
-					var label = show ? this.matrix[i][j] : "";
-					this.cmd("Connect", j, i, this.foregroundColor, 
-							undirectedGraphCurve, this.directed, label);
-				}
-			}
-		}
-	}
-	return this.commands;
-}
 // 清除图的所有边
 Graph.prototype.clearAllEdges = function () {
 	//alert("clearAllEdges");
@@ -408,7 +308,6 @@ Graph.prototype.addEdge = function() {
 		this.cmd("SetHighlight", endVertex, false) ;
 		this.cmd("Step") ;
 	}
-	//this.cmd("Connect", startVertex, endVertex, this.foregroundColor, 0.0, false, weight);
 
 	// 有向图
 	if (this.directed) {
@@ -448,8 +347,8 @@ Graph.prototype.addEdge = function() {
 // 删除边
 Graph.prototype.delEdge = function() {
 	// 传入参数，要删除的边
-	startVertex = arguments[0][0];
-	endVertex = arguments[0][1];
+	var startVertex = arguments[0][0];
+	var endVertex = arguments[0][1];
 	// 传入参数的合法性判断
 	if (startVertex <0 || startVertex >= this.vertexNum) {
 		alert("start Vertex illeagl.");
@@ -525,25 +424,17 @@ Graph.prototype.clearHintArea = function () {
 	if (typeof(this.visited) == 'undefined') {
 		return this.commands;
 	}
-	// alert(this.hintObjectID.length);
-	// don't use for now
-	// for (var i=0; i<this.hintObjectID.length; i++) {
-	// 	if (this.visited[i] ) {
-	// 		//this.cmd("Delete", this.hintObjectID[i]);
-	// 		try {
-	// 			this.cmd("Delete", this.hintObjectID[i]);
-	// 		}
-	// 		catch(error) {
-	// 			// do nothing 
-	// 		}
-	// 	}
-	// }
+	for (var i=0; i<this.hintObjectID.length; i++) {
+		if (this.visited[i] ) {
+			this.cmd("Delete", this.hintObjectID[i]);
+		}
+	}
 	return this.commands;
 }
 // BFS
 Graph.prototype.BFSTraverse = function(startVertex) {
 	if (startVertex >= this.vertexNum) {
-		this.cmd("SetState", "输入的顶点应在0-"+(this.vertexNum-1)+"之间");
+		show_message("输入的顶点应在0-"+(this.vertexNum-1)+"之间",'error');
 		return this.commands;
 	}
 	this.visited = new Array(this.vertexNum);
@@ -555,9 +446,8 @@ Graph.prototype.BFSTraverse = function(startVertex) {
 	this.cmd("SetForegroundColor", this.BFSCircleID, "#FF0000");
 	this.cmd("SetBackgroundColor", this.BFSCircleID, '#FFFFFF');
 	this.cmd("Step");
-	this.objectID++;
 	// hint circle
-	this.cmd("CreateHighlightCircle", this.hintHighlightCircleID, this.hintStartX, this.hintStartY, this.radius);
+	this.cmd("CreateHighlightCircle", this.hintHighlightCircleID, this.hintStartX, this.hintStartY+60, this.radius);
 	this.cmd("SetForegroundColor", this.hintHighlightCircleID, this.highlightColor);
 	this.cmd("SetBackgroundColor", this.hintHighlightCircleID, this.backgroundColor);
 	var visitSeq = [];
@@ -574,7 +464,7 @@ Graph.prototype.BFSTraverse = function(startVertex) {
 		}
 		visitSeqStr+=visitSeq[i]
 	}
-	this.cmd("SetState", "BFS遍历顺序是 "+visitSeqStr);
+	show_notice("BFS遍历顺序是 "+visitSeqStr,'success',0);
 	this.cmd("Delete", this.BFSCircleID);
 	this.cmd("Delete", this.hintHighlightCircleID);
 	this.cmd("Step");
@@ -594,6 +484,7 @@ Graph.prototype.BFS = function (startVertex) {
 	this.cmd("Move", this.BFSCircleID, this.position[startVertex][0], this.position[startVertex][1] );
 	this.cmd("Step");
 	this.cmd("Step");
+	this.cmd("SetBackgroundColor",this.nodeID_arr[startVertex],"#ff9f0f") //设置访问过的节点的颜色
 	// 产生BFS	parent circle 
 	this.cmd("CreateHighlightCircle", this.BFSParentCircleID, 
 			this.position[startVertex][0], this.position[startVertex][1], this.radius);
@@ -606,18 +497,11 @@ Graph.prototype.BFS = function (startVertex) {
 	for (var i=0; i<this.vertexNum; i++) {
 		parent[i] = startVertex;
 	}
-
 	queue.push(startVertex);
-	this.cmd("SetState", "将起始节点添加到队列");
+	show_notice("将起始节点<"+startVertex+">添加到队列",'info');
 	this.cmd("Step");
 	// 在右边的hint区域同步显示queue内容
-	// this.cmd("CreateLabel", this.hintLabelID, "BFS Queue", this.hintStartX - this.radius - 40, this.hintStartY);
-	// this.cmd("SetForegroundColor", this.hintLabelID, this.foregroundColor);
-	// this.cmd("SetBackgroundColor", this.hintLabelID, this.backgroundColor);
-	// this.cmd("CreateHighlightCircle", this.hintHighlightCircleID, this.hintStartX, this.hintStartY, this.radius);
-	// this.cmd("SetForegroundColor", this.hintHighlightCircleID, this.highlightColor);
-	// this.cmd("SetBackgroundColor", this.hintHighlightCircleID, this.backgroundColor);
-	this.cmd("CreateCircle", this.hintObjectIDStart+ this.hintObjectIDCount, startVertex, this.hintStartX, this.hintStartY, this.radius);
+	this.cmd("CreateCircle", this.hintObjectIDStart+ this.hintObjectIDCount, startVertex, this.hintStartX, this.hintStartY+60, this.radius);
 	this.cmd("SetForegroundColor", this.hintObjectIDStart+ this.hintObjectIDCount, this.foregroundColor);
 	this.cmd("SetBackgroundColor", this.hintObjectIDStart+ this.hintObjectIDCount, this.backgroundColor);
 	this.hintObjectIDArray.push(this.hintObjectIDStart + this.hintObjectIDCount);
@@ -625,7 +509,7 @@ Graph.prototype.BFS = function (startVertex) {
 
 	while(queue.length != 0) {
 		var vertex = queue[0];
-		this.cmd("SetState","取出队列第一个顶点<"+vertex+">");
+		show_notice("取出队列第一个顶点<"+vertex+">",'info');
 		this.cmd("Step");
 		
 		queue.shift();	// 删除第一个元素
@@ -633,7 +517,7 @@ Graph.prototype.BFS = function (startVertex) {
 		this.cmd("Step");
 		this.cmd("Step");
 		for (var edge = this.firstEdge(vertex); edge != null ; edge = this.nextEdge(edge) ) {
-			this.cmd("SetState", "检查和顶点<"+vertex+">相连的顶点<"+edge.endVertex+">是否被访问");
+			show_notice("检查和顶点<"+vertex+">相连的顶点<"+edge.endVertex+">是否被访问",'info');
 			this.cmd("Step");
 			var fromV = edge.startVertex;
 			var toV = edge.endVertex;
@@ -643,9 +527,9 @@ Graph.prototype.BFS = function (startVertex) {
 			}
 			this.cmd("SetLineHighlight", fromV, toV, true);
 			this.cmd("Step");
+			this.cmd("Step")
 			this.cmd("SetLineHighlight", fromV, toV, false);
 			//this.cmd("Step");
-
 			this.cmd("Move", this.BFSCircleID, this.position[edge.endVertex][0], this.position[edge.endVertex][1] );
 			this.cmd("Step");
 			this.cmd("Step");
@@ -656,11 +540,12 @@ Graph.prototype.BFS = function (startVertex) {
 				parent[nextVertex] = edge.startVertex;
 				visitSeq.push(nextVertex);
 				this.visited[nextVertex] = true;
-				this.cmd("SetState", "访问顶点<"+nextVertex+">");
+				show_notice("访问顶点<"+nextVertex+">",'info');
 				this.cmd("Step");
 				this.cmd("Move", this.BFSCircleID, this.position[nextVertex][0], this.position[nextVertex][1] );
 				this.cmd("Step");
 				this.cmd("Step");
+				this.cmd("SetBackgroundColor",this.nodeID_arr[nextVertex],"#ff9f0f"); // 设置访问过的节点的颜色
 				var flag = 0;
 				for (var j=0; j<queue.length; j++) {
 					if (queue[j] == nextVertex){
@@ -670,13 +555,11 @@ Graph.prototype.BFS = function (startVertex) {
 				}
 				if (flag == 0) {
 					queue.push(nextVertex);
-					this.cmd("SetState", "将顶点<"+nextVertex+">添加到队列中");
+					show_notice("将顶点<"+nextVertex+">添加到队列中",'info');
 					this.cmd("Step");
 					// 在hint区域最后添加元素
 					this.cmd("CreateCircle", this.hintObjectIDStart+this.hintObjectIDCount, nextVertex,
-							this.hintStartX + this.hintObjectIDArray.length * (this.hintInterval + 2*this.radius), this.hintStartY, this.radius);
-					// this.cmd("CreateCircle", this.hintObjectIDStart+this.hintObjectIDCount, nextVertex,
-					// 		this.hintStartX + this.hintObjectIDCount * (this.hintInterval + 2*this.radius), this.hintStartY, this.radius);
+							this.hintStartX + this.hintObjectIDArray.length * (this.hintInterval + 2*this.radius), this.hintStartY+60, this.radius);
 					this.cmd("SetForegroundColor", this.hintObjectIDStart+this.hintObjectIDCount, this.foregroundColor);
 					this.cmd("SetBackgroundColor", this.hintObjectIDStart+this.hintObjectIDCount, this.backgroundColor);
 					this.hintObjectIDArray.push(this.hintObjectIDStart+this.hintObjectIDCount);
@@ -687,7 +570,7 @@ Graph.prototype.BFS = function (startVertex) {
 		}
 		this.cmd("Delete", this.hintObjectIDArray.shift());
 		for (var j=0; j<this.hintObjectIDArray.length; j++) {
-			this.cmd("Move", this.hintObjectIDArray[j], this.hintStartX + j * (this.hintInterval + 2 * this.radius), this.hintStartY);
+			this.cmd("Move", this.hintObjectIDArray[j], this.hintStartX + j * (this.hintInterval + 2 * this.radius), this.hintStartY+60);
 		}
 		var visitSeqStr = "";
 		for (var i=0; i<visitSeq.length; i++) {
@@ -696,11 +579,31 @@ Graph.prototype.BFS = function (startVertex) {
 			}
 			visitSeqStr+=visitSeq[i]
 		}
-		// this.cmd("SetState", "BFS遍历顺序是 "+visitSeqStr);
-		// this.cmd("Step");
-		// this.cmd("Step");
 	}
 	this.cmd("Delete", this.BFSParentCircleID);
-	// this.cmd("Delete", this.hintLabelID);
 	return visitSeq;
+}
+
+export function change_graph_style_js(style) {
+	var flag = false;
+	if(style=='有向图'){
+		flag = true;
+	}else{
+		flag = false;
+	}
+	//show_message(flag,'info');	
+	currentGraph.directedGraphSwitch(flag);
+}
+export function creat_graph_js(node_count) {
+	currentGraph.vertexNumSelectChangeCallBack(node_count);
+    currentGraph.randomGraphCallBack();
+}
+export function insert_edge_js(start_node,end_node) {
+	currentGraph.addEdgeCallBack(start_node, end_node);
+}
+export function delete_edge_js(start_node,end_node) {
+	currentGraph.delEdgeCallBack(start_node,end_node);
+}
+export function start_traverse_js(start_node) {
+	currentGraph.runBFSCallBack(start_node);
 }
