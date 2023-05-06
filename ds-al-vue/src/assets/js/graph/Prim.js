@@ -17,6 +17,15 @@ function show_notice(notices, type , during_time) {
 		duration: times  	// 持续时间
 	});
 }
+function show_message(content, type, during_time ) {
+	var times = during_time == undefined ? 0: during_time ;
+	Message[type]({
+		content: content, // 内容
+		duration: times , 	// 持续时间
+		background: true, // 是否显示背景色
+		closable: true, // 是否显示关闭按钮
+	});
+}
 // 初始化函数
 var currentGraph;
 // 有向图的边画法改变
@@ -160,7 +169,7 @@ Graph.prototype.vertexNumSelectChangeCallBack = function (newVertexNum) {
 		currentGraph = new Graph(animationManager, drawing.width, drawing.height);
 		currentGraph.implementAction(currentGraph.initGraph.bind(currentGraph), parseInt(newVertexNum) ) ;
 	} else {
-		alert("顶点数量取值范围应为 3-10 !");
+		show_message("顶点数量取值范围应为 3-10 !",'error');
 	}
 }
 
@@ -236,7 +245,6 @@ Graph.prototype.initGraph = function(vertexNum) {
 
 // 是否显示边权重，show为bool类型，表示是否显示权重
 Graph.prototype.showEdgeWeightFunc = function(show) {
-	//alert("show Edge weight");
 	// 有向图
 	if (this.directed) {
 		// 先删除图上所有的边
@@ -285,9 +293,6 @@ Graph.prototype.showEdgeWeightFunc = function(show) {
 
 // 清除图的所有边
 Graph.prototype.clearAllEdges = function () {
-	//alert("clearAllEdges");
-	// 有向图
-	//alert(this.directed);
 	if (this.directed ) {
 		for(var i=0; i<this.vertexNum; i++ ) {
 			for(var j=0; j<this.vertexNum; j++) {
@@ -331,7 +336,6 @@ Graph.prototype.getRandomGraph = function () {
 		for(var i=0; i < this.vertexNum; i++) {
 			for (var j=0; j < this.vertexNum; j++) {
 				if (i != j ) {
-					//alert(i +" "+j +":"+this.matrix[i][j] );
 					// 决定是否添加边
 					if (getRandomNumber(0,1) ) {
 						this.addEdge( [i , j, getRandomNumber(1,100), false] );
@@ -340,7 +344,6 @@ Graph.prototype.getRandomGraph = function () {
 			}
 		}
 	}
-	//alert(this.matrix);
 	return this.commands;
 }
 
@@ -354,27 +357,27 @@ Graph.prototype.addEdge = function() {
 
 	// 传入参数的合法性判断
 	if (startVertex <0 || startVertex >= this.vertexNum) {
-		alert("start Vertex illeagl");
+		show_message("开始节点输入错误",'error');
 		return this.commands;
 	}
 	if (endVertex <0 || endVertex >= this.vertexNum) {
-		alert("end Vertex illeagl");
+		show_message("结束节点输入错误",'error');
 		return this.commands;
 	}
 	if(weight <=0 ) {
-		alert("weight illeagl");
+		show_message("权重应该大于0",'error');
 		return this.commands;
 	}
 	// 判断这条边是否已经存在
 	if (this.directed) {
 		if (this.matrix[startVertex][endVertex] ) {
-			alert("this edge already exists");
+			show_message("该边已经存在",'error');
 			return this.commands;
 		}
 	}
 	else {
 		if (this.matrix[startVertex][endVertex] || this.matrix[endVertex][startVertex]) {
-			alert("this edge already exists");
+			show_message("该边已经存在",'error');
 			return this.commands;
 		}
 	}
@@ -431,11 +434,11 @@ Graph.prototype.delEdge = function() {
 	var endVertex = arguments[0][1];
 	// 传入参数的合法性判断
 	if (startVertex <0 || startVertex >= this.vertexNum) {
-		alert("start Vertex illeagl.");
+		show_message("开始节点输入错误",'error');
 		return this.commands;
 	}
 	if (endVertex <0 || endVertex >= this.vertexNum) {
-		alert("end Vertex illeagl.");
+		show_message("结束节点输入错误",'error');
 		return this.commands;
 	}
 	// 如果是无向图，需要调整起点和终点
@@ -445,7 +448,7 @@ Graph.prototype.delEdge = function() {
 		endVertex = tmp;
 	}
 	if ( !this.matrix[startVertex][endVertex] ) {
-		alert("this edge do not exists.");
+		show_message("该边不存在",'error');
 		return this.commands;
 	}
 	
@@ -468,7 +471,6 @@ Graph.prototype.delEdge = function() {
 		}
 	}
 	else {
-		//alert(startVertex+" "+endVertex);
 		this.cmd("Disconnect", startVertex, endVertex);
 		this.matrix[startVertex][endVertex] = 0;
 		this.matrix[endVertex][startVertex] = 0;
@@ -518,7 +520,6 @@ Graph.prototype.nextEdge = function (edge) {
 // DFS
 Graph.prototype.DFS = function(vertex) {
 	this.visited[vertex] = true;
-	//alert("DFS:"+vertex);
 	for (var edge = this.firstEdge(vertex); ; edge = this.nextEdge(edge)) {
 		if( edge == null ) {		// edge 不是边, 退出
 			return null;
@@ -581,8 +582,7 @@ Graph.prototype.isAllConnected = function () {
 Graph.prototype.Prim = function (startVertex) {
 	// 先判断是否是连通图，不是的话停止算法执行
 	if ( !this.isAllConnected() ) {
-		// alert("This graph is not a connected graph, algorithm cannot run. Please add some edges or get a new graph to retry the algorithm. ");
-		this.cmd("SetState", "该图不是连通图，算法停止执行");
+		show_message("该图不是连通图，算法停止执行",'error');
 		return this.commands;
 	}
 	// 检查边顶点是否高亮，
@@ -597,7 +597,7 @@ Graph.prototype.Prim = function (startVertex) {
 		this.setConnectLineHighlight(startV, endV, false);
 	}
 
-	this.cmd("SetState", "将所有的顶点加到集合 U 中");
+	show_notice("将所有的顶点加到集合 U 中",'info');
 	var inSetCount = 0;	// MST集合计数器
 	var outSetCount = this.vertexNum;	// not in MST集合计数器
 	// 展现所有的not In MST集合顶点
@@ -608,7 +608,7 @@ Graph.prototype.Prim = function (startVertex) {
 		//this.cmd("Step");
 	}
 	this.cmd("Step");
-	this.cmd("SetState", "将算法起始顶点<"+startVertex+">加到集合 U-V 中");
+	show_notice("将算法起始顶点<"+startVertex+">加到集合 U-V 中",'info');
 	// 将起点加入到MST集合
 	this.cmd("Move", this.MSTSetCircleID[startVertex],
 			this.hintStartX + this.hintWidth, this.hintStartY + inSetCount*(this.hintInterval + 2 * this.radius));
@@ -691,7 +691,7 @@ Graph.prototype.Prim = function (startVertex) {
 			var tmp = this.addNew[v];
 			this.addNew[v] = -1;		// 将v点添加到生成树中
 			var e = "<"+tmp+","+v+">";
-			this.cmd("SetState", "找到权重最小的边"+e+",将点<"+v+">添加到集合 U-V 中");
+			show_notice("找到权重最小的边"+e+",将点<"+v+">添加到集合 U-V 中",'info');
 			// hint区域非最短路径disconnect
 			for (var j=0; j<this.vertexNum; j++) {
 				if (this.addNew[j] > -1 && lowCost[j] != INF) {
@@ -737,15 +737,14 @@ Graph.prototype.Prim = function (startVertex) {
 	var edgesStr = "";
 	for (var i=0; i<edges.length; i++) {
 		if (i!=0) {
-			edgesStr+=",";
+			edgesStr+="，";
 		}
-		edgesStr+="<"+edges[i].startVertex+","+edges[i].endVertex+">";
+		edgesStr+="< "+edges[i].startVertex+"，"+edges[i].endVertex+" >";
 	}
-	this.cmd("SetState", "最小生成树的边有" + edgesStr);
+	show_notice("最小生成树的边有" + edgesStr,'success',0);
 	for (var i=0; i<10; i++)  {
 		this.cmd("Step");
 	}
-	// this.clearHighlightCircle();
 	return this.commands;
 }
 

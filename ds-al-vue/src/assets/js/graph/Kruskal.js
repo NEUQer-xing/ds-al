@@ -1,10 +1,31 @@
-// JavaScript Document
-/*
-**	init()函数
-**	GraphEdge类
-**	Graph类
-**  UFSets类
-*/
+import {Message,Notice} from 'view-ui-plus';
+function show_notice(notices, type , during_time) {
+	let type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	} else if(type == 'warning') {
+		type_zh = '警告' ;
+	}
+	var times = during_time == undefined ? 6 : during_time ;
+	Notice[type]({
+		title: type_zh, // 标题
+		desc: notices,  // 内容
+		duration: times  	// 持续时间
+	});
+}
+function show_message(content, type, during_time ) {
+	var times = during_time == undefined ? 0: during_time ;
+	Message[type]({
+		content: content, // 内容
+		duration: times , 	// 持续时间
+		background: true, // 是否显示背景色
+		closable: true, // 是否显示关闭按钮
+	});
+}
 // 初始化函数
 var currentGraph;
 // 有向图的边画法改变
@@ -12,23 +33,25 @@ var directedGraphCurveWithSingleEdge = 0.0;	// 两个顶点之间只有一条边
 var directedGraphCurveWithDoubleEdge = 0.15;	// 两个顶点之间有两条边， 此时画曲线
 var undirectedGraphCurve = 0.0;
 var initialVertexNum = 6;
-function init() {
+export function init() {
 	objectManager = new ObjectManager() ;
 	animationManager = new AnimationManager(objectManager) ;
 	currentGraph = new Graph(animationManager, drawing.width, drawing.height);
 	currentGraph.implementAction(currentGraph.initGraph.bind(currentGraph), initialVertexNum) ;
 	
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 3, 5, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 4, 5, false]) ;
 	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 2, 1, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 1, 6, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [2, 3, 5, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [1, 2, 5, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [4, 2, 10, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [5, 3, 5, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [3, 1, 4, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [1, 5, 6, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 5, 10, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 1, 5, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [1, 2, 20, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [4, 5, 5, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [4, 3, 10, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [3, 2, 15, false]) ;
 	
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [1, 4, 3, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [2, 4, 6, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [4, 5, 6, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [3, 5, 2, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [2, 5, 4, false]) ;
 }
 
 // 产生介于上界和下界的随机数，整数，上界和下界都可以取到
@@ -71,8 +94,6 @@ Graph.prototype.initialize = function() {
 	//this.head = -1 ; // 头指针
 	this.directed = false;		// 是否是有向图
 	this.showEdgeWeight = true;	// 是否显示边权重
-	$(".runKruNumber").val('0');
-	$(".weightKruNumber").val('10');
 	// 图形部分
 	this.objectID = 0 ; // 图形的序号
 	this.highightCircleID;	// 高亮圆
@@ -85,19 +106,19 @@ Graph.prototype.initialize = function() {
 	this.radius = 26;	// 顶点圆的半径
 	// 顶点位置的确定
 	this.R = 150;		// 所有顶点分布在该圆上
-	this.X0 = 250;		// 分布圆的圆心横坐标
+	this.X0 = 200;	// 分布圆的圆心横坐标
 	this.Y0 = 250; 		// 分布圆的圆心纵坐标
 
-	this.EdgeArrayObjectStartX = 550;
+	this.EdgeArrayObjectStartX = 450;
 	this.EdgeArrayObjectStartY = 100;
 	this.EdgeArrayObjectInterval = 20;
 	this.EdgeArrayLineLength = 30;
 	this.EdgeArrayObjectRadius = 20;
 
-	this.UFSetsObjectStartX = 750;
-	this.UFSetsObjectStartY = 150;
-	this.UFSetsObjectWidth = 25;
-	this.UFSetsObjectHeight = 20;
+	this.UFSetsObjectStartX = 700;
+	this.UFSetsObjectStartY = 200;
+	this.UFSetsObjectWidth = 30;
+	this.UFSetsObjectHeight = 25;
 	this.UFSetsObjectInterval = 15;
 	this.UFSetsObjectCount;
 	this.UFSetsObjectPosition;
@@ -108,38 +129,38 @@ Graph.prototype.initialize = function() {
 }
 
 // 添加边调用函数
-addEdgeCallBack = function (startVertex, endVertex, weight) {
+Graph.prototype.addEdgeCallBack = function (startVertex, endVertex, weight) {
 	if (isNaN(weight) || weight == null) {
 		weight = 10;
 	}
 	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [startVertex, endVertex, weight]) ;
 }
 // 删除边调用函数
-delEdgeCallBack = function (startVertex, endVertex) {
+Graph.prototype.delEdgeCallBack = function (startVertex, endVertex) {
 	currentGraph.implementAction(currentGraph.delEdge.bind(currentGraph), [startVertex, endVertex]) ;
 }
 // DFS遍历调用函数
-runKruskalCallBack = function() {
+Graph.prototype.runKruskalCallBack = function() {
 	// startVertex = ( startVertex == null || isNaN(startVertex) ) ? 0: startVertex;
 	// currentGraph.implementAction(currentGraph.clearHintArea.bind(currentGraph), 0);
 	currentGraph.implementAction(currentGraph.Kruskal.bind(currentGraph), 0);
 }
 // 产生随机图调用函数
-randomGraphCallBack = function() {
+Graph.prototype.randomGraphCallBack = function() {
 	do {
 		currentGraph.implementAction(currentGraph.clearAllEdges.bind(currentGraph), 0);
 		currentGraph.implementAction(currentGraph.getRandomGraph.bind(currentGraph), 0);
 	} while(!currentGraph.isAllConnected());
 }
 // 显示边权重调用函数
-showEdgeWeightSwitch = function (show) {
+Graph.prototype.showEdgeWeightSwitch = function (show) {
 	if (show != null) {
 		currentGraph.showEdgeWeight = show;
 		currentGraph.implementAction(currentGraph.showEdgeWeightFunc.bind(currentGraph), show);
 	}
 }
 // 有向图和无向图的转换
-directedGraphSwitch = function (directed) {
+Graph.prototype.directedGraphSwitch = function (directed) {
 	if (directed != null) {
 		// 先清除所有的边
 		currentGraph.implementAction(currentGraph.clearAllEdges.bind(currentGraph), 0);
@@ -149,7 +170,7 @@ directedGraphSwitch = function (directed) {
 	}
 }
 // 顶点数量取值变化调用函数
-vertexNumSelectChangeCallBack = function (newVertexNum) {
+Graph.prototype.vertexNumSelectChangeCallBack = function (newVertexNum) {
 	if (!isNaN(parseInt(newVertexNum)) && parseInt(newVertexNum) >=3 && parseInt(newVertexNum) <=10) {
 		// 清除所有
 		objectManager = null;
@@ -161,72 +182,8 @@ vertexNumSelectChangeCallBack = function (newVertexNum) {
 		currentGraph = new Graph(animationManager, drawing.width, drawing.height);
 		currentGraph.implementAction(currentGraph.initGraph.bind(currentGraph), parseInt(newVertexNum) ) ;
 	} else {
-		alert("顶点数量取值范围应为 3-10 !");
+		show_message("顶点数量取值范围应为 3-10 !",'error');
 	}
-}
-
-// var vertexNumSelect;
-
-// var randomGraphButton;
-// var startVertexText;
-// var endVertexText;
-// var edgeWeightText;
-// var addEdgeButton;
-// var delEdgeButton;
-
-// var KruskalStartVertexText;
-// var runPrimButton;
-
-// var showEdgeWeight;
-// var directedGraph;
-// var undirectedGraph;
-
-// 添加控制按钮
-Graph.prototype.addControls = function () {
-	addLabelToAlgorithmBar("顶点数量");
-	var vertexNumList = [3, 4, 5, 6, 7, 8, 9, 10];
-	vertexNumSelect = addSelectToAlgorithmBar(vertexNumList);
-	vertexNumSelect.onchange = vertexNumSelectChangeCallBack;
-	// 添加初始值
-	for (var i=0; i<vertexNumSelect.length; i++) {
-		if (vertexNumSelect.options[i].value == initialVertexNum ) {
-			vertexNumSelect.options[i].selected = true;
-		}
-	}
-
-	addLabelToAlgorithmBar("起点");
-	startVertexText = addInputToAlgorithmBar("text", "");
-	addLabelToAlgorithmBar("终点");
-	endVertexText = addInputToAlgorithmBar("text", "");
-	addLabelToAlgorithmBar("权重");
-	edgeWeightText = addInputToAlgorithmBar("text", "");
-	edgeWeightText.value = "10";
-	addEdgeButton = addInputToAlgorithmBar("button", "添加边");
-	addEdgeButton.onclick = addEdgeCallBack;
-	delEdgeButton = addInputToAlgorithmBar("button", "删除边");
-	delEdgeButton.onclick = delEdgeCallBack;
-	randomGraphButton = addInputToAlgorithmBar("button", "生成随机图");
-	randomGraphButton.onclick = randomGraphCallBack;
-	
-	addLabelToAlgorithmBar("Kruskal起始顶点");
-	KruskalStartVertexText = addInputToAlgorithmBar("text", "0");
-	
-	runKruskalButton = addInputToAlgorithmBar("button", "Run Kruskal");
-	runKruskalButton.onclick = runKruskalCallBack;
-
-	showEdgeWeight = addCheckboxToAlgorithmBar("显示边权重");
-	showEdgeWeight.onclick = showEdgeWeightSwitch;
-	showEdgeWeight.checked = true;
-	showEdgeWeight.disabled = true;
-	
-	var directedGraphList = addRadioButtonGroupToAlgorithmBar(["directed Graph","undirected Graph"],"GraphType");
-	directedGraph = directedGraphList[0];
-	undirectedGraph = directedGraphList[1];
-	directedGraph.onclick = directedGraphSwitch;
-	undirectedGraph.onclick = directedGraphSwitch;
-	undirectedGraph.checked = true;
-	directedGraph.disabled = true;
-	undirectedGraph.disabled = true;
 }
 
 // 初始化数组
@@ -250,13 +207,6 @@ Graph.prototype.initGraph = function(vertexNum) {
 	}
 	this.UFSetsObjectCount = new Array(vertexNum);
 	this.UFSetsObjectPosition = new Array(vertexNum);
-	// for (var i=0; i< this.vertexNum; i++) {
-	// 	this.UFSetsObjectCount[i] = 1;
-	// 	// 二维坐标
-	// 	this.UFSetsObjectPosition[i] = new Array(2);
-	// 	this.UFSetsObjectPosition[i][0] = this.UFSetsObjectStartX;
-	// 	this.UFSetsObjectPosition[i][1] = this.UFSetsObjectStartY + i * (this.UFSetsObjectHeight + this.UFSetsObjectInterval);
-	// }
 
 	this.edgeNum = 0;				// 边的数量
 	this.matrix = new Array(this.vertexNum);	// 图的邻接矩阵
@@ -286,55 +236,6 @@ Graph.prototype.initGraph = function(vertexNum) {
 		this.cmd("SetForegroundColor", this.objectID, this.foregroundColor);
 		this.cmd("SetBackgroundColor", this.objectID, '#FFFFFF') ;
 		this.objectID ++ ;
-	}
-	return this.commands;
-}
-
-// 是否显示边权重，show为bool类型，表示是否显示权重
-Graph.prototype.showEdgeWeight = function(show) {
-	//alert("show Edge weight");
-	// 有向图
-	if (this.directed) {
-		// 先删除图上所有的边
-		for (var i=0; i< this.vertexNum; i++) {
-			for (var j=0; j< this.vertexNum; j++) {
-				if (this.matrix[i][j] ) {
-					this.cmd("Disconnect", i, j);
-				}
-			}
-		}
-		// 重新绘边
-		for (var i=0; i<this.vertexNum; i++) {
-			for (var j =0; j<this.vertexNum; j++) {
-				if(this.matrix[i][j]) {
-					var label = show ? this.matrix[i][j] : "";
-					var curve = (this.matrix[j][i] ) ? directedGraphCurveWithDoubleEdge : directedGraphCurveWithSingleEdge;
-					this.cmd("Connect", i, j, this.foregroundColor, 
-							curve, this.directed, label);
-				}
-			}
-		}
-	}
-	// 无向图
-	else {
-		// 先删除图上所有的边
-		for (var i=0; i< this.vertexNum; i++) {
-			for (var j=0; j< i; j++) {
-				if (this.matrix[j][i] ) {
-					this.cmd("Disconnect", j, i);
-				}
-			}
-		}
-		// 重新绘边
-		for (var i=0; i<this.vertexNum; i++) {
-			for (var j =0; j<i; j++) {
-				if(this.matrix[j][i]) {
-					var label = show ? this.matrix[i][j] : "";
-					this.cmd("Connect", j, i, this.foregroundColor, 
-							undirectedGraphCurve, this.directed, label);
-				}
-			}
-		}
 	}
 	return this.commands;
 }
@@ -370,8 +271,7 @@ Graph.prototype.clearAllEdges = function () {
 
 // 产生随机图
 Graph.prototype.getRandomGraph = function () {
-	//alert("getRandomGraph");
-	//alert(this.matrix);
+
 	// 产生无向图
 	if (!this.directed) {
 		for(var i=0; i < this.vertexNum; i++) {
@@ -387,7 +287,6 @@ Graph.prototype.getRandomGraph = function () {
 		for(var i=0; i < this.vertexNum; i++) {
 			for (var j=0; j < this.vertexNum; j++) {
 				if (i != j ) {
-					//alert(i +" "+j +":"+this.matrix[i][j] );
 					// 决定是否添加边
 					if (getRandomNumber(0,1) ) {
 						this.addEdge( [i , j, getRandomNumber(1,100), false] );
@@ -396,7 +295,6 @@ Graph.prototype.getRandomGraph = function () {
 			}
 		}
 	}
-	//alert(this.matrix);
 	return this.commands;
 }
 
@@ -410,27 +308,27 @@ Graph.prototype.addEdge = function() {
 
 	// 传入参数的合法性判断
 	if (startVertex <0 || startVertex >= this.vertexNum) {
-		alert("start Vertex illeagl");
+		show_message("起始节点的值不合法",'error');
 		return this.commands;
 	}
 	if (endVertex <0 || endVertex >= this.vertexNum) {
-		alert("end Vertex illeagl");
+		show_message("终止节点的值不合法",'error');
 		return this.commands;
 	}
 	if(weight <=0 ) {
-		alert("weight illeagl");
+		show_message("权重值应该输入大于0的值",'error');
 		return this.commands;
 	}
 	// 判断这条边是否已经存在
 	if (this.directed) {
 		if (this.matrix[startVertex][endVertex] ) {
-			alert("this edge already exists");
+			show_message("该边已经存在",'error');
 			return this.commands;
 		}
 	}
 	else {
 		if (this.matrix[startVertex][endVertex] || this.matrix[endVertex][startVertex]) {
-			alert("this edge already exists");
+			show_message("该边已经存在",'error');
 			return this.commands;
 		}
 	}
@@ -483,15 +381,15 @@ Graph.prototype.addEdge = function() {
 // 删除边
 Graph.prototype.delEdge = function() {
 	// 传入参数，要删除的边
-	startVertex = arguments[0][0];
-	endVertex = arguments[0][1];
+	var startVertex = arguments[0][0];
+	var endVertex = arguments[0][1];
 	// 传入参数的合法性判断
 	if (startVertex <0 || startVertex >= this.vertexNum) {
-		alert("start Vertex illeagl.");
+		show_message("起始节点的值不合法",'error');
 		return this.commands;
 	}
 	if (endVertex <0 || endVertex >= this.vertexNum) {
-		alert("end Vertex illeagl.");
+		show_message("终止节点的值不合法",'error');
 		return this.commands;
 	}
 	// 如果是无向图，需要调整起点和终点
@@ -501,7 +399,7 @@ Graph.prototype.delEdge = function() {
 		endVertex = tmp;
 	}
 	if ( !this.matrix[startVertex][endVertex] ) {
-		alert("this edge do not exists.");
+		show_message("该边不存在",'error');
 		return this.commands;
 	}
 	
@@ -529,7 +427,6 @@ Graph.prototype.delEdge = function() {
 			endVertex = startVertex;
 			startVertex = tmp;
 		}
-		//alert(startVertex+" "+endVertex);
 		this.cmd("Disconnect", startVertex, endVertex);
 		this.matrix[startVertex][endVertex] = 0;
 		this.matrix[endVertex][startVertex] = 0;
@@ -579,7 +476,6 @@ Graph.prototype.nextEdge = function (edge) {
 // DFS
 Graph.prototype.DFS = function(vertex) {
 	this.visited[vertex] = true;
-	//alert("DFS:"+vertex);
 	for (var edge = this.firstEdge(vertex); ; edge = this.nextEdge(edge)) {
 		if( edge == null ) {		// edge 不是边, 退出
 			return null;
@@ -611,8 +507,7 @@ Graph.prototype.isAllConnected = function () {
 Graph.prototype.Kruskal = function ( ) {
 	// 先判断是否是连通图，不是的话停止算法执行
 	if ( !this.isAllConnected() ) {
-		// alert("This graph is not a connected graph, algorithm cannot run. Please add some edges or get a new graph to retry the algorithm. ");
-		this.cmd("SetState", "该图不是连通图，算法停止执行");
+		show_notice("该图不是连通图，算法停止执行",'error',0);
 		return this.commands;
 	}
 	// 检查是否有高亮显示的边，有的话删除掉
@@ -620,7 +515,6 @@ Graph.prototype.Kruskal = function ( ) {
 		var line = this.highlightConnectArray.pop();
 		var startV = line[0];
 		var endV = line[1];
-		//alert(startV+" "+endV);
 		this.setConnectLineHighlight(startV, endV, false);
 	}
 	// 将所有的顶点前景色设为一般颜色（非高亮）
@@ -657,14 +551,14 @@ Graph.prototype.Kruskal = function ( ) {
 		this.EdgeArrayObjectID[i] = 3* this.vertexNum + i;
 	}
 
-	this.cmd("SetState", "先对所有的边排序");
+	show_notice("先对所有的边排序",'info');
 	this.cmd("Step");
 	this.cmd("Step");
 	this.cmd("Step");
 	// 对所有的边进行排序，升序
 	edgeArray.sort( function (e1, e2) {return (e1.weight > e2.weight) ? 1 : -1; }  );
 	// 显示Edge Array
-	this.cmd("SetState", "排序完成");
+	show_notice("排序完成",'info');
 	this.cmd("CreateLabel", this.hintLabelLeftID, "排序后的边", this.EdgeArrayObjectStartX + 35, this.EdgeArrayObjectStartY - 50);
 	this.cmd("SetForegroundColor", this.hintLabelLeftID, this.foregroundColor);
 	this.cmd("SetBackgroundColor", this.hintLabelLeftID, this.backgroundColor);
@@ -722,7 +616,7 @@ Graph.prototype.Kruskal = function ( ) {
 			this.cmd("Step");
 			this.cmd("Step");
 			var stateV = "<"+edgeArray[edgeCount].startVertex+","+edgeArray[edgeCount].endVertex+">";
-			this.cmd("SetState", "检查两个顶点"+stateV+"是否在同一个等价类中");
+			show_notice("检查两个顶点"+stateV+"是否在同一个等价类中",'info');
 			this.cmd("Step");
 			this.cmd("Move", this.EdgeArrayLeftHighlightCircleID, 
 					this.UFSetsObjectPosition[startVertex][0], this.UFSetsObjectPosition[startVertex][1] );
@@ -735,7 +629,7 @@ Graph.prototype.Kruskal = function ( ) {
 			
 			// 检查两个顶点是否属于同一个等价类
 			if ( !set.check(startVertex, endVertex) ) {
-				this.cmd("SetState", "顶点"+stateV+"不在同一个等价类，添加该边到最小生成树，合并该等价类");
+				show_notice("顶点"+stateV+"不在同一个等价类，添加该边到最小生成树，合并该等价类",'info');
 				// 将两个不属于同一个等价类的顶点合并为一个等价类
 				set.union(startVertex, endVertex );
 				MSTEdge.push(stateV);
@@ -747,14 +641,12 @@ Graph.prototype.Kruskal = function ( ) {
 				for (var i=0; i< this.vertexNum; i++) {
 					this.UFSetsObjectPosition[i][0] = this.UFSetsObjectStartX + this.UFSetsObjectCount[set.find(i)] * this.UFSetsObjectWidth;
 					this.UFSetsObjectPosition[i][1] = this.UFSetsObjectStartY + (set.find(i)) * (this.UFSetsObjectHeight + this.UFSetsObjectInterval);
-					//alert(this.UFSetsObjectPosition[i][0]+" "+this.UFSetsObjectPosition[i][1]);
 					this.cmd("Move", this.UFSetsObjectID[i], this.UFSetsObjectPosition[i][0], 
 							this.UFSetsObjectPosition[i][1] );
 					this.UFSetsObjectCount[ set.find(i) ] ++;
 
 				}
 				this.cmd("Step");
-				//alert(startVertex +" "+ endVertex);
 				// 图上的高亮操作
 				if ( !hasHighlightCiecle[startVertex] ) {
 					this.cmd("CreateHighlightCircle", this.highightCircleID[startVertex], 
@@ -780,7 +672,7 @@ Graph.prototype.Kruskal = function ( ) {
 			}
 			// 该边位于同一个等价类
 			else{
-				this.cmd("SetState", "顶点"+stateV+"在同一个等价类，舍弃该边");
+				show_notice("顶点"+stateV+"在同一个等价类，舍弃该边",'info');
 				this.cmd("Step");
 			}
 			// 检查完成后需要把第一条边删掉并且剩余的边需要上移一行
@@ -797,41 +689,37 @@ Graph.prototype.Kruskal = function ( ) {
 			this.cmd("Step");
 		}
 		else {
-			// alert("不存在最小生成树");
-			this.cmd("SetState", "不存在最小生成树");
+			show_notice("不存在最小生成树",'error');
 			return this.commands;
 		}
 		edgeCount++;
 	}
-	this.cmd("SetState", "完成算法");
+	show_notice("完成算法",'success');
 	this.cmd("Step");
 	MSTEdge.reverse();
 	var edgesStr = ""+ MSTEdge.pop();
 	while (MSTEdge.length > 0) {
-		edgesStr+=("," + MSTEdge.pop());
+		edgesStr+=("   " + MSTEdge.pop());
 	}
-	this.cmd("SetState", "最小生成树的边有" + edgesStr);
+	show_notice("最小生成树的边有" + edgesStr,'success',0);
 	// 删除剩余的 edge circle
 	this.cmd("Step");
 	this.cmd("Step");
 	this.cmd("Step");
-	this.cmd("Step");
-	this.cmd("Step");
-	this.cmd("Step");
-	for (var i= edgeCount; i < edgeArray.length; i++) {
-		this.cmd("Disconnect", this.EdgeArrayObjectID[2*i], this.EdgeArrayObjectID[2*i+1]);
-		this.cmd("Delete", this.EdgeArrayObjectID[2*i]);
-		this.cmd("Delete", this.EdgeArrayObjectID[2*i+1]);
-	}
-	// 删除label
-	this.cmd("Delete", this.hintLabelLeftID);
-	this.cmd("Delete", this.hintLabelRightID);
-	// 删除高亮圆，删除UFSet提示矩形
-	for (var i=0; i<this.vertexNum; i++ ) {
-		this.cmd("Delete", this.highightCircleID[i]);
-		this.cmd("Delete", this.UFSetsObjectID[i]);
-	}
-	this.cmd("Step");
+	// for (var i= edgeCount; i < edgeArray.length; i++) {
+	// 	this.cmd("Disconnect", this.EdgeArrayObjectID[2*i], this.EdgeArrayObjectID[2*i+1]);
+	// 	this.cmd("Delete", this.EdgeArrayObjectID[2*i]);
+	// 	this.cmd("Delete", this.EdgeArrayObjectID[2*i+1]);
+	// }
+	// // 删除label
+	// this.cmd("Delete", this.hintLabelLeftID);
+	// this.cmd("Delete", this.hintLabelRightID);
+	// // 删除高亮圆，删除UFSet提示矩形
+	// for (var i=0; i<this.vertexNum; i++ ) {
+	// 	this.cmd("Delete", this.highightCircleID[i]);
+	// 	this.cmd("Delete", this.UFSetsObjectID[i]);
+	// }
+	// this.cmd("Step");
 	return this.commands;
 }
 
@@ -852,11 +740,9 @@ UFSets.prototype = {
 // 对n1和n2 进行等价合并
 UFSets.prototype.union = function (n1, n2) {
 	if(n1 == n2 ) {
-		alert("cannot union two same number " + n1);
 		return null;
 	}
 	if (this.sameSet[n1] == this.sameSet[n2]) {
-		alert(n1+","+n2 +" are already in the same Set. ");
 		return null;
 	}
 	var min = (this.sameSet[n1] < this.sameSet[n2]) ? this.sameSet[n1] : this.sameSet[n2];
@@ -878,4 +764,18 @@ UFSets.prototype.check = function (n1, n2) {
 // find
 UFSets.prototype.find = function (n) {
 	return this.sameSet[n];
+}
+
+export function creat_graph_js(node_count) {
+	currentGraph.vertexNumSelectChangeCallBack(node_count);
+    currentGraph.randomGraphCallBack();
+}
+export function insert_edge_js(start_node,end_node,weight) {
+	currentGraph.addEdgeCallBack(start_node, end_node,weight);
+}
+export function delete_edge_js(start_node,end_node) {
+	currentGraph.delEdgeCallBack(start_node,end_node);
+}
+export function start_creat_mintree_js() {
+	currentGraph.runKruskalCallBack();
 }
