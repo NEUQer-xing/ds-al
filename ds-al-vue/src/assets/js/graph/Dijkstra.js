@@ -1,9 +1,31 @@
-// JavaScript Document
-/*
-**	init()函数
-**	GraphEdge类
-**	Graph类
-*/
+import {Message,Notice} from 'view-ui-plus';
+function show_notice(notices, type , during_time) {
+	let type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	} else if(type == 'warning') {
+		type_zh = '警告' ;
+	}
+	var times = during_time == undefined ? 6 : during_time ;
+	Notice[type]({
+		title: type_zh, // 标题
+		desc: notices,  // 内容
+		duration: times  	// 持续时间
+	});
+}
+function show_message(content, type, during_time ) {
+	var times = during_time == undefined ? 0: during_time ;
+	Message[type]({
+		content: content, // 内容
+		duration: times , 	// 持续时间
+		background: true, // 是否显示背景色
+		closable: true, // 是否显示关闭按钮
+	});
+}
 // 初始化函数
 var currentGraph;
 /* chenged */
@@ -12,22 +34,25 @@ var directedGraphCurveWithSingleEdge = 0.0;	// 两个顶点之间只有一条边
 var directedGraphCurveWithDoubleEdge = 0.15;	// 两个顶点之间有两条边， 此时画曲线
 var undirectedGraphCurve = 0.0;
 var initialVertexNum = 6;
-function init() {
+export function init() {
 	objectManager = new ObjectManager() ;
 	animationManager = new AnimationManager(objectManager) ;
 	currentGraph = new Graph(animationManager, drawing.width, drawing.height);
 	currentGraph.implementAction(currentGraph.initGraph.bind(currentGraph), initialVertexNum) ;
 	
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 5, 100, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 4, 30, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 2, 10, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 1, 12, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [1, 2, 5, false]) ;
-	
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [2, 3, 50, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [4, 3, 20, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [3, 5, 10, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [4, 5, 60, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 4, 5, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 2, 1, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [4, 2, 10, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [5, 3, 5, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [3, 1, 4, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [1, 5, 6, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 5, 10, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 1, 5, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [1, 2, 20, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [4, 5, 5, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [4, 3, 10, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [3, 2, 15, false]) ;
+
 }
 
 // 产生介于上界和下界的随机数，整数，上界和下界都可以取到
@@ -70,12 +95,6 @@ Graph.prototype.initialize = function() {
 	//this.head = -1 ; // 头指针
 	this.directed = true;		// 是否是有向图
 	this.showEdgeWeight = true;	// 是否显示边权重
-	// 设置界面
-	$(".radio1").attr("checked", "checked");
-	$(".runDijNumber").val('0');
-	$(".weightDijNumber").val('10');
-	// $("#displayWeight").attr("checked", "checked");
-
 	// 图形部分
 	this.objectID = 0 ; // 图形的序号
 	
@@ -96,12 +115,12 @@ Graph.prototype.initialize = function() {
 	this.radius = 26;	// 顶点圆的半径
 	// 顶点位置的确定
 	this.R = 150;		// 所有顶点分布在该圆上
-	this.X0 = 250;		// 分布圆的圆心横坐标
+	this.X0 = 200;		// 分布圆的圆心横坐标
 	this.Y0 = 250; 		// 分布圆的圆心纵坐标
 
-	this.hintStartX = 600;
-	this.hintStartY = 150;
-	this.hintObjectWidth = 60;
+	this.hintStartX = 450;
+	this.hintStartY = 170;
+	this.hintObjectWidth = 80;
 	this.hintObjectHeight = 30;
 	
 	this.foregroundColor = '#1E90FF' ; // 前景色
@@ -110,36 +129,36 @@ Graph.prototype.initialize = function() {
 }
 
 // 添加边调用函数
-addEdgeCallBack = function (startVertex, endVertex, weight) {
+Graph.prototype.addEdgeCallBack = function (startVertex, endVertex, weight) {
 	if (isNaN(weight) || weight == null) {
 		weight = 10;
 	}
 	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [startVertex, endVertex, weight]) ;
 }
 // 删除边调用函数
-delEdgeCallBack = function (startVertex, endVertex) {
+Graph.prototype.delEdgeCallBack = function (startVertex, endVertex) {
 	currentGraph.implementAction(currentGraph.delEdge.bind(currentGraph), [startVertex, endVertex]) ;
 }
 // Dijkstra调用函数
-runDijkstraCallBack = function(startVertex) {
+Graph.prototype.runDijkstraCallBack = function(startVertex) {
 	startVertex = ( startVertex == null || isNaN(startVertex) ) ? 0: startVertex;
 	currentGraph.implementAction(currentGraph.clearHintArea.bind(currentGraph), 0);
 	currentGraph.implementAction(currentGraph.Dijkstra.bind(currentGraph), startVertex);
 }
 // 产生随机图调用函数
-randomGraphCallBack = function() {
+Graph.prototype.randomGraphCallBack = function() {
 	currentGraph.implementAction(currentGraph.clearAllEdges.bind(currentGraph), 0);
 	currentGraph.implementAction(currentGraph.getRandomGraph.bind(currentGraph), 0);
 }
 // 显示边权重调用函数
-showEdgeWeightSwitch = function (show) {
+Graph.prototype.showEdgeWeightSwitch = function (show) {
 	if (show != null) {
 		currentGraph.showEdgeWeight = show;
 		currentGraph.implementAction(currentGraph.showEdgeWeightFunc.bind(currentGraph), show);
 	}
 }
 // 有向图和无向图的转换
-directedGraphSwitch = function (directed) {
+Graph.prototype.directedGraphSwitch = function (directed) {
 	if (directed != null) {
 		// 先清除所有的边
 		currentGraph.implementAction(currentGraph.clearAllEdges.bind(currentGraph), 0);
@@ -149,7 +168,7 @@ directedGraphSwitch = function (directed) {
 	}
 }
 // 顶点数量取值变化调用函数
-vertexNumSelectChangeCallBack = function (newVertexNum) {
+Graph.prototype.vertexNumSelectChangeCallBack = function (newVertexNum) {
 	if (!isNaN(parseInt(newVertexNum)) && parseInt(newVertexNum)>=3 && parseInt(newVertexNum)<=10) {
 		// 清除所有
 		objectManager = null;
@@ -161,80 +180,14 @@ vertexNumSelectChangeCallBack = function (newVertexNum) {
 		currentGraph = new Graph(animationManager, drawing.width, drawing.height);
 		currentGraph.implementAction(currentGraph.initGraph.bind(currentGraph), parseInt(newVertexNum) ) ;
 	} else {
-		alert("顶点数量取值范围应为 3-10 !");
+		show_message("顶点数量取值范围应为 3-10 !",'error');
 	}
-}
-
-// var vertexNumSelect;
-
-// var randomGraphButton;
-// var startVertexText;
-// var endVertexText;
-// var edgeWeightText;
-// var addEdgeButton;
-// var delEdgeButton;
-
-// var DijkstraStartVertexText;
-// var runDijkstraButton;
-
-// var showEdgeWeight;
-// var directedGraph;
-// var undirectedGraph;
-
-// 添加控制按钮
-Graph.prototype.addControls = function () {
-	addLabelToAlgorithmBar("顶点数量");
-	var vertexNumList = [3, 4, 5, 6, 7, 8, 9, 10];
-	vertexNumSelect = addSelectToAlgorithmBar(vertexNumList);
-	vertexNumSelect.onchange = vertexNumSelectChangeCallBack;
-	// 添加初始值
-	for (var i=0; i<vertexNumSelect.length; i++) {
-		if (vertexNumSelect.options[i].value == initialVertexNum ) {
-			vertexNumSelect.options[i].selected = true;
-		}
-	}
-
-	addLabelToAlgorithmBar("起点");
-	startVertexText = addInputToAlgorithmBar("text", "");
-	addLabelToAlgorithmBar("终点");
-	endVertexText = addInputToAlgorithmBar("text", "");
-	addLabelToAlgorithmBar("权重");
-	edgeWeightText = addInputToAlgorithmBar("text", "");
-	edgeWeightText.value = "10";
-	addEdgeButton = addInputToAlgorithmBar("button", "添加边");
-	addEdgeButton.onclick = addEdgeCallBack;
-	delEdgeButton = addInputToAlgorithmBar("button", "删除边");
-	delEdgeButton.onclick = delEdgeCallBack;	
-	randomGraphButton = addInputToAlgorithmBar("button", "生成随机图");
-	randomGraphButton.onclick = randomGraphCallBack;
-
-	addLabelToAlgorithmBar("Dijkstra起始顶点");
-	DijkstraStartVertexText = addInputToAlgorithmBar("text", "0");
-	
-	runDijkstraButton = addInputToAlgorithmBar("button", "Run Dijkstra");
-	runDijkstraButton.onclick = runDijkstraCallBack;
-
-	showEdgeWeight = addCheckboxToAlgorithmBar("显示边权重");
-	showEdgeWeight.onclick = showEdgeWeightSwitch;
-	showEdgeWeight.checked = true;
-	showEdgeWeight.disabled = true;
-
-	var directedGraphList = addRadioButtonGroupToAlgorithmBar(["directed Graph","undirected Graph"],"GraphType");
-	directedGraph = directedGraphList[0];
-	undirectedGraph = directedGraphList[1];
-	directedGraph.onclick = directedGraphSwitch;
-	undirectedGraph.onclick = directedGraphSwitch;
-	directedGraph.checked = true;
 }
 
 // 初始化数组
 Graph.prototype.initGraph = function(vertexNum) {
 	this.vertexNum = vertexNum ; 	// 顶点的数量
 	this.edgeNum = 0;				// 边的数量
-	// 对一些图形ID进行初始化	
-	// this.highlightRectangleKnownID; // Known 高亮矩形
-	// this.highlightRectangleCostID = vecostte Num;
-	// this.highlightRectanglePathID = vertpathN um+1;
 	this.hintVertexID = vertexNum;
 	this.hintKnownID = vertexNum+1;
 	this.hintCostID = vertexNum+2;
@@ -284,54 +237,6 @@ Graph.prototype.initGraph = function(vertexNum) {
 	return this.commands;
 }
 
-// 是否显示边权重，show为bool类型，表示是否显示权重
-Graph.prototype.showEdgeWeightFunc = function(show) {
-	//alert("show Edge weight");
-	// 有向图
-	if (this.directed) {
-		// 先删除图上所有的边
-		for (var i=0; i< this.vertexNum; i++) {
-			for (var j=0; j< this.vertexNum; j++) {
-				if (this.matrix[i][j] ) {
-					this.cmd("Disconnect", i, j);
-				}
-			}
-		}
-		// 重新绘边
-		for (var i=0; i<this.vertexNum; i++) {
-			for (var j =0; j<this.vertexNum; j++) {
-				if(this.matrix[i][j]) {
-					var label = show ? this.matrix[i][j] : "";
-					var curve = (this.matrix[j][i] ) ? directedGraphCurveWithDoubleEdge : directedGraphCurveWithSingleEdge;
-					this.cmd("Connect", i, j, this.foregroundColor, 
-							curve, this.directed, label);
-				}
-			}
-		}
-	}
-	// 无向图
-	else {
-		// 先删除图上所有的边
-		for (var i=0; i< this.vertexNum; i++) {
-			for (var j=0; j< i; j++) {
-				if (this.matrix[j][i] ) {
-					this.cmd("Disconnect", j, i);
-				}
-			}
-		}
-		// 重新绘边
-		for (var i=0; i<this.vertexNum; i++) {
-			for (var j =0; j<i; j++) {
-				if(this.matrix[j][i]) {
-					var label = show ? this.matrix[i][j] : "";
-					this.cmd("Connect", j, i, this.foregroundColor, 
-							undirectedGraphCurve, this.directed, label);
-				}
-			}
-		}
-	}
-	return this.commands;
-}
 // 清除hint区域
 Graph.prototype.clearHintArea = function () {
 	if(typeof(this.INF) == 'undefined') {
@@ -353,9 +258,6 @@ Graph.prototype.clearHintArea = function () {
 }
 // 清除图的所有边
 Graph.prototype.clearAllEdges = function () {
-	//alert("clearAllEdges");
-	// 有向图
-	//alert(this.directed);
 	if (this.directed ) {
 		for(var i=0; i<this.vertexNum; i++ ) {
 			for(var j=0; j<this.vertexNum; j++) {
@@ -371,9 +273,7 @@ Graph.prototype.clearAllEdges = function () {
 		for (var i=0; i<this.vertexNum; i++) {
 			for (var j=0; j<i ; j++) {
 				if (this.matrix[i][j]) {
-					// 由于connect时候是小到大，故disconnect时候也要小到大
 					this.cmd("Disconnect", j, i );	
-					//alert("disconnected"+" "+j +" "+i);
 					this.matrix[i][j] =0;
 					this.matrix[j][i] =0;
 				}
@@ -402,10 +302,8 @@ Graph.prototype.getRandomGraph = function () {
 		for(var i=0; i < this.vertexNum; i++) {
 			for (var j=0; j<this.vertexNum; j++) {
 				if (i != j ) {
-					//alert(i +" "+j +":"+this.matrix[i][j] );
 					// 决定是否添加边
 					if (getRandomNumber(0,1) ) {
-						//alert(i+ " " +j +" "+ rand);
 						this.addEdge( [i , j, getRandomNumber(1,100), false] );
 					}
 				}
@@ -424,27 +322,27 @@ Graph.prototype.addEdge = function() {
 	var withAnimation = arguments[0][3];	// bool
 	// 传入参数的合法性判断
 	if (startVertex <0 || startVertex >= this.vertexNum) {
-		alert("start Vertex illeagl");
+		show_message('起始节点不合法','error');
 		return this.commands;
 	}
 	if (endVertex <0 || endVertex >= this.vertexNum) {
-		alert("end Vertex illeagl");
+		show_message('终止节点不合法','error');
 		return this.commands;
 	}
 	if(weight <=0 ) {
-		alert("weight illeagl");
+		show_message('权重值应该大于0','error');
 		return this.commands;
 	}
 	// 判断这条边是否已经存在
 	if (this.directed) {
 		if (this.matrix[startVertex][endVertex] ) {
-			alert("this edge already exists");
+			show_message('该边已经存在','error');
 			return this.commands;
 		}
 	}
 	else {
 		if (this.matrix[startVertex][endVertex] || this.matrix[endVertex][startVertex]) {
-			alert("this edge already exists");
+			show_message('该边已经存在','error');
 			return this.commands;
 		}
 	}
@@ -496,15 +394,15 @@ Graph.prototype.addEdge = function() {
 // 删除边
 Graph.prototype.delEdge = function() {
 	// 传入参数，要删除的边
-	startVertex = arguments[0][0];
-	endVertex = arguments[0][1];
+	var startVertex = arguments[0][0];
+	var endVertex = arguments[0][1];
 	// 传入参数的合法性判断
 	if (startVertex <0 || startVertex >= this.vertexNum) {
-		alert("start Vertex illeagl.");
+		show_message('起始节点不合法','error');
 		return this.commands;
 	}
 	if (endVertex <0 || endVertex >= this.vertexNum) {
-		alert("end Vertex illeagl.");
+		show_message('终止节点不合法','error');
 		return this.commands;
 	}
 	// 如果是无向图，需要调整起点和终点
@@ -514,7 +412,7 @@ Graph.prototype.delEdge = function() {
 		endVertex = tmp;
 	}
 	if ( !this.matrix[startVertex][endVertex] ) {
-		alert("this edge do not exists.");
+		show_message('该边不存在','error');
 		return this.commands;
 	}
 	
@@ -568,6 +466,7 @@ Graph.prototype.nextEdge = function (edge) {
 
 // Dijkstra算法
 Graph.prototype.Dijkstra = function (startVertex) {
+	this.cmd("CreateLabel", 99999 , "从点"+startVertex+'出发,到达各个顶点的最短路径如下:',this.hintStartX+180,this.hintStartY-60 );
 	// 把高亮顶点取消
 	for (var i=0; i<this.vertexNum; i++) {
 		this.cmd("SetForegroundColor", i, this.foregroundColor);
@@ -654,7 +553,7 @@ Graph.prototype.Dijkstra = function (startVertex) {
 		this.cmd("SetBackgroundColor", this.hintPathColumnID[i], this.backgroundColor);
 	}
 
-	this.cmd("SetState", "把起始顶点 "+startVertex+" 到自身的代价设为0");
+	show_notice("把起始顶点 "+startVertex+" 到自身的代价设为0",'info');
 	this.cmd("SetHighlight", startVertex, true);
 	this.cmd("Step");
 	this.cmd("SetHighlight", startVertex, false);
@@ -693,7 +592,7 @@ Graph.prototype.Dijkstra = function (startVertex) {
 		}
 		// 找到了合适的边
 		found[vertex] = 1;
-		this.cmd("SetState", "找到到达顶点 "+vertex+" 的最短路径,代价是 "+min);
+		show_notice("找到到达顶点 "+vertex+" 的最短路径,代价是 "+min,'info');
 		// 由path推算出完全路径
 		fullPath[vertex].push(vertex);
 		for (var i=fullPath[path[vertex]].length-1; i>=0; i--) {
@@ -757,24 +656,12 @@ Graph.prototype.Dijkstra = function (startVertex) {
 			this.cmd("SetLineHighlight", lineSt, lineEn, false);
 			this.cmd("Step");
 			if (found[edge.endVertex] == -1 && dist[vertex]+ edge.weight < dist[edge.endVertex]) {
-				this.cmd("SetState", "更新从顶点"+startVertex+" 到 "+edge.endVertex+" 的最短路径为"+
-						startVertex+".->"+vertex+"->"+edge.endVertex);
+				show_notice("更新从顶点"+startVertex+" 到 "+edge.endVertex+" 的最短路径为"+startVertex+".->"+vertex+"->"+edge.endVertex,'info');
 				this.cmd("Step");
 				dist[edge.endVertex] = dist[vertex]+ edge.weight;
-				// 高亮显示dist更新
-				// this.cmd("CreateHighlightRectangle", this.highlightRectangleCostID, 
-				// 		this.hintObjectWidth, this.hintObjectHeight, 'left', 'top', 
-				// 		this.hintStartX + 2* this.hintObjectWidth, this.hintStartY + edge.endVertex * this.hintObjectHeight);
-				// this.cmd("SetForegroundColor", this.highlightRectangleCostID, this.foregroundColor);
-				// this.cmd("SetBackgroundColor", this.highlightRectangleCostID, this.backgroundColor);
-				// this.cmd("Step");
-				// this.cmd("SetLabel", this.hintCostColumnID[edge.endVertex], dist[edge.endVertex]);
-				// this.cmd("Step");
-				// this.cmd("Delete", this.highlightRectangleCostID);
-
 				path[edge.endVertex] = vertex;
 			} else {
-				this.cmd("SetState", "顶点"+startVertex+" 到 "+edge.endVertex+" 的路径不用更新");
+				show_notice("顶点"+startVertex+" 到 "+edge.endVertex+" 的路径不用更新",'info');
 				this.cmd("Step");
 			}
 			// 找到一个最短路径的顶点后，更新cost
@@ -797,23 +684,7 @@ Graph.prototype.Dijkstra = function (startVertex) {
 	for (var i=0; i< this.vertexNum; i++) {
 		if ( found[i] == -1 && dist[i] == this.INF) {
 			// hint区域高亮这个顶点，然后修改路径label
-			this.cmd("SetState", "没有找到从 "+startVertex+" 到 "+i+" 的路径，其路径设置为NO PATH");
-			this.cmd("Step");
-			this.cmd("CreateHighlightRectangle", this.highlightRectangleKnownID,
-					this.hintObjectWidth, this.hintObjectHeight, 'left', 'top',
-					this.hintStartX + this.hintObjectWidth, this.hintStartY + i*(this.hintObjectHeight));
-			this.cmd("SetForegroundColor", this.highlightRectangleKnownID, this.foregroundColor);
-			this.cmd("SetBackgroundColor", this.highlightRectangleKnownID, this.backgroundColor);
-			this.cmd("CreateHighlightRectangle", this.highlightRectangleCostID, 
-					this.hintObjectWidth, this.hintObjectHeight, 'left', 'top',
-					this.hintStartX+2*this.hintObjectWidth, this.hintStartY+i*this.hintObjectHeight);
-			this.cmd("SetForegroundColor", this.highlightRectangleCostID, this.foregroundColor);
-			this.cmd("SetBackgroundColor", this.highlightRectangleCostID, this.backgroundColor);
-			this.cmd("CreateHighlightRectangle", this.highlightRectanglePathID,
-					2*this.hintObjectWidth, this.hintObjectHeight, 'left', 'top',
-					this.hintStartX + 3*this.hintObjectWidth, this.hintObjectHeight+i*this.hintObjectHeight);
-			this.cmd("SetForegroundColor", this.highlightRectanglePathID, this.foregroundColor);
-			this.cmd("SetBackgroundColor", this.highlightRectanglePathID, this.backgroundColor);
+			show_notice("没有找到从 "+startVertex+" 到 "+i+" 的路径，其路径设置为NO PATH",'info');
 			this.cmd("Step");
 			this.cmd("SetLabel", this.hintPathColumnID[i], 'NO PATH');
 			this.cmd("Setp");
@@ -823,6 +694,30 @@ Graph.prototype.Dijkstra = function (startVertex) {
 			this.cmd("Step");
 		}
 	}
-	this.cmd("SetState", "算法执行完成，结果见下表");
+	show_notice("算法执行完成，结果见下表",'success',0);
 	return this.commands;
+}
+
+export function change_graph_style_js(style) {
+	var flag = false;
+	if(style=='有向图'){
+		flag = true;
+	}else{
+		flag = false;
+	}
+	//show_message(flag,'info');	
+	currentGraph.directedGraphSwitch(flag);
+}
+export function creat_graph_js(node_count) {
+	currentGraph.vertexNumSelectChangeCallBack(node_count);
+    currentGraph.randomGraphCallBack();
+}
+export function insert_edge_js(start_node,end_node,weight) {
+	currentGraph.addEdgeCallBack(start_node, end_node,weight);
+}
+export function delete_edge_js(start_node,end_node) {
+	currentGraph.delEdgeCallBack(start_node,end_node);
+}
+export function start_traverse_js(start_node) {
+	currentGraph.runDijkstraCallBack(start_node);
 }

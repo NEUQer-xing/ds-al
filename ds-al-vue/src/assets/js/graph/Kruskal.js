@@ -706,6 +706,9 @@ Graph.prototype.Kruskal = function ( ) {
 	this.cmd("Step");
 	this.cmd("Step");
 	this.cmd("Step");
+
+	// 是否要清除所有的图形
+	
 	// for (var i= edgeCount; i < edgeArray.length; i++) {
 	// 	this.cmd("Disconnect", this.EdgeArrayObjectID[2*i], this.EdgeArrayObjectID[2*i+1]);
 	// 	this.cmd("Delete", this.EdgeArrayObjectID[2*i]);
