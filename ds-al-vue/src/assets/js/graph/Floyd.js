@@ -1,9 +1,31 @@
-// JavaScript Document
-/*
-**	init()函数
-**	GraphEdge类
-**	Graph类
-*/
+import {Message,Notice} from 'view-ui-plus';
+function show_notice(notices, type , during_time) {
+	let type_zh ;
+	if(type == 'success') {
+		type_zh = '成功' ;
+	} else if(type == 'error') {
+		type_zh = '错误' ;
+	} else if(type == 'info') {
+		type_zh = '提示' ;
+	} else if(type == 'warning') {
+		type_zh = '警告' ;
+	}
+	var times = during_time == undefined ? 6 : during_time ;
+	Notice[type]({
+		title: type_zh, // 标题
+		desc: notices,  // 内容
+		duration: times  	// 持续时间
+	});
+}
+function show_message(content, type, during_time ) {
+	var times = during_time == undefined ? 0: during_time ;
+	Message[type]({
+		content: content, // 内容
+		duration: times , 	// 持续时间
+		background: true, // 是否显示背景色
+		closable: true, // 是否显示关闭按钮
+	});
+}
 // 初始化函数
 var currentGraph;
 /* chenged */
@@ -12,22 +34,24 @@ var directedGraphCurveWithSingleEdge = 0.0;	// 两个顶点之间只有一条边
 var directedGraphCurveWithDoubleEdge = 0.15;	// 两个顶点之间有两条边， 此时画曲线
 var undirectedGraphCurve = 0.0;
 var initialVertexNum = 6;
-function init() {
+export function init() {
 	objectManager = new ObjectManager() ;
 	animationManager = new AnimationManager(objectManager) ;
 	currentGraph = new Graph(animationManager, drawing.width, drawing.height);
 	currentGraph.implementAction(currentGraph.initGraph.bind(currentGraph), initialVertexNum) ;
 	
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 5, 100, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 4, 30, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 2, 10, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 1, 12, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [1, 2, 5, false]) ;
-	
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [2, 3, 50, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [4, 3, 20, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [3, 5, 10, false]) ;
-	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [4, 5, 60, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 4, 5, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 2, 1, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [4, 2, 10, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [5, 3, 5, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [3, 1, 4, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [1, 5, 6, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 5, 10, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [0, 1, 5, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [1, 2, 20, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [4, 5, 5, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [4, 3, 10, false]) ;
+	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [3, 2, 15, false]) ;
 }
 
 // 产生介于上界和下界的随机数，整数，上界和下界都可以取到
@@ -70,12 +94,6 @@ Graph.prototype.initialize = function() {
 	//this.head = -1 ; // 头指针
 	this.directed = true;		// 是否是有向图
 	this.showEdgeWeight = true;	// 是否显示边权重
-	// 设置界面
-	$(".radio1").attr("checked", "checked");
-	$(".runDijNumber").val('0');
-	$(".weightDijNumber").val('10');
-	// $("#displayWeight").attr("checked", "checked");
-
 	// 图形部分
 	this.objectID = 0 ; // 图形的序号
 	
@@ -96,13 +114,13 @@ Graph.prototype.initialize = function() {
 	this.radius = 26;	// 顶点圆的半径
 	// 顶点位置的确定
 	this.R = 150;		// 所有顶点分布在该圆上
-	this.X0 = 250;		// 分布圆的圆心横坐标
+	this.X0 = 200;		// 分布圆的圆心横坐标
 	this.Y0 = 250; 		// 分布圆的圆心纵坐标
 
 	this.tableWidth = 60;
 	this.tableHeight = 30;
-	this.tableStartX = 600;
-	this.tableStartY = 150;
+	this.tableStartX = 500;
+	this.tableStartY = 180;
 
 	this.hintStartX = 600;
 	this.hintStartY = 150;
@@ -115,36 +133,36 @@ Graph.prototype.initialize = function() {
 }
 
 // 添加边调用函数
-addEdgeCallBack = function (startVertex, endVertex, weight) {
+Graph.prototype.addEdgeCallBack = function (startVertex, endVertex, weight) {
 	if (isNaN(weight) || weight == null) {
 		weight = 10;
 	}
 	currentGraph.implementAction(currentGraph.addEdge.bind(currentGraph), [startVertex, endVertex, weight]) ;
 }
 // 删除边调用函数
-delEdgeCallBack = function (startVertex, endVertex) {
+Graph.prototype.delEdgeCallBack = function (startVertex, endVertex) {
 	currentGraph.implementAction(currentGraph.delEdge.bind(currentGraph), [startVertex, endVertex]) ;
 }
 // Floyd调用函数
-runFloydCallBack = function(startVertex) {
+Graph.prototype.runFloydCallBack = function(startVertex) {
 	// startVertex = ( startVertex == null || isNaN(startVertex) ) ? 0: startVertex;
 	// currentGraph.implementAction(currentGraph.clearHintArea.bind(currentGraph), 0);
 	currentGraph.implementAction(currentGraph.Floyd.bind(currentGraph), startVertex);
 }
 // 产生随机图调用函数
-randomGraphCallBack = function() {
+Graph.prototype.randomGraphCallBack = function() {
 	currentGraph.implementAction(currentGraph.clearAllEdges.bind(currentGraph), 0);
 	currentGraph.implementAction(currentGraph.getRandomGraph.bind(currentGraph), 0);
 }
 // 显示边权重调用函数
-showEdgeWeightSwitch = function (show) {
+Graph.prototype.showEdgeWeightSwitch = function (show) {
 	if (show != null) {
 		currentGraph.showEdgeWeight = show;
 		currentGraph.implementAction(currentGraph.showEdgeWeightFunc.bind(currentGraph), show);
 	}
 }
 // 有向图和无向图的转换
-directedGraphSwitch = function (directed) {
+Graph.prototype.directedGraphSwitch = function (directed) {
 	if (directed != null) {
 		// 先清除所有的边
 		currentGraph.implementAction(currentGraph.clearAllEdges.bind(currentGraph), 0);
@@ -153,8 +171,9 @@ directedGraphSwitch = function (directed) {
 		currentGraph.implementAction(currentGraph.getRandomGraph.bind(currentGraph), 0);
 	}
 }
+
 // 顶点数量取值变化调用函数
-vertexNumSelectChangeCallBack = function (newVertexNum) {
+Graph.prototype.vertexNumSelectChangeCallBack = function (newVertexNum) {
 	if (!isNaN(parseInt(newVertexNum)) && parseInt(newVertexNum)>=3 && parseInt(newVertexNum)<=10) {
 		// 清除所有
 		objectManager = null;
@@ -166,81 +185,14 @@ vertexNumSelectChangeCallBack = function (newVertexNum) {
 		currentGraph = new Graph(animationManager, drawing.width, drawing.height);
 		currentGraph.implementAction(currentGraph.initGraph.bind(currentGraph), parseInt(newVertexNum) ) ;
 	} else {
-		alert("顶点数量取值范围应为 3-10 !");
+		show_message("顶点数量取值范围应为 3-10 !",'error');
 	}
-}
-
-// var vertexNumSelect;
-
-// var randomGraphButton;
-// var startVertexText;
-// var endVertexText;
-// var edgeWeightText;
-// var addEdgeButton;
-// var delEdgeButton;
-
-// var DijkstraStartVertexText;
-// var runDijkstraButton;
-
-// var showEdgeWeight;
-// var directedGraph;
-// var undirectedGraph;
-
-// 添加控制按钮
-Graph.prototype.addControls = function () {
-	addLabelToAlgorithmBar("顶点数量");
-	var vertexNumList = [3, 4, 5, 6, 7, 8, 9, 10];
-	vertexNumSelect = addSelectToAlgorithmBar(vertexNumList);
-	vertexNumSelect.onchange = vertexNumSelectChangeCallBack;
-	// 添加初始值
-	for (var i=0; i<vertexNumSelect.length; i++) {
-		if (vertexNumSelect.options[i].value == initialVertexNum ) {
-			vertexNumSelect.options[i].selected = true;
-		}
-	}
-
-	addLabelToAlgorithmBar("起点");
-	startVertexText = addInputToAlgorithmBar("text", "");
-	addLabelToAlgorithmBar("终点");
-	endVertexText = addInputToAlgorithmBar("text", "");
-	addLabelToAlgorithmBar("权重");
-	edgeWeightText = addInputToAlgorithmBar("text", "");
-	edgeWeightText.value = "10";
-	addEdgeButton = addInputToAlgorithmBar("button", "添加边");
-	addEdgeButton.onclick = addEdgeCallBack;
-	delEdgeButton = addInputToAlgorithmBar("button", "删除边");
-	delEdgeButton.onclick = delEdgeCallBack;	
-	randomGraphButton = addInputToAlgorithmBar("button", "生成随机图");
-	randomGraphButton.onclick = randomGraphCallBack;
-
-	addLabelToAlgorithmBar("Dijkstra起始顶点");
-	DijkstraStartVertexText = addInputToAlgorithmBar("text", "0");
-	
-	runDijkstraButton = addInputToAlgorithmBar("button", "Run Dijkstra");
-	runDijkstraButton.onclick = runDijkstraCallBack;
-
-	showEdgeWeight = addCheckboxToAlgorithmBar("显示边权重");
-	showEdgeWeight.onclick = showEdgeWeightSwitch;
-	showEdgeWeight.checked = true;
-	showEdgeWeight.disabled = true;
-
-	var directedGraphList = addRadioButtonGroupToAlgorithmBar(["directed Graph","undirected Graph"],"GraphType");
-	directedGraph = directedGraphList[0];
-	undirectedGraph = directedGraphList[1];
-	directedGraph.onclick = directedGraphSwitch;
-	undirectedGraph.onclick = directedGraphSwitch;
-	directedGraph.checked = true;
 }
 
 // 初始化数组
 Graph.prototype.initGraph = function(vertexNum) {
 	this.vertexNum = vertexNum ; 	// 顶点的数量
 	this.edgeNum = 0;				// 边的数量
-	// 对一些图形ID进行初始化	
-	// this.highlightRectangleKnownID; // Known 高亮矩形
-	// this.highlightRectangleCostID = vecostte Num;
-	// this.highlightRectanglePathID = vertpathN um+1;
-
 	this.hintVertexID = vertexNum;
 	this.hintKnownID = vertexNum+1;
 	this.hintCostID = vertexNum+2;
@@ -290,54 +242,6 @@ Graph.prototype.initGraph = function(vertexNum) {
 	return this.commands;
 }
 
-// 是否显示边权重，show为bool类型，表示是否显示权重
-Graph.prototype.showEdgeWeightFunc = function(show) {
-	//alert("show Edge weight");
-	// 有向图
-	if (this.directed) {
-		// 先删除图上所有的边
-		for (var i=0; i< this.vertexNum; i++) {
-			for (var j=0; j< this.vertexNum; j++) {
-				if (this.matrix[i][j] ) {
-					this.cmd("Disconnect", i, j);
-				}
-			}
-		}
-		// 重新绘边
-		for (var i=0; i<this.vertexNum; i++) {
-			for (var j =0; j<this.vertexNum; j++) {
-				if(this.matrix[i][j]) {
-					var label = show ? this.matrix[i][j] : "";
-					var curve = (this.matrix[j][i] ) ? directedGraphCurveWithDoubleEdge : directedGraphCurveWithSingleEdge;
-					this.cmd("Connect", i, j, this.foregroundColor, 
-							curve, this.directed, label);
-				}
-			}
-		}
-	}
-	// 无向图
-	else {
-		// 先删除图上所有的边
-		for (var i=0; i< this.vertexNum; i++) {
-			for (var j=0; j< i; j++) {
-				if (this.matrix[j][i] ) {
-					this.cmd("Disconnect", j, i);
-				}
-			}
-		}
-		// 重新绘边
-		for (var i=0; i<this.vertexNum; i++) {
-			for (var j =0; j<i; j++) {
-				if(this.matrix[j][i]) {
-					var label = show ? this.matrix[i][j] : "";
-					this.cmd("Connect", j, i, this.foregroundColor, 
-							undirectedGraphCurve, this.directed, label);
-				}
-			}
-		}
-	}
-	return this.commands;
-}
 // 清除hint区域
 Graph.prototype.clearHintArea = function () {
 	if (this.header != null) {
@@ -381,7 +285,6 @@ Graph.prototype.clearAllEdges = function () {
 				if (this.matrix[i][j]) {
 					// 由于connect时候是小到大，故disconnect时候也要小到大
 					this.cmd("Disconnect", j, i );	
-					//alert("disconnected"+" "+j +" "+i);
 					this.matrix[i][j] =0;
 					this.matrix[j][i] =0;
 				}
@@ -409,10 +312,8 @@ Graph.prototype.getRandomGraph = function () {
 		for(var i=0; i < this.vertexNum; i++) {
 			for (var j=0; j<this.vertexNum; j++) {
 				if (i != j ) {
-					//alert(i +" "+j +":"+this.matrix[i][j] );
 					// 决定是否添加边
 					if (getRandomNumber(0,1) ) {
-						//alert(i+ " " +j +" "+ rand);
 						this.addEdge( [i , j, getRandomNumber(1,100), false] );
 					}
 				}
@@ -431,27 +332,27 @@ Graph.prototype.addEdge = function() {
 	var withAnimation = arguments[0][3];	// bool
 	// 传入参数的合法性判断
 	if (startVertex <0 || startVertex >= this.vertexNum) {
-		alert("start Vertex illeagl");
+		show_message('起始节点输入错误',error);
 		return this.commands;
 	}
 	if (endVertex <0 || endVertex >= this.vertexNum) {
-		alert("end Vertex illeagl");
+		show_message('终止节点输入错误',error);
 		return this.commands;
 	}
 	if(weight <=0 ) {
-		alert("weight illeagl");
+		show_message('权重应该大于0',error);
 		return this.commands;
 	}
 	// 判断这条边是否已经存在
 	if (this.directed) {
 		if (this.matrix[startVertex][endVertex] ) {
-			alert("this edge already exists");
+			show_message('该边已经存在',error);
 			return this.commands;
 		}
 	}
 	else {
 		if (this.matrix[startVertex][endVertex] || this.matrix[endVertex][startVertex]) {
-			alert("this edge already exists");
+			show_message('该边已经存在',error);
 			return this.commands;
 		}
 	}
@@ -503,15 +404,15 @@ Graph.prototype.addEdge = function() {
 // 删除边
 Graph.prototype.delEdge = function() {
 	// 传入参数，要删除的边
-	startVertex = arguments[0][0];
-	endVertex = arguments[0][1];
+	var startVertex = arguments[0][0];
+	var endVertex = arguments[0][1];
 	// 传入参数的合法性判断
 	if (startVertex <0 || startVertex >= this.vertexNum) {
-		alert("start Vertex illeagl.");
+		show_message('起始节点输入错误',error);
 		return this.commands;
 	}
 	if (endVertex <0 || endVertex >= this.vertexNum) {
-		alert("end Vertex illeagl.");
+		show_message('终止节点输入错误',error);
 		return this.commands;
 	}
 	// 如果是无向图，需要调整起点和终点
@@ -521,7 +422,7 @@ Graph.prototype.delEdge = function() {
 		endVertex = tmp;
 	}
 	if ( !this.matrix[startVertex][endVertex] ) {
-		alert("this edge do not exists.");
+		show_message('该边不存在',error);
 		return this.commands;
 	}
 	
@@ -575,10 +476,9 @@ Graph.prototype.nextEdge = function (edge) {
 
 // Floyd 算法
 Graph.prototype.Floyd = function() {
-	// alert("Floyd");
+	this.cmd("CreateLabel", 99999 , '纵轴为起始点,横轴为终点,各个顶点最短路径如下:',this.hintStartX+60,this.hintStartY-20);
 	this.INF = 10000;
 	this.clearHintArea();
-	// new this.dist
 	this.dist = new Array(this.vertexNum);
 	for (var i=0; i<this.vertexNum; i++) {
 		this.dist[i] = new Array(this.vertexNum);
@@ -635,26 +535,18 @@ Graph.prototype.Floyd = function() {
 	var highlightCircle1 = new Node(this.objectID++, '', this.position[0][0], this.position[0][1]);
 	var highlightCircle2 = new Node(this.objectID++, '', this.position[0][0], this.position[0][1]);
 	var highlightCircle3 = new Node(this.objectID++, '', this.position[0][0], this.position[0][1]);
-	// this.cmd('CreateCircle', highlightCircle1.objectID, highlightCircle1.value, highlightCircle1.x, highlightCircle1.y, this.radius);
-	// this.cmd('SetForegroundColor', highlightCircle1.objectID, this.foregroundColor);
-	// this.cmd('SetBackgroundColor', highlightCircle1.objectID, this.backgroundColor);
-
-	// calculate shortest this.dist
 	for (var k=0; k<this.vertexNum; k++) {
 		for (var i=0; i<this.vertexNum; i++) {
 			for (var j=0; j<this.vertexNum; j++) {
 				if (i == j || j == k|| i == k) {
 					continue;
 				}
-				// highlight node in graph
-				// this.cmd('SetHighlight', i, true);
-				// this.cmd('SetHighlight', j, true);
 				this.cmd('SetBackgroundColor', i, this.backgroundColor);
 				this.cmd('SetBackgroundColor', j, this.backgroundColor);
 				this.cmd('SetBackgroundColor', k, this.backgroundColor);
 
 				if (this.dist[i][k]+this.dist[k][j] < this.dist[i][j]) {
-					this.cmd('SetState', 'dist['+i+']['+k+']+dist['+k+']['+j+'] < dist['+i+']['+j+']');
+					show_notice('dist['+i+']['+k+']+dist['+k+']['+j+'] < dist['+i+']['+j+']','info');
 					this.dist[i][j] = this.dist[i][k] + this.dist[k][j];
 					// change table 
 					this.cmd('SetHighlight', this.table[i][k].objectID, true);
@@ -670,7 +562,7 @@ Graph.prototype.Floyd = function() {
 					this.cmd('SetHighlight', this.table[k][j].objectID, false);
 					this.cmd('Step');
 				} else {
-					this.cmd('SetState', 'dist['+i+']['+k+']+dist['+k+']['+j+'] > dist['+i+']['+j+']');
+					show_notice('dist['+i+']['+k+']+dist['+k+']['+j+'] > dist['+i+']['+j+']','info');
 					this.cmd('SetHighlight', this.table[i][k].objectID, true);
 					this.cmd('SetHighlight', this.table[k][j].objectID, true);
 					this.cmd('Step');
@@ -682,274 +574,10 @@ Graph.prototype.Floyd = function() {
 				this.cmd('SetBackgroundColor', i, '#FFFFFF');
 				this.cmd('SetBackgroundColor', j, '#FFFFFF');
 				this.cmd('SetBackgroundColor', k, '#FFFFFF');
-				// this.cmd('SetHighlight', i, false);
-				// this.cmd('SetHighlight', j, false);
 			}
 		}
 	}
-	this.cmd('SetState', '算法执行完成，最短路径见下表\n纵轴为起始点，横轴为终点');
-	// console.log(this.dist);
-	return this.commands;
-}
-
-// Dijkstra算法
-Graph.prototype.Dijkstra = function (startVertex) {
-	// 把高亮顶点取消
-	for (var i=0; i<this.vertexNum; i++) {
-		this.cmd("SetForegroundColor", i, this.foregroundColor);
-	}
-	// 先假设是有向图
-	this.INF = 10000;
-	// 源点到i的最短距离
-	var dist = new Array(this.vertexNum);
-	// 是否找到到i 的最短路径
-	var found = new Array( this.vertexNum );
-	// 记录路径
-	var path = new Array(this.vertexNum);
-	// 记录完全路径
-	var fullPath = new Array(this.vertexNum);
-	for (var i=0; i< this.vertexNum; i++) {
-		fullPath[i] = new Array();
-	}
-	// 一些初始化
-	for (var i=0; i< this.vertexNum; i++) {
-		if (this.matrix[startVertex][i]) {
-			dist[i] = this.matrix[startVertex][i];
-		}
-		else {
-			dist[i] = this.INF;
-		}
-		found[i] = -1;	// -1表示没有找到
-		path[i] = startVertex;	// 经由startVertex到达
-	}
-	dist[startVertex] = 0;
-	found[startVertex] = 1;
-	this.cmd("SetForegroundColor", startVertex, this.highlightColor);
-	fullPath[startVertex].push(startVertex);
-	//path[startVertex] = startVertex;
-	// hint显示当前内容
-	// vertex
-	this.cmd("CreateRectangle", this.hintVertexID, 'Vertex', this.hintObjectWidth, this.hintObjectHeight, 
-			'left', 'top', this.hintStartX, this.hintStartY - this.hintObjectHeight);
-	this.cmd("SetForegroundColor", this.hintVertexID, this.foregroundColor);
-	this.cmd("SetBackgroundColor", this.hintVertexID, this.backgroundColor);
-	// Known
-	this.cmd("CreateRectangle", this.hintKnownID, 'Known', this.hintObjectWidth, this.hintObjectHeight, 
-			'left', 'top', this.hintStartX+this.hintObjectWidth, this.hintStartY - this.hintObjectHeight);
-	this.cmd("SetForegroundColor", this.hintKnownID, this.foregroundColor);
-	this.cmd("SetBackgroundColor", this.hintKnownID, this.backgroundColor);
-	// Cost
-	this.cmd("CreateRectangle", this.hintCostID, 'Cost', this.hintObjectWidth, this.hintObjectHeight, 
-			'left', 'top', this.hintStartX + 2*this.hintObjectWidth, this.hintStartY - this.hintObjectHeight);
-	this.cmd("SetForegroundColor", this.hintCostID, this.foregroundColor);
-	this.cmd("SetBackgroundColor", this.hintCostID, this.backgroundColor);
-	// Path
-	this.cmd("CreateRectangle", this.hintPathID, 'Path', 2*this.hintObjectWidth, this.hintObjectHeight, 
-			'left', 'top', this.hintStartX + 3*this.hintObjectWidth, this.hintStartY - this.hintObjectHeight);
-	this.cmd("SetForegroundColor", this.hintPathID, this.foregroundColor);
-	this.cmd("SetBackgroundColor", this.hintPathID, this.backgroundColor);
-	// vertex
-	for (var i=0; i< this.vertexNum; i++) {
-		this.cmd("CreateRectangle", this.hintVertexColumnID[i], i, this.hintObjectWidth, this.hintObjectHeight,
-				'left', 'top', this.hintStartX, this.hintStartY + i*this.hintObjectHeight);
-		this.cmd("SetForegroundColor", this.hintVertexColumnID[i], this.foregroundColor);
-		this.cmd("SetBackgroundColor", this.hintVertexColumnID[i], this.backgroundColor);
-	}
-	// known
-	for (var i=0; i< this.vertexNum; i++) {
-		var label = (found[i] == 1) ? 'True' : 'False';
-		this.cmd("CreateRectangle", this.hintKnownColumnID[i], label, this.hintObjectWidth, this.hintObjectHeight,
-				'left', 'top', this.hintStartX + this.hintObjectWidth, this.hintStartY + i*this.hintObjectHeight);
-		this.cmd("SetForegroundColor", this.hintKnownColumnID[i], this.foregroundColor);
-		this.cmd("SetBackgroundColor", this.hintKnownColumnID[i], this.backgroundColor);
-	}
-	// cost
-	for (var i=0; i< this.vertexNum; i++) {
-		var label = (dist[i] == this.INF) ? 'INF' : dist[i];
-		this.cmd("CreateRectangle", this.hintCostColumnID[i], label, this.hintObjectWidth, this.hintObjectHeight,
-				'left', 'top', this.hintStartX + 2*this.hintObjectWidth, this.hintStartY + i*this.hintObjectHeight);
-		this.cmd("SetForegroundColor", this.hintCostColumnID[i], this.foregroundColor);
-		this.cmd("SetBackgroundColor", this.hintCostColumnID[i], this.backgroundColor);
-	}
-	// Path
-	for (var i=0; i< this.vertexNum; i++) {
-		var label = '';
-		this.cmd("CreateRectangle", this.hintPathColumnID[i], label, 2*this.hintObjectWidth, this.hintObjectHeight,
-				'left', 'top', this.hintStartX + 3*this.hintObjectWidth, this.hintStartY + i*this.hintObjectHeight);
-		this.cmd("SetForegroundColor", this.hintPathColumnID[i], this.foregroundColor);
-		this.cmd("SetBackgroundColor", this.hintPathColumnID[i], this.backgroundColor);
-	}
-
-	this.cmd("SetState", "把起始顶点 "+startVertex+" 到自身的代价设为0");
-	this.cmd("SetHighlight", startVertex, true);
-	this.cmd("Step");
-	this.cmd("SetHighlight", startVertex, false);
-	this.cmd("Step");
-	
-	// 向起点添加路径
-	this.cmd("CreateHighlightRectangle", this.highlightRectangleKnownID, 
-			this.hintObjectWidth, this.hintObjectHeight, 'left', 'top',
-			this.hintStartX+this.hintObjectWidth, this.hintStartY+startVertex*this.hintObjectHeight);
-	this.cmd("SetForegroundColor", this.highlightRectangleKnownID, this.foregroundColor);
-	this.cmd("SetBackgroundColor", this.highlightRectangleKnownID, this.backgroundColor);
-	this.cmd("Step");
-	this.cmd("CreateHighlightRectangle", this.highlightRectanglePathID, 
-			2*this.hintObjectWidth, this.hintObjectHeight, 'left', 'top',
-			this.hintStartX+3*this.hintObjectWidth, this.hintStartY+startVertex*(this.hintObjectHeight) );
-	this.cmd("SetForegroundColor", this.highlightRectanglePathID, this.foregroundColor);
-	this.cmd("SetBackgroundColor", this.highlightRectanglePathID, this.backgroundColor);
-	this.cmd("Step");
-	this.cmd("SetLabel", this.hintPathColumnID[startVertex], fullPath[startVertex][0]);
-	this.cmd("Step");
-	this.cmd("Delete", this.highlightRectanglePathID);
-	this.cmd("Delete", this.highlightRectangleKnownID);
-
-	for (var i=1; i< this.vertexNum; i++ ) {
-		var min = this.INF;
-		var vertex = -1;
-		for (var j=0; j< dist.length; j++) {
-			if ( found[j] == -1 && dist[j] < min) {
-				min = dist[j];
-				vertex = j;
-			}
-		}
-		// 找不到有效且最小的边
-		if (vertex == -1) {		// 中指
-			break;
-		}
-		// 找到了合适的边
-		found[vertex] = 1;
-		this.cmd("SetState", "找到到达顶点 "+vertex+" 的最短路径,代价是 "+min);
-		// 由path推算出完全路径
-		fullPath[vertex].push(vertex);
-		for (var i=fullPath[path[vertex]].length-1; i>=0; i--) {
-			fullPath[vertex].unshift(fullPath[path[vertex]][i]);
-		}
-		// 高亮显示最小的cost
-		this.cmd("CreateHighlightRectangle", this.highlightRectangleCostID, 
-				this.hintObjectWidth, this.hintObjectHeight, 'left', 'top', 
-				this.hintStartX + 2*this.hintObjectWidth, this.hintStartY + vertex * this.hintObjectHeight);
-		this.cmd("SetForegroundColor", this.highlightRectangleCostID, this.foregroundColor);
-		this.cmd("SetBackgroundColor", this.highlightRectangleCostID, this.backgroundColor);
-		this.cmd("Step");
-		this.cmd("SetForegroundColor", vertex, this.highlightColor);
-		// 将vertex的Known修改
-		this.cmd("CreateHighlightRectangle", this.highlightRectangleKnownID, 
-				this.hintObjectWidth, this.hintObjectHeight, 'left', 'top',
-				this.hintStartX + this.hintObjectWidth, this.hintStartY + vertex * this.hintObjectHeight);
-		this.cmd("SetForegroundColor", this.highlightRectangleKnownID, this.foregroundColor);
-		this.cmd("SetBackgroundColor", this.highlightRectangleKnownID, this.backgroundColor);
-		this.cmd("SetLabel", this.hintKnownColumnID[vertex], 'True');
-		// this.cmd("SetForegroundColor", this.hintKnownColumnID[vertex], this.highlightColor);
-		this.cmd("Step");
-		// 高亮显示Path，并更新
-		this.cmd("CreateHighlightRectangle", this.highlightRectanglePathID, 
-				2*this.hintObjectWidth, this.hintObjectHeight, 'left', 'top',
-				this.hintStartX + 3*this.hintObjectWidth, this.hintStartY + vertex*this.hintObjectHeight);
-		this.cmd("SetForegroundColor", this.highlightRectanglePathID, this.foregroundColor);
-		this.cmd("SetBackgroundColor", this.highlightRectanglePathID, this.backgroundColor);
-		this.cmd("Step");
-		var labelPath ="";
-		for (var i=0; i<fullPath[vertex].length; i++) {
-			labelPath = labelPath + fullPath[vertex][i] + " ";
-		}
-		this.cmd("SetLabel", this.hintPathColumnID[vertex], labelPath);
-		this.cmd("Step");
-		// 删除掉两个高亮圆
-		// this.cmd("Delete", this.highlightRectangleKnownID);
-		this.cmd("Delete", this.highlightRectangleCostID);
-		this.cmd("Delete", this.highlightRectanglePathID);
-		this.cmd("Step");
-
-		this.cmd("SetHighlight", vertex, true);
-		this.cmd("Step");
-		this.cmd("SetHighlight", vertex, false);
-		this.cmd("Step");
-		for (var edge = this.firstEdge(vertex); edge!=null ; edge = this.nextEdge(edge) ) {
-			
-			this.cmd("SetHighlight", edge.startVertex, true);
-			this.cmd("Step");
-			this.cmd("SetHighlight", edge.startVertex, false);
-			this.cmd("Step");
-			var lineSt = edge.startVertex;
-			var lineEn = edge.endVertex;
-			if (!this.directed && lineSt>lineEn) {
-				var tmp = lineEn;
-				lineEn = lineSt;
-				lineSt = tmp;
-			}
-			this.cmd("SetLineHighlight", lineSt, lineEn, true);
-			this.cmd("Step");
-			this.cmd("SetLineHighlight", lineSt, lineEn, false);
-			this.cmd("Step");
-			if (found[edge.endVertex] == -1 && dist[vertex]+ edge.weight < dist[edge.endVertex]) {
-				this.cmd("SetState", "更新从顶点"+startVertex+" 到 "+edge.endVertex+" 的最短路径为"+
-						startVertex+".->"+vertex+"->"+edge.endVertex);
-				this.cmd("Step");
-				dist[edge.endVertex] = dist[vertex]+ edge.weight;
-				// 高亮显示dist更新
-				// this.cmd("CreateHighlightRectangle", this.highlightRectangleCostID, 
-				// 		this.hintObjectWidth, this.hintObjectHeight, 'left', 'top', 
-				// 		this.hintStartX + 2* this.hintObjectWidth, this.hintStartY + edge.endVertex * this.hintObjectHeight);
-				// this.cmd("SetForegroundColor", this.highlightRectangleCostID, this.foregroundColor);
-				// this.cmd("SetBackgroundColor", this.highlightRectangleCostID, this.backgroundColor);
-				// this.cmd("Step");
-				// this.cmd("SetLabel", this.hintCostColumnID[edge.endVertex], dist[edge.endVertex]);
-				// this.cmd("Step");
-				// this.cmd("Delete", this.highlightRectangleCostID);
-
-				path[edge.endVertex] = vertex;
-			} else {
-				this.cmd("SetState", "顶点"+startVertex+" 到 "+edge.endVertex+" 的路径不用更新");
-				this.cmd("Step");
-			}
-			// 找到一个最短路径的顶点后，更新cost
-			this.cmd("CreateHighlightRectangle", this.highlightRectangleCostID, 
-					this.hintObjectWidth, this.hintObjectHeight, 'left', 'top', 
-					this.hintStartX + 2* this.hintObjectWidth, this.hintStartY + edge.endVertex * this.hintObjectHeight);
-			this.cmd("SetForegroundColor", this.highlightRectangleCostID, this.foregroundColor);
-			this.cmd("SetBackgroundColor", this.highlightRectangleCostID, this.backgroundColor);
-			this.cmd("Step");
-			this.cmd("SetLabel", this.hintCostColumnID[edge.endVertex], dist[edge.endVertex]);
-			this.cmd("Step");
-			this.cmd("Delete", this.highlightRectangleCostID);
-		}
-		// 更新完成，删除known high light circle ID
-		this.cmd("Delete", this.highlightRectangleKnownID);
-		this.cmd("Step");
-	}
-
-	// 处理剩余的找不到路径的顶点，其路径设置为NO PATH
-	for (var i=0; i< this.vertexNum; i++) {
-		if ( found[i] == -1 && dist[i] == this.INF) {
-			// hint区域高亮这个顶点，然后修改路径label
-			this.cmd("SetState", "没有找到从 "+startVertex+" 到 "+i+" 的路径，其路径设置为NO PATH");
-			this.cmd("Step");
-			this.cmd("CreateHighlightRectangle", this.highlightRectangleKnownID,
-					this.hintObjectWidth, this.hintObjectHeight, 'left', 'top',
-					this.hintStartX + this.hintObjectWidth, this.hintStartY + i*(this.hintObjectHeight));
-			this.cmd("SetForegroundColor", this.highlightRectangleKnownID, this.foregroundColor);
-			this.cmd("SetBackgroundColor", this.highlightRectangleKnownID, this.backgroundColor);
-			this.cmd("CreateHighlightRectangle", this.highlightRectangleCostID, 
-					this.hintObjectWidth, this.hintObjectHeight, 'left', 'top',
-					this.hintStartX+2*this.hintObjectWidth, this.hintStartY+i*this.hintObjectHeight);
-			this.cmd("SetForegroundColor", this.highlightRectangleCostID, this.foregroundColor);
-			this.cmd("SetBackgroundColor", this.highlightRectangleCostID, this.backgroundColor);
-			this.cmd("CreateHighlightRectangle", this.highlightRectanglePathID,
-					2*this.hintObjectWidth, this.hintObjectHeight, 'left', 'top',
-					this.hintStartX + 3*this.hintObjectWidth, this.hintObjectHeight+i*this.hintObjectHeight);
-			this.cmd("SetForegroundColor", this.highlightRectanglePathID, this.foregroundColor);
-			this.cmd("SetBackgroundColor", this.highlightRectanglePathID, this.backgroundColor);
-			this.cmd("Step");
-			this.cmd("SetLabel", this.hintPathColumnID[i], 'NO PATH');
-			this.cmd("Setp");
-			this.cmd("Delete", this.highlightRectanglePathID);
-			this.cmd("Delete", this.highlightRectangleCostID);
-			this.cmd("Delete", this.highlightRectangleKnownID);
-			this.cmd("Step");
-		}
-	}
-	this.cmd("SetState", "算法执行完成，结果见下表");
+	show_notice('算法执行完成!','success',0);
 	return this.commands;
 }
 
@@ -958,4 +586,28 @@ var Node = function(objectID, value, x, y) {
 	this.value = value ; // 值
 	this.x = x ; // x坐标
 	this.y = y ; // y坐标
+}
+
+
+export function change_graph_style_js(style) {
+	var flag = false;
+	if(style=='有向图'){
+		flag = true;
+	}else{
+		flag = false;
+	}	
+	currentGraph.directedGraphSwitch(flag);
+}
+export function creat_graph_js(node_count) {
+	currentGraph.vertexNumSelectChangeCallBack(node_count);
+    currentGraph.randomGraphCallBack();
+}
+export function insert_edge_js(start_node,end_node,weight) {
+	currentGraph.addEdgeCallBack(start_node, end_node,weight);
+}
+export function delete_edge_js(start_node,end_node) {
+	currentGraph.delEdgeCallBack(start_node,end_node);
+}
+export function start_traverse_js() {
+	currentGraph.runFloydCallBack();
 }
