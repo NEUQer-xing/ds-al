@@ -1,0 +1,86 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>DS&AL</title>
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'img/D&A-icon.png'%}" type="image/png">
+    <link rel="stylesheet" href="{% static 'css/all.min.css'%}">
+    <!-- Quick CSS -->
+    <link rel="stylesheet" href="{% static 'css/quick-website.css'%}">
+</head>
+
+<body>
+    <!-- Main content -->
+    <section>
+        <div class="container d-flex flex-column">
+            <div class="row align-items-center justify-content-center min-vh-100">
+                <div class="col-md-6 col-lg-5 col-xl-5 py-6 py-md-0">
+                    <div class="card shadow zindex-100 mb-0">
+                        <div class="card-body px-md-5 py-5">
+                            <div class="mb-5">
+                                <h6 class="h3">登录&注册</h6>
+                                <p class="text-muted mb-0">登录账号，即可体验笔记功能</p>
+                            </div>
+                            <span class="clearfix"></span>
+                            <form method="post" action="/login/">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label class="form-control-label">邮箱地址</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i data-feather="user"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control" id="input-email" name = "user" placeholder="name@example.com">
+                                    </div>
+                                </div>
+                                <div class="form-group mb-0">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <label class="form-control-label">密码</label>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i data-feather="key"></i></span>
+                                        </div>
+                                        <input type="password" class="form-control" id="input-password" name="password" placeholder="Password">
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <input type="submit" class="btn btn-block btn-warning" value="注册" />
+                                </div>
+                                <div class="mt-4">
+                                    <input type="submit" class="btn btn-block btn-success" value="登录" />
+                                </div>
+                                <div class="card-footer px-md-5">
+                                    <strong style="color: red">{{ error_msg }}</strong>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Core JS  -->
+    <script src="{% static 'js/jquery/jquery.min.js'%}"></script>
+
+    <script src="{% static 'js/bootstrap/bootstrap.bundle.min.js'%}"></script>
+    <script src="{% static 'js/svg-injector/svg-injector.min.js'%}"></script>
+    <script src="{% static 'js/feather-icons/feather.min.js'%}"></script>
+    <!-- Quick JS -->
+    <script src="{% static 'js/quick-website.js'%}"></script>
+    <!-- Feather Icons -->
+    <script>
+        feather.replace({
+            'width': '1em',
+            'height': '1em'
+        })
+    </script>
+</body>
+
+</html>
