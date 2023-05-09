@@ -10,6 +10,7 @@
   "dependencies": {
     "@icon-park/vue-next": "^1.4.2",
     "@kangc/v-md-editor": "^2.3.15",
+    "axios": "^1.4.0",
     "babel-plugin-prismjs": "^2.1.0",
     "bootstrap-icons": "^1.10.4",
     "pinia": "^2.0.32",

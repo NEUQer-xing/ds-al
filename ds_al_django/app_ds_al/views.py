@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render, HttpResponse
 
 
@@ -5,6 +6,7 @@ from django.shortcuts import render, HttpResponse
 
 def home(request):
     return render(request, "test.html")
+
 
 def login(request):
     if request.method == "GET":
@@ -16,3 +18,8 @@ def login(request):
             return HttpResponse("登录成功")
         else:
             return render(request, "login.html", {"error_msg": "用户名或密码错误"})
+
+
+def test(request):
+    data = {"title": "test", "content": "test content"}
+    return JsonResponse(data)
