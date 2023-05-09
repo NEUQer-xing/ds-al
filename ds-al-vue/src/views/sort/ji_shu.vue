@@ -13,11 +13,11 @@
         <jishu_sort_menu @show_style_emit="show_style" @creat_random_array_emit="creat_random_array"
         @creat_custom_array_emit="creat_custom_array" @start_sort_emit="start_sort">
         </jishu_sort_menu>
-        <note @call_note_emit="show_note"></note>
         <chatgpt @call_gpt_emit="show_gpt"></chatgpt>
+        <note @call_note_emit="show_note"></note>
         </Col>
     </Row>
-    <Drawer title="AI助理" placement="left" :closable="false" v-model="gpt" width="30">
+    <Drawer title="AI助理" placement="right" :closable="false" v-model="gpt" width="30">
         <chatgpt_main></chatgpt_main>
     </Drawer>
     <Drawer title="学习笔记" placement="bottom" :closable="false" v-model="notes" height="70">

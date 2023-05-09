@@ -62,7 +62,7 @@
                     <div style="float: right;">
                         <MenuItem>
                             <Button type="primary">
-                                <a href="/welcome.html">
+                                <a href="/.html">
                                     <span style="font-size: 16px; font-weight: bold; color: #ffff;">登录</span>
                                 </a>
                             </Button>

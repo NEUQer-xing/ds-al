@@ -15,11 +15,11 @@
             @creat_moshi_string_emit="creat_moshi_string" 
             @start_search_emit="start_search" >
         </string_match_menu>
-        <note @call_note_emit="show_note"></note>
         <chatgpt @call_gpt_emit="show_gpt"></chatgpt>
+        <note @call_note_emit="show_note"></note>
         </Col>
     </Row>
-    <Drawer title="AI助理" placement="left" :closable="false" v-model="gpt" width="30">
+    <Drawer title="AI助理" placement="right" :closable="false" v-model="gpt" width="30">
         <chatgpt_main></chatgpt_main>
     </Drawer>
     <Drawer title="学习笔记" placement="bottom" :closable="false" v-model="notes" height="70">

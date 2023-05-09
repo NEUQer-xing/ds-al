@@ -12,11 +12,11 @@
     <introduce>霍夫曼树</introduce>
     <control @control_speed="speed_func" @control_scale="scale_func" @control_scale_reset="scale_reset"></control>
     <huo_fu_man_menu @node_insert_emit="node_insert" @node_init_emit="node_init"></huo_fu_man_menu>
-    <note @call_note_emit="show_note"></note>
     <chatgpt @call_gpt_emit="show_gpt"></chatgpt>
+    <note @call_note_emit="show_note"></note>
     </Col>
   </Row>
-  <Drawer title="AI助理" placement="left" :closable="false" v-model="gpt" width="30">
+  <Drawer title="AI助理" placement="right" :closable="false" v-model="gpt" width="30">
     <chatgpt_main></chatgpt_main>
   </Drawer>
   <Drawer title="学习笔记" placement="bottom" :closable="false" v-model="notes" height="70">

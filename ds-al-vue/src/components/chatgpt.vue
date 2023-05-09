@@ -9,7 +9,7 @@
     </Card>
 </template>
 
-<script setup lang="ts">
+<script setup>
     const emit = defineEmits(['call_gpt_emit']);
     function call_gpt(){
         emit('call_gpt_emit');
