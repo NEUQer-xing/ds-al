@@ -59,7 +59,7 @@
                         基于
                         <a href="https://vuejs.org/">Vue3</a>
                         和
-                        <a href="https://docs.djangoproject.com/zh-hans/4.2/">Django</a>
+                        <a href="https://www.iviewui.com/">ViewDesign</a>
                         的数据结构和算法可视化学习平台
                     </p>
                     <!-- Buttons -->
