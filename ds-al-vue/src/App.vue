@@ -59,7 +59,7 @@
                             <img src="./assets/img/D&A.png" style="width: 110px; height: 55px;"/>
                         </a>
                     </div>
-                    <div style="float: right;">
+                    <!-- <div style="float: right;">
                         <MenuItem>
                             <Button type="primary">
                                 <a href="/.html">
@@ -73,7 +73,7 @@
                                 </a>
                             </Button>
                         </MenuItem>
-                    </div>
+                    </div> -->
                     <div id="title">
                         <span style="font-size: 30px; font-weight: bold; color: #f75200;">数据结构</span>
                         <span style="font-size: 30px; font-weight: bold; color: #76b8fa;">与</span>
