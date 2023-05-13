@@ -47,7 +47,7 @@
         font-weight: bold;
         float: right;
         color: #76b8fa;
-      }
+    }
 </style>
 <template>
     <div class="layout">
@@ -84,7 +84,7 @@
             </Header>
             <Layout>
                 <Sider breakpoint="md" collapsible :collapsed-width="110" v-model="isCollapsed" :style="{background: '#fff'}">
-                    <Menu theme="light" width="auto" :class="menuitemClasses">
+                    <Menu theme="light" width="auto" :class="menuitemClasses" accordion @on-select="show_spin">
                         <Submenu name="1" >
                             <template #title>
                                 <Icon type="md-code" />
@@ -167,12 +167,19 @@
 
 <script>
 import { Submenu } from 'view-ui-plus';
-
-    export default {
+export default {
     data() {
         return {
             isCollapsed: false
         };
+    },
+    methods:{
+        show_spin(){
+            this.$Spin.show();
+            setTimeout(() => {
+                this.$Spin.hide();
+            }, 1500);
+        },
     },
     computed: {
         menuitemClasses: function () {
@@ -182,7 +189,8 @@ import { Submenu } from 'view-ui-plus';
             ];
         }
     },
-    components: { Submenu }
+    components: { Submenu },
+
 }
 </script>
     
