@@ -28,8 +28,6 @@ function AnimationManager(objectManager) {
 		var foundBreak = false ;
 		while(this.currentAnimation < this.animationSteps.length && !foundBreak) {
 			var nextCommand = this.animationSteps[this.currentAnimation].split("<cry>");
-			//alert(nextCommand) ;
-			console.log('下一个步骤为:'+nextCommand) ;
 			// 画圆形
 			if(nextCommand[0].toUpperCase() == "CREATECIRCLE") {
 				this.objectManager.addCircleObject(parseInt(nextCommand[1]), 
